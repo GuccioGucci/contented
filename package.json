@@ -1,0 +1,19 @@
+{
+  "name": "@gucciogucci/contented",
+  "version": "0.0.0",
+  "author": "Gucci <npm@gucci.com>",
+  "license": "LGPL-3.0-only",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GuccioGucci/contented.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/GuccioGucci/contented/issues"
+  },
+  "homepage": "https://github.com/GuccioGucci/contented#readme"
+}
