@@ -1,18 +1,18 @@
-import { test } from 'uvu';
-import * as assert from 'uvu/assert';
+import { test } from 'uvu'
+import * as assert from 'uvu/assert'
 
-import { jsonParse, jsonStringify } from '.';
+import { jsonParse, jsonStringify } from '.'
 
-test('JSON', () => {
+test('JSON', function () {
   const input = {
     foo: 'hello',
-    bar: 'world'
-  };
+    bar: 'world',
+  }
 
-  const output = jsonStringify(input);
+  const output = jsonStringify(input)
 
-  assert.equal(output, `{"foo":"hello","bar":"world"}`);
-  assert.equal(jsonParse(output), input);
-});
+  assert.equal(output, `{"foo":"hello","bar":"world"}`)
+  assert.equal(jsonParse(output), input)
+})
 
-test.run();
+test.run()
