@@ -1,11 +1,11 @@
 interface As<T> {
-  from(value: any): T | AsError
+  from(value: any): T | InvalidCoercion
 }
 
 class AsString implements As<string> {
   from(value: any) {
     if (typeof value !== 'string') {
-      return new AsError('string', value)
+      return new InvalidCoercion('string', value)
     }
     return value
   }
@@ -14,7 +14,7 @@ class AsString implements As<string> {
 class AsBoolean implements As<boolean> {
   from(value: any) {
     if (typeof value !== 'boolean') {
-      return new AsError('boolean', value)
+      return new InvalidCoercion('boolean', value)
     }
     return value
   }
@@ -23,7 +23,7 @@ class AsBoolean implements As<boolean> {
 class AsNumber implements As<number> {
   from(value: any) {
     if (typeof value !== 'number') {
-      return new AsError('number', value)
+      return new InvalidCoercion('number', value)
     }
     return value
   }
@@ -33,7 +33,7 @@ export const string: As<string> = new AsString()
 export const boolean: As<boolean> = new AsBoolean()
 export const number: As<number> = new AsNumber()
 
-export class AsError {
+export class InvalidCoercion {
   constructor(public readonly expected: Expected, public readonly got: any) {}
 }
 

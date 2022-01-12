@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { boolean, AsError, number, string } from './As'
+import { boolean, InvalidCoercion, number, string } from './As'
 
 test('string accepts string values', function () {
   assert(property(fc.string(), (value) => equal(string.from(value), value)))
@@ -18,7 +18,7 @@ test('string rejects all but string values', function () {
 
   assert(
     property(notAString, (value) =>
-      equal(string.from(value), new AsError('string', value))
+      equal(string.from(value), new InvalidCoercion('string', value))
     )
   )
 })
@@ -37,7 +37,7 @@ test('boolean rejects all but boolean values', function () {
   )
   assert(
     property(notABoolean, (value) =>
-      equal(boolean.from(value), new AsError('boolean', value))
+      equal(boolean.from(value), new InvalidCoercion('boolean', value))
     )
   )
 })
@@ -57,7 +57,7 @@ test('number rejects all but number values', function () {
 
   assert(
     property(notANumber, (value) =>
-      equal(number.from(value), new AsError('number', value))
+      equal(number.from(value), new InvalidCoercion('number', value))
     )
   )
 })
