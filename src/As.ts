@@ -1,15 +1,15 @@
 abstract class As<T> {
   static as<T>(asT: As<T>, value: any) {
-    return asT.from(value)
+    return asT.coerce(value)
   }
 
-  protected abstract from(value: any): T | InvalidCoercion
+  protected abstract coerce(value: any): T | InvalidCoercion
 }
 
 export const as = As.as
 
 class AsString extends As<string> {
-  protected from(value: any) {
+  protected coerce(value: any) {
     if (typeof value !== 'string') {
       return new InvalidCoercion('string', value)
     }
@@ -18,7 +18,7 @@ class AsString extends As<string> {
 }
 
 class AsBoolean extends As<boolean> {
-  protected from(value: any) {
+  protected coerce(value: any) {
     if (typeof value !== 'boolean') {
       return new InvalidCoercion('boolean', value)
     }
@@ -27,7 +27,7 @@ class AsBoolean extends As<boolean> {
 }
 
 class AsNumber extends As<number> {
-  protected from(value: any) {
+  protected coerce(value: any) {
     if (typeof value !== 'number') {
       return new InvalidCoercion('number', value)
     }
