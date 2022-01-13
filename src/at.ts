@@ -1,4 +1,3 @@
-import { test } from 'uvu'
 import { As, as } from './As'
 
 export function at<T, E>(path: Path, asT: As<T, E>): As<T, E | MissingKey> {
