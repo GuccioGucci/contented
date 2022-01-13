@@ -9,8 +9,9 @@
     "/dist"
   ],
   "scripts": {
+    "pretest": "npm run ts:check",
     "test": "uvu -r tsm src .test.ts",
-    "build": "tsc",
+    "build": "tsc --build tsconfig.build.json",
     "ts:check": "tsc --noEmit",
     "prepare": "husky install",
     "dep:upgrade:major": "npx npm-check-updates -u",
