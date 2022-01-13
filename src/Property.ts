@@ -1,24 +1,20 @@
 import { as, As, InvalidCoercion } from './As'
 
-interface Property<T> {
-  across(
-    root: Record<Key, unknown> | unknown[]
-  ): T | MissingKey | InvalidCoercion
-  orElse(fallback: T): Property<T>
+interface Property<T, E> {
+  across(root: Record<Key, unknown> | unknown[]): T | E | MissingKey
+  orElse(fallback: T): Property<T, E>
 }
 
-class MandatoryProperty<T> implements Property<T> {
+class MandatoryProperty<T, E> implements Property<T, E> {
   private readonly path: Path
-  private readonly as: As<T>
+  private readonly as: As<T, E>
 
-  constructor(path: Path, as: As<T>) {
+  constructor(path: Path, as: As<T, E>) {
     this.path = path
     this.as = as
   }
 
-  across(
-    root: Record<Key, unknown> | unknown[]
-  ): T | MissingKey | InvalidCoercion {
+  across(root: Record<Key, unknown> | unknown[]) {
     let curr: any = root
     for (const [key, pos] of enumerate(this.path)) {
       if (curr[key] === undefined) {
@@ -29,20 +25,20 @@ class MandatoryProperty<T> implements Property<T> {
     return as(this.as, curr)
   }
 
-  orElse(fallback: T): Property<T> {
+  orElse(fallback: T): Property<T, E> {
     return new PropertyWithFallback(this.path, this.as, fallback)
   }
 }
 
-class PropertyWithFallback<T> extends MandatoryProperty<T> {
+class PropertyWithFallback<T, E> extends MandatoryProperty<T, E> {
   private readonly fallback: T
 
-  constructor(at: Path, as: As<T>, fallback: T) {
+  constructor(at: Path, as: As<T, E>, fallback: T) {
     super(at, as)
     this.fallback = fallback
   }
 
-  across(root: Record<Key, unknown> | unknown[]) {
+  across(root: Record<Key, unknown> | unknown[]): T | E {
     const res = super.across(root)
     if (res instanceof MissingKey) {
       return this.fallback
@@ -51,7 +47,7 @@ class PropertyWithFallback<T> extends MandatoryProperty<T> {
   }
 }
 
-export function at<T>(path: Path, as: As<T>): Property<T> {
+export function at<T, E>(path: Path, as: As<T, E>): Property<T, E> {
   return new MandatoryProperty(path, as)
 }
 
