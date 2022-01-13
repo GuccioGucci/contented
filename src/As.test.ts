@@ -1,10 +1,10 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { boolean, InvalidCoercion, number, string } from './As'
+import { as, boolean, InvalidCoercion, number, string } from './As'
 
 test('string accepts string values', function () {
-  assert(property(fc.string(), (value) => equal(string.from(value), value)))
+  assert(property(fc.string(), (value) => equal(as(string, value), value)))
 })
 
 test('string rejects all but string values', function () {
@@ -18,13 +18,13 @@ test('string rejects all but string values', function () {
 
   assert(
     property(notAString, (value) =>
-      equal(string.from(value), new InvalidCoercion('string', value))
+      equal(as(string, value), new InvalidCoercion('string', value))
     )
   )
 })
 
 test('boolean accepts boolean values', function () {
-  assert(property(fc.boolean(), (value) => equal(boolean.from(value), value)))
+  assert(property(fc.boolean(), (value) => equal(as(boolean, value), value)))
 })
 
 test('boolean rejects all but boolean values', function () {
@@ -37,13 +37,13 @@ test('boolean rejects all but boolean values', function () {
   )
   assert(
     property(notABoolean, (value) =>
-      equal(boolean.from(value), new InvalidCoercion('boolean', value))
+      equal(as(boolean, value), new InvalidCoercion('boolean', value))
     )
   )
 })
 
 test('number accepts number values', function () {
-  assert(property(fcNumber, (value) => equal(number.from(value), value)))
+  assert(property(fcNumber, (value) => equal(as(number, value), value)))
 })
 
 test('number rejects all but number values', function () {
@@ -57,7 +57,7 @@ test('number rejects all but number values', function () {
 
   assert(
     property(notANumber, (value) =>
-      equal(number.from(value), new InvalidCoercion('number', value))
+      equal(as(number, value), new InvalidCoercion('number', value))
     )
   )
 })

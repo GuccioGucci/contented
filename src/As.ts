@@ -1,9 +1,15 @@
-interface As<T> {
-  from(value: any): T | InvalidCoercion
+abstract class As<T> {
+  static as<T>(asT: As<T>, value: any) {
+    return asT.from(value)
+  }
+
+  protected abstract from(value: any): T | InvalidCoercion
 }
 
-class AsString implements As<string> {
-  from(value: any) {
+export const as = As.as
+
+class AsString extends As<string> {
+  protected from(value: any) {
     if (typeof value !== 'string') {
       return new InvalidCoercion('string', value)
     }
@@ -11,8 +17,8 @@ class AsString implements As<string> {
   }
 }
 
-class AsBoolean implements As<boolean> {
-  from(value: any) {
+class AsBoolean extends As<boolean> {
+  protected from(value: any) {
     if (typeof value !== 'boolean') {
       return new InvalidCoercion('boolean', value)
     }
@@ -20,8 +26,8 @@ class AsBoolean implements As<boolean> {
   }
 }
 
-class AsNumber implements As<number> {
-  from(value: any) {
+class AsNumber extends As<number> {
+  protected from(value: any) {
     if (typeof value !== 'number') {
       return new InvalidCoercion('number', value)
     }
