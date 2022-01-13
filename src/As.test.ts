@@ -1,7 +1,8 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { as, boolean, InvalidCoercion, number, string } from './As'
+import { as, at, boolean, InvalidCoercion, number, string } from './As'
+import { MissingKey } from './Property'
 
 test('string accepts string values', function () {
   assert(property(fc.string(), (value) => equal(as(string, value), value)))
@@ -60,6 +61,22 @@ test('number rejects all but number values', function () {
       equal(as(number, value), new InvalidCoercion('number', value))
     )
   )
+})
+
+test('at', function () {
+  const toC = at(['a', 'b', 'c'], string)
+
+  const c1 = as(toC, { a: { b: { c: 'foo' } } })
+  const c2 = as(toC, { a: 2 })
+  const c3 = as(toC, { a: { b: 2 } })
+  const c4 = as(toC, { a: { b: { c: 12 } } })
+  const c5 = as(toC, undefined)
+
+  equal(c1, 'foo')
+  equal(c2, new MissingKey(['a', 'b']))
+  equal(c3, new MissingKey(['a', 'b', 'c']))
+  equal(c4, new InvalidCoercion('string', 12))
+  equal(c5, new MissingKey(['a']))
 })
 
 test.run()
