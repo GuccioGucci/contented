@@ -6,6 +6,7 @@ abstract class As<T> {
   protected abstract coerce(value: any): T | InvalidCoercion
 }
 
+export type { As }
 export const as = As.as
 
 class AsString extends As<string> {
