@@ -1,3 +1,5 @@
+import { MissingKey } from './Property'
+
 abstract class As<T> {
   static as<T>(asT: As<T>, value: any) {
     return asT.coerce(value)

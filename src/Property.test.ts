@@ -1,10 +1,10 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { number, string } from './As'
-import { Property, MissingKey } from './Property'
+import { at, MissingKey } from './Property'
 
 test(`a path leads to the value of an object's property`, function () {
-  const pathToC = new Property(['a', 'b', 'c'], number)
+  const pathToC = at(['a', 'b', 'c'], number)
 
   const c = pathToC.across({ a: { b: { c: 12 } } })
 
@@ -12,8 +12,8 @@ test(`a path leads to the value of an object's property`, function () {
 })
 
 test(`a path supports navigating an array when numeric keys are used`, function () {
-  const pathToLast = new Property([2], string)
-  const pathToB = new Property(['a', 1, 'b'], number)
+  const pathToLast = at([2], string)
+  const pathToB = at(['a', 1, 'b'], number)
 
   const last = pathToLast.across(['b', 'c', 'd'])
   const b = pathToB.across({ a: [{ b: 1 }, { b: 2 }] })
@@ -23,7 +23,7 @@ test(`a path supports navigating an array when numeric keys are used`, function 
 })
 
 test(`a path to a non-existing property reports when the path got interrupted`, function () {
-  const pathToC = new Property(['a', 'b', 'c'], number)
+  const pathToC = at(['a', 'b', 'c'], number)
 
   const c1 = pathToC.across({ a: 2 })
   const c2 = pathToC.across({ a: { b: 3 } })
@@ -37,7 +37,7 @@ test(`a path to a non-existing property reports when the path got interrupted`, 
 })
 
 test(`when indicated, a path returns a fallback value in case of an interrupted path`, function () {
-  const pathToC = new Property(['a', 'b', 'c'], number, { fallback: 42 })
+  const pathToC = at(['a', 'b', 'c'], number).orElse(42)
 
   const c1 = pathToC.across({ a: 2 })
   const c2 = pathToC.across({ a: { b: 3 } })
