@@ -1,7 +1,7 @@
-import { As, as } from './As'
+import { To, coerce } from './To'
 
-export function at<T, E>(path: Path, asT: As<T, E>): As<T, E | MissingKey> {
-  return new (class extends As<T, E | MissingKey> {
+export function at<T, E>(path: Path, to: To<T, E>): To<T, E | MissingKey> {
+  return new (class extends To<T, E | MissingKey> {
     protected coerce(value: any): T | E | MissingKey {
       let curr: any = value
       for (const [key, pos] of enumerate(path)) {
@@ -10,7 +10,7 @@ export function at<T, E>(path: Path, asT: As<T, E>): As<T, E | MissingKey> {
         }
         curr = curr[key]
       }
-      return as(asT, curr)
+      return coerce(curr, to)
     }
   })()
 }

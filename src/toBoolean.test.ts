@@ -1,14 +1,16 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { as, InvalidCoercion } from './As'
-import { boolean } from './boolean'
+import { coerce, InvalidCoercion } from './To'
+import { toBoolean } from './toBoolean'
 
-test('boolean accepts boolean values', function () {
-  assert(property(fc.boolean(), (value) => equal(as(boolean, value), value)))
+test('toBoolean accepts boolean values', function () {
+  assert(
+    property(fc.boolean(), (value) => equal(coerce(value, toBoolean), value))
+  )
 })
 
-test('boolean rejects all but boolean values', function () {
+test('toBoolean rejects all but boolean values', function () {
   const notABoolean = fc.oneof(
     fcNumber,
     fc.string(),
@@ -18,7 +20,7 @@ test('boolean rejects all but boolean values', function () {
   )
   assert(
     property(notABoolean, (value) =>
-      equal(as(boolean, value), new InvalidCoercion('boolean', value))
+      equal(coerce(value, toBoolean), new InvalidCoercion('boolean', value))
     )
   )
 })

@@ -1,13 +1,13 @@
-import { As, as } from './As'
+import { To, coerce } from './To'
 import { MissingKey } from './at'
 
 export function fallback<T, E>(
-  asT: As<T, Has<E, MissingKey, 'Must include MissingKey'>>,
+  to: To<T, Has<E, MissingKey, 'Must include MissingKey'>>,
   fallback: T
-): As<T, Exclude<E, MissingKey>> {
-  return new (class extends As<T, Exclude<E, MissingKey>> {
+): To<T, Exclude<E, MissingKey>> {
+  return new (class extends To<T, Exclude<E, MissingKey>> {
     protected coerce(value: any): T | Exclude<E, MissingKey> {
-      const res = as(asT, value)
+      const res = coerce(value, to)
       if (res instanceof MissingKey) {
         return fallback
       }

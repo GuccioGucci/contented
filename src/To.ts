@@ -1,12 +1,12 @@
-export abstract class As<T, E> {
-  static as<T, E>(asT: As<T, E>, value: any) {
-    return asT.coerce(value)
+export abstract class To<T, E> {
+  static coerce<T, E>(value: any, to: To<T, E>) {
+    return to.coerce(value)
   }
 
   protected abstract coerce(value: any): T | E
 }
 
-export const as = As.as
+export const coerce = To.coerce
 
 export class InvalidCoercion {
   constructor(public readonly expected: Expected, public readonly got: any) {}
