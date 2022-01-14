@@ -1,7 +1,8 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerce, InvalidCoercion } from './To'
+import { coerce } from './To'
 import { at, MissingKey } from './at'
+import { InvalidCoercion } from './InvalidCoercion'
 import { toNumber } from './toNumber'
 import { toString } from './toString'
 

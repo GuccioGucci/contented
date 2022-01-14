@@ -1,4 +1,5 @@
-import { To, InvalidCoercion } from './To'
+import { To } from './To'
+import { InvalidCoercion } from './InvalidCoercion'
 
 class ToString extends To<string, InvalidCoercion> {
   protected coerce(value: any) {

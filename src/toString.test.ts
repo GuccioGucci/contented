@@ -1,7 +1,8 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerce, InvalidCoercion } from './To'
+import { coerce } from './To'
+import { InvalidCoercion } from './InvalidCoercion'
 import { toString } from './toString'
 
 test('toString accepts string values', function () {
