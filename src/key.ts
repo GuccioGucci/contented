@@ -1,4 +1,5 @@
 import { ContentedError } from './ContentedError'
+import { enumerate } from './enumerate'
 import { To, coerce } from './To'
 
 export function at<T, E extends ContentedError>(
@@ -73,12 +74,6 @@ export class AtKey<E extends ContentedError> extends ContentedError {
 
 type Key = string | symbol | number
 type Path = Key[]
-
-function* enumerate<T>(xs: T[]) {
-  for (let i = 0; i < xs.length; i++) {
-    yield [xs[i], i] as const
-  }
-}
 
 type InnerMostError<E extends ContentedError> = E extends AtKey<infer U>
   ? InnerMostError<U>

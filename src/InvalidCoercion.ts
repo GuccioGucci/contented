@@ -6,4 +6,4 @@ export class InvalidCoercion extends ContentedError {
   }
 }
 
-type Expected = 'string' | 'number' | 'boolean'
+type Expected = 'string' | 'number' | 'boolean' | 'array'
