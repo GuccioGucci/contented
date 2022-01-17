@@ -1,8 +1,12 @@
+import { ContentedError } from './ContentedError'
 import { To, coerce } from './To'
 
-export function at<T, E>(path: Path, to: To<T, E>): To<T, E | MissingKey> {
-  return new (class extends To<T, E | MissingKey> {
-    protected coerce(value: any): T | E | MissingKey {
+export function at<T, E extends ContentedError>(
+  path: Path,
+  to: To<T, E>
+): To<T, AtKey<E> | MissingKey> {
+  return new (class extends To<T, AtKey<E> | MissingKey> {
+    protected coerce(value: any): T | AtKey<E> | MissingKey {
       let curr: any = value
       for (const [key, pos] of enumerate(path)) {
         if (curr?.[key] === undefined) {
@@ -10,12 +14,16 @@ export function at<T, E>(path: Path, to: To<T, E>): To<T, E | MissingKey> {
         }
         curr = curr[key]
       }
-      return coerce(to, curr)
+      const res = coerce(to, curr)
+      if (res instanceof ContentedError) {
+        return new AtKey(path, res)
+      }
+      return res
     }
   })()
 }
 
-export function fallback<T, E>(
+export function fallback<T, E extends ContentedError>(
   to: To<T, Has<E, MissingKey, 'Must include MissingKey'>>,
   fallback: T
 ): To<T, Exclude<E, MissingKey>> {
@@ -34,8 +42,16 @@ type Has<U extends any, U1 extends any, Msg extends string> = [U1] extends [U]
   ? U
   : Msg
 
-export class MissingKey {
-  constructor(public readonly at: Path) {}
+export class MissingKey extends ContentedError {
+  constructor(public readonly at: Path) {
+    super()
+  }
+}
+
+export class AtKey<E> extends ContentedError {
+  constructor(public readonly at: Path, public readonly error: E) {
+    super()
+  }
 }
 
 type Key = string | symbol | number

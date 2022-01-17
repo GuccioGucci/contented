@@ -3,7 +3,8 @@ import assert from 'uvu/assert'
 import { coerce } from './To'
 import { toNumber } from './toNumber'
 import { toString } from './toString'
-import { at, fallback, MissingKey } from './key'
+import { at, AtKey, fallback, MissingKey } from './key'
+import { InvalidCoercion } from './InvalidCoercion'
 
 test(`at leads to the value of an object's property`, function () {
   const cToNumber = at(['a', 'b', 'c'], toNumber)
@@ -36,6 +37,17 @@ test(`pointing to a non-existing property reports when the path got interrupted`
   assert.equal(c2, new MissingKey(['a', 'b', 'c']))
   assert.equal(c3, new MissingKey(['a', 'b', 'c']))
   assert.equal(c4, new MissingKey(['a']))
+})
+
+test(`any error on the value part of a property is accompanied by the property path`, function () {
+  const cToNumber = at(['a', 'b', 'c'], toNumber)
+
+  const c1 = coerce(cToNumber, { a: { b: { c: 'hello' } } })
+
+  assert.equal(
+    c1,
+    new AtKey(['a', 'b', 'c'], new InvalidCoercion('number', 'hello'))
+  )
 })
 
 test(`fallback returns a fallback value in case of an interrupted path towards a key`, function () {

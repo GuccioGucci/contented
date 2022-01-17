@@ -1,5 +1,7 @@
+import { ContentedError } from './ContentedError'
+
 export abstract class To<T, E> {
-  static coerce<T, E>(to: To<T, E>, value: any) {
+  static coerce<T, E extends ContentedError>(to: To<T, E>, value: any) {
     return to.coerce(value)
   }
 
