@@ -50,6 +50,20 @@ test(`any error on the value part of a property is accompanied by the property p
   )
 })
 
+test(`it is the same to specify the path at once or incrementally`, function () {
+  const cToNumber1 = at(['a', 'b', 'c'], toNumber)
+  const cToNumber2 = at(['a'], at(['b'], at(['c'], toNumber)))
+
+  const c1 = coerce(cToNumber1, { a: { b: { c: 'hello' } } })
+  const c2 = coerce(cToNumber2, { a: { b: { c: 'hello' } } })
+
+  const c3 = coerce(cToNumber1, { a: { b: { d: 12 } } })
+  const c4 = coerce(cToNumber2, { a: { b: { d: 12 } } })
+
+  assert.equal(c1, c2)
+  assert.equal(c3, c4)
+})
+
 test(`fallback returns a fallback value in case of an interrupted path towards a key`, function () {
   const cToNumber = fallback(at(['a', 'b', 'c'], toNumber), 42)
 
