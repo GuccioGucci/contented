@@ -1,5 +1,5 @@
 export abstract class To<T, E> {
-  static coerce<T, E>(value: any, to: To<T, E>) {
+  static coerce<T, E>(to: To<T, E>, value: any) {
     return to.coerce(value)
   }
 

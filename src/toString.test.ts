@@ -7,7 +7,7 @@ import { toString } from './toString'
 
 test('toString accepts string values', function () {
   assert(
-    property(fc.string(), (value) => equal(coerce(value, toString), value))
+    property(fc.string(), (value) => equal(coerce(toString, value), value))
   )
 })
 
@@ -22,7 +22,7 @@ test('toString rejects all but string values', function () {
 
   assert(
     property(notAString, (value) =>
-      equal(coerce(value, toString), new InvalidCoercion('string', value))
+      equal(coerce(toString, value), new InvalidCoercion('string', value))
     )
   )
 })

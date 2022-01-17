@@ -10,7 +10,7 @@ export function at<T, E>(path: Path, to: To<T, E>): To<T, E | MissingKey> {
         }
         curr = curr[key]
       }
-      return coerce(curr, to)
+      return coerce(to, curr)
     }
   })()
 }
@@ -21,7 +21,7 @@ export function fallback<T, E>(
 ): To<T, Exclude<E, MissingKey>> {
   return new (class extends To<T, Exclude<E, MissingKey>> {
     protected coerce(value: any): T | Exclude<E, MissingKey> {
-      const res = coerce(value, to)
+      const res = coerce(to, value)
       if (res instanceof MissingKey) {
         return fallback
       }

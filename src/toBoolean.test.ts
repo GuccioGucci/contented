@@ -7,7 +7,7 @@ import { toBoolean } from './toBoolean'
 
 test('toBoolean accepts boolean values', function () {
   assert(
-    property(fc.boolean(), (value) => equal(coerce(value, toBoolean), value))
+    property(fc.boolean(), (value) => equal(coerce(toBoolean, value), value))
   )
 })
 
@@ -21,7 +21,7 @@ test('toBoolean rejects all but boolean values', function () {
   )
   assert(
     property(notABoolean, (value) =>
-      equal(coerce(value, toBoolean), new InvalidCoercion('boolean', value))
+      equal(coerce(toBoolean, value), new InvalidCoercion('boolean', value))
     )
   )
 })

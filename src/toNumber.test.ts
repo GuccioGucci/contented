@@ -6,7 +6,7 @@ import { toNumber } from './toNumber'
 import { InvalidCoercion } from './InvalidCoercion'
 
 test('toNumber accepts number values', function () {
-  assert(property(fcNumber, (value) => equal(coerce(value, toNumber), value)))
+  assert(property(fcNumber, (value) => equal(coerce(toNumber, value), value)))
 })
 
 test('toNumber rejects all but number values', function () {
@@ -20,7 +20,7 @@ test('toNumber rejects all but number values', function () {
 
   assert(
     property(notANumber, (value) =>
-      equal(coerce(value, toNumber), new InvalidCoercion('number', value))
+      equal(coerce(toNumber, value), new InvalidCoercion('number', value))
     )
   )
 })
