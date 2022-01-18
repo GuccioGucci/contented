@@ -3,7 +3,7 @@ import assert from 'uvu/assert'
 import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
-import { at, fallback, arrayOf, MissingKey, AtKey } from './collection'
+import { at, fallback, arrayOf, MissingKey, AtKey, combine } from './collection'
 import { InvalidCoercion } from './InvalidCoercion'
 
 test(`at leads to the value of an object's property`, function () {
@@ -130,6 +130,42 @@ test('array rejects a value upon the first missing element', function () {
   const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
   assert.equal(res, new MissingKey([0, 'a']))
+})
+
+test(`combine accepts a function to mix-and-match other types`, function () {
+  const id = combine(
+    (a, b) => `${a}-${b}`,
+    at(['a'], string),
+    at(['b'], number)
+  )
+
+  const res = coerceTo(id, { a: 'hello', b: 12 })
+
+  assert.is(res, 'hello-12')
+})
+
+test(`combine rejects the combination upon the first missing element`, function () {
+  const id = combine(
+    (a, b) => `${a}-${b}`,
+    at(['a'], string),
+    at(['b'], number)
+  )
+
+  const res = coerceTo(id, { b: 12 })
+
+  assert.equal(res, new MissingKey(['a']))
+})
+
+test(`combine rejects the combination upon the first mismatching element`, function () {
+  const id = combine(
+    (a, b) => `${a}-${b}`,
+    at(['a'], string),
+    at(['b'], number)
+  )
+
+  const res = coerceTo(id, { a: 10, b: 12 })
+
+  assert.equal(res, new AtKey(['a'], new InvalidCoercion('string', 10)))
 })
 
 test.run()

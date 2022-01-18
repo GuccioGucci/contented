@@ -68,6 +68,29 @@ export function arrayOf<T, E extends ContentedError>(
   })()
 }
 
+export function combine<
+  E extends ContentedError,
+  Ts extends Type<unknown, E>[],
+  O
+>(
+  fn: (...args: [...ExpectedTypes<Ts>]) => O,
+  ...types: [...Ts]
+): Type<O, ErrorTypes<Ts>[number]> {
+  return new (class extends Type<O, ErrorTypes<Ts>[number]> {
+    protected coerce(value: any) {
+      const args = []
+      for (const type of types) {
+        const res = coerceTo(type, value)
+        if (res instanceof ContentedError) {
+          return res as ErrorTypes<Ts>[number]
+        }
+        args.push(res)
+      }
+      return fn(...(args as ExpectedTypes<Ts>))
+    }
+  })()
+}
+
 function scope<T, E extends ContentedError>(
   path: Path,
   value: T | E
@@ -119,3 +142,13 @@ type InnerMostError<E extends ContentedError> = E extends AtKey<infer U>
   : Exclude<E, MissingKey>
 
 type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never
+
+type ExpectedType<T> = T extends Type<infer A, any> ? A : never
+type ExpectedTypes<Ts> = Ts extends [infer Head, ...infer Tail]
+  ? [ExpectedType<Head>, ...ExpectedTypes<Tail>]
+  : []
+
+type ErrorType<T> = T extends Type<any, infer E> ? E : never
+type ErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail]
+  ? [ErrorType<Head>, ...ErrorTypes<Tail>]
+  : []
