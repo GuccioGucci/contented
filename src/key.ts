@@ -1,13 +1,13 @@
 import { ContentedError } from './ContentedError'
 import { enumerate } from './enumerate'
-import { To, coerceTo } from './To'
+import { Type, coerceTo } from './Type'
 
 export function at<T, E extends ContentedError>(
   path: Path,
-  to: To<T, E>
-): To<T, MissingKey | AtKey<InnerMostError<E>>> {
-  return new (class extends To<T, MissingKey | AtKey<InnerMostError<E>>> {
-    protected coerceTo(value: any): T | MissingKey | AtKey<InnerMostError<E>> {
+  type: Type<T, E>
+): Type<T, MissingKey | AtKey<InnerMostError<E>>> {
+  return new (class extends Type<T, MissingKey | AtKey<InnerMostError<E>>> {
+    protected coerce(value: any): T | MissingKey | AtKey<InnerMostError<E>> {
       let curr: any = value
       for (const [key, pos] of enumerate(path)) {
         if (curr?.[key] === undefined) {
@@ -15,7 +15,7 @@ export function at<T, E extends ContentedError>(
         }
         curr = curr[key]
       }
-      const res = coerceTo(to, curr)
+      const res = coerceTo(type, curr)
       if (res instanceof ContentedError) {
         if (res instanceof AtKey) {
           return new AtKey(path.concat(res.at), res.error)
@@ -31,12 +31,12 @@ export function at<T, E extends ContentedError>(
 }
 
 export function fallback<T, E extends ContentedError>(
-  to: To<T, Has<E, MissingKey, 'Must include MissingKey'>>,
+  type: Type<T, Has<E, MissingKey, 'Must include MissingKey'>>,
   fallback: T
-): To<T, Exclude<E, MissingKey>> {
-  return new (class extends To<T, Exclude<E, MissingKey>> {
-    protected coerceTo(value: any): T | Exclude<E, MissingKey> {
-      const res = coerceTo(to, value)
+): Type<T, Exclude<E, MissingKey>> {
+  return new (class extends Type<T, Exclude<E, MissingKey>> {
+    protected coerce(value: any): T | Exclude<E, MissingKey> {
+      const res = coerceTo(type, value)
       if (res instanceof MissingKey) {
         return fallback
       }

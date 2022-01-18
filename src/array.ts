@@ -2,22 +2,22 @@ import { ContentedError } from './ContentedError'
 import { enumerate } from './enumerate'
 import { InvalidCoercion } from './InvalidCoercion'
 import { AtKey, MissingKey } from './key'
-import { To, coerceTo } from './To'
+import { Type, coerceTo } from './Type'
 
 export function arrayOf<T, E extends ContentedError>(
-  to: To<T, E>
-): To<T[], AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion> {
-  return new (class extends To<
+  type: Type<T, E>
+): Type<T[], AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion> {
+  return new (class extends Type<
     T[],
     AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion
   > {
-    protected coerceTo(value: any) {
+    protected coerce(value: any) {
       if (!Array.isArray(value)) {
         return new InvalidCoercion('array', value)
       }
       const res = []
       for (const [el, pos] of enumerate(value)) {
-        const c = scope<T, E>(pos, coerceTo(to, el))
+        const c = scope<T, E>(pos, coerceTo(type, el))
         if (c instanceof ContentedError) {
           return c
         }

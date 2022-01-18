@@ -1,8 +1,8 @@
-import { To } from './To'
+import { Type } from './Type'
 import { InvalidCoercion } from './InvalidCoercion'
 
-class ToNumber extends To<number, InvalidCoercion> {
-  protected coerceTo(value: any) {
+class NumberType extends Type<number, InvalidCoercion> {
+  protected coerce(value: any) {
     if (typeof value !== 'number') {
       return new InvalidCoercion('number', value)
     }
@@ -10,4 +10,4 @@ class ToNumber extends To<number, InvalidCoercion> {
   }
 }
 
-export const number: To<number, InvalidCoercion> = new ToNumber()
+export const number: Type<number, InvalidCoercion> = new NumberType()

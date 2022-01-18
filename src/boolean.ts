@@ -1,8 +1,8 @@
-import { To } from './To'
+import { Type } from './Type'
 import { InvalidCoercion } from './InvalidCoercion'
 
-class ToBoolean extends To<boolean, InvalidCoercion> {
-  protected coerceTo(value: any) {
+class BooleanType extends Type<boolean, InvalidCoercion> {
+  protected coerce(value: any) {
     if (typeof value !== 'boolean') {
       return new InvalidCoercion('boolean', value)
     }
@@ -10,4 +10,4 @@ class ToBoolean extends To<boolean, InvalidCoercion> {
   }
 }
 
-export const boolean: To<boolean, InvalidCoercion> = new ToBoolean()
+export const boolean: Type<boolean, InvalidCoercion> = new BooleanType()

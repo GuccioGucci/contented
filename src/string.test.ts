@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerceTo } from './To'
+import { coerceTo } from './Type'
 import { InvalidCoercion } from './InvalidCoercion'
 import { string } from './string'
 

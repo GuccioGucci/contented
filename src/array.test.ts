@@ -3,7 +3,7 @@ import assert from 'uvu/assert'
 import { arrayOf } from './array'
 import { InvalidCoercion } from './InvalidCoercion'
 import { at, AtKey, MissingKey } from './key'
-import { coerceTo } from './To'
+import { coerceTo } from './Type'
 import { string } from './string'
 
 test(`array`, function () {

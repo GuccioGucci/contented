@@ -1,8 +1,8 @@
-import { To } from './To'
+import { Type } from './Type'
 import { InvalidCoercion } from './InvalidCoercion'
 
-class ToString extends To<string, InvalidCoercion> {
-  protected coerceTo(value: any) {
+class StringType extends Type<string, InvalidCoercion> {
+  protected coerce(value: any) {
     if (typeof value !== 'string') {
       return new InvalidCoercion('string', value)
     }
@@ -10,4 +10,4 @@ class ToString extends To<string, InvalidCoercion> {
   }
 }
 
-export const string: To<string, InvalidCoercion> = new ToString()
+export const string: Type<string, InvalidCoercion> = new StringType()

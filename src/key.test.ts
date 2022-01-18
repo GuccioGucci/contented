@@ -1,6 +1,6 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './To'
+import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
 import { at, AtKey, fallback, MissingKey } from './key'
