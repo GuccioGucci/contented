@@ -1,13 +1,13 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { many } from './array'
+import { arrayOf } from './array'
 import { InvalidCoercion } from './InvalidCoercion'
 import { at, AtKey, MissingKey } from './key'
 import { coerceTo } from './To'
 import { string } from './string'
 
 test(`array`, function () {
-  const arrayOfStrings = many(string)
+  const arrayOfStrings = arrayOf(string)
 
   const res = coerceTo(arrayOfStrings, ['a', 'b', 'c'])
 
@@ -15,7 +15,7 @@ test(`array`, function () {
 })
 
 test('not an array', function () {
-  const arrayOfStrings = many(string)
+  const arrayOfStrings = arrayOf(string)
 
   const res = coerceTo(arrayOfStrings, 5)
 
@@ -23,7 +23,7 @@ test('not an array', function () {
 })
 
 test('not right element', function () {
-  const arrayOfStrings = many(string)
+  const arrayOfStrings = arrayOf(string)
 
   const res = coerceTo(arrayOfStrings, [1, 2, 3])
 
@@ -31,7 +31,7 @@ test('not right element', function () {
 })
 
 test('not right nested element', function () {
-  const arrayOfStrings = many(at(['a'], string))
+  const arrayOfStrings = arrayOf(at(['a'], string))
 
   const res = coerceTo(arrayOfStrings, [{ a: 5 }])
 
@@ -39,7 +39,7 @@ test('not right nested element', function () {
 })
 
 test('missing element', function () {
-  const arrayOfStrings = many(at(['a'], string))
+  const arrayOfStrings = arrayOf(at(['a'], string))
 
   const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
 

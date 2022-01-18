@@ -4,7 +4,7 @@ import { InvalidCoercion } from './InvalidCoercion'
 import { AtKey, MissingKey } from './key'
 import { To, coerceTo } from './To'
 
-export function many<T, E extends ContentedError>(
+export function arrayOf<T, E extends ContentedError>(
   to: To<T, E>
 ): To<T[], AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion> {
   return new (class extends To<
