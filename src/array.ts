@@ -2,7 +2,7 @@ import { ContentedError } from './ContentedError'
 import { enumerate } from './enumerate'
 import { InvalidCoercion } from './InvalidCoercion'
 import { AtKey, MissingKey } from './key'
-import { To, coerce } from './To'
+import { To, coerceTo } from './To'
 
 export function many<T, E extends ContentedError>(
   to: To<T, E>
@@ -11,13 +11,13 @@ export function many<T, E extends ContentedError>(
     T[],
     AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion
   > {
-    protected coerce(value: any) {
+    protected coerceTo(value: any) {
       if (!Array.isArray(value)) {
         return new InvalidCoercion('array', value)
       }
       const res = []
       for (const [el, pos] of enumerate(value)) {
-        const c = scope<T, E>(pos, coerce(to, el))
+        const c = scope<T, E>(pos, coerceTo(to, el))
         if (c instanceof ContentedError) {
           return c
         }

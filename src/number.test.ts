@@ -1,15 +1,15 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerce } from './To'
-import { toNumber } from './toNumber'
+import { coerceTo } from './To'
+import { number } from './number'
 import { InvalidCoercion } from './InvalidCoercion'
 
-test('toNumber accepts number values', function () {
-  assert(property(fcNumber, (value) => equal(coerce(toNumber, value), value)))
+test('number accepts number values', function () {
+  assert(property(fcNumber, (value) => equal(coerceTo(number, value), value)))
 })
 
-test('toNumber rejects all but number values', function () {
+test('number rejects all but number values', function () {
   const notANumber = fc.oneof(
     fc.string(),
     fc.boolean(),
@@ -20,7 +20,7 @@ test('toNumber rejects all but number values', function () {
 
   assert(
     property(notANumber, (value) =>
-      equal(coerce(toNumber, value), new InvalidCoercion('number', value))
+      equal(coerceTo(number, value), new InvalidCoercion('number', value))
     )
   )
 })

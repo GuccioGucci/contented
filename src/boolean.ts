@@ -2,7 +2,7 @@ import { To } from './To'
 import { InvalidCoercion } from './InvalidCoercion'
 
 class ToBoolean extends To<boolean, InvalidCoercion> {
-  protected coerce(value: any) {
+  protected coerceTo(value: any) {
     if (typeof value !== 'boolean') {
       return new InvalidCoercion('boolean', value)
     }
@@ -10,4 +10,4 @@ class ToBoolean extends To<boolean, InvalidCoercion> {
   }
 }
 
-export const toBoolean: To<boolean, InvalidCoercion> = new ToBoolean()
+export const boolean: To<boolean, InvalidCoercion> = new ToBoolean()

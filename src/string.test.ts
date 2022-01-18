@@ -1,17 +1,17 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerce } from './To'
+import { coerceTo } from './To'
 import { InvalidCoercion } from './InvalidCoercion'
-import { toString } from './toString'
+import { string } from './string'
 
-test('toString accepts string values', function () {
+test('string accepts string values', function () {
   assert(
-    property(fc.string(), (value) => equal(coerce(toString, value), value))
+    property(fc.string(), (value) => equal(coerceTo(string, value), value))
   )
 })
 
-test('toString rejects all but string values', function () {
+test('string rejects all but string values', function () {
   const notAString = fc.oneof(
     fcNumber,
     fc.boolean(),
@@ -22,7 +22,7 @@ test('toString rejects all but string values', function () {
 
   assert(
     property(notAString, (value) =>
-      equal(coerce(toString, value), new InvalidCoercion('string', value))
+      equal(coerceTo(string, value), new InvalidCoercion('string', value))
     )
   )
 })

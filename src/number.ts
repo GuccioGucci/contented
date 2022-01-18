@@ -2,7 +2,7 @@ import { To } from './To'
 import { InvalidCoercion } from './InvalidCoercion'
 
 class ToNumber extends To<number, InvalidCoercion> {
-  protected coerce(value: any) {
+  protected coerceTo(value: any) {
     if (typeof value !== 'number') {
       return new InvalidCoercion('number', value)
     }
@@ -10,4 +10,4 @@ class ToNumber extends To<number, InvalidCoercion> {
   }
 }
 
-export const toNumber: To<number, InvalidCoercion> = new ToNumber()
+export const number: To<number, InvalidCoercion> = new ToNumber()

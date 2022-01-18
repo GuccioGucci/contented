@@ -3,45 +3,45 @@ import assert from 'uvu/assert'
 import { many } from './array'
 import { InvalidCoercion } from './InvalidCoercion'
 import { at, AtKey, MissingKey } from './key'
-import { coerce } from './To'
-import { toString } from './toString'
+import { coerceTo } from './To'
+import { string } from './string'
 
 test(`array`, function () {
-  const toArrayOfStrings = many(toString)
+  const arrayOfStrings = many(string)
 
-  const res = coerce(toArrayOfStrings, ['a', 'b', 'c'])
+  const res = coerceTo(arrayOfStrings, ['a', 'b', 'c'])
 
   assert.equal(res, ['a', 'b', 'c'])
 })
 
 test('not an array', function () {
-  const toArrayOfStrings = many(toString)
+  const arrayOfStrings = many(string)
 
-  const res = coerce(toArrayOfStrings, 5)
+  const res = coerceTo(arrayOfStrings, 5)
 
   assert.equal(res, new InvalidCoercion('array', 5))
 })
 
 test('not right element', function () {
-  const toArrayOfStrings = many(toString)
+  const arrayOfStrings = many(string)
 
-  const res = coerce(toArrayOfStrings, [1, 2, 3])
+  const res = coerceTo(arrayOfStrings, [1, 2, 3])
 
   assert.equal(res, new AtKey([0], new InvalidCoercion('string', 1)))
 })
 
 test('not right nested element', function () {
-  const toArrayOfStrings = many(at(['a'], toString))
+  const arrayOfStrings = many(at(['a'], string))
 
-  const res = coerce(toArrayOfStrings, [{ a: 5 }])
+  const res = coerceTo(arrayOfStrings, [{ a: 5 }])
 
   assert.equal(res, new AtKey([0, 'a'], new InvalidCoercion('string', 5)))
 })
 
 test('missing element', function () {
-  const toArrayOfStrings = many(at(['a'], toString))
+  const arrayOfStrings = many(at(['a'], string))
 
-  const res = coerce(toArrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
+  const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
   assert.equal(res, new MissingKey([0, 'a']))
 })
