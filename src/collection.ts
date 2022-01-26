@@ -68,6 +68,45 @@ export function arrayOf<T, E extends ContentedError>(
   })()
 }
 
+export function permissiveArrayOf<T, E extends ContentedError>(
+  type: Type<T, E>
+): Type<
+  [T[], (AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion)[]],
+  InvalidCoercion
+> {
+  return new (class extends Type<
+    [T[], (AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion)[]],
+    InvalidCoercion
+  > {
+    protected coerce(value: any) {
+      type Return = [
+        T[],
+        (AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion)[]
+      ]
+
+      if (!Array.isArray(value)) {
+        return new InvalidCoercion('array', value)
+      }
+      const res: T[] = []
+      const errs: (
+        | AtKey<InnerMostError<E>>
+        | HasMissingKey<E>
+        | InvalidCoercion
+      )[] = []
+      for (const [el, pos] of enumerate(value)) {
+        const c = scope<T, E>([pos], coerceTo(type, el))
+        if (c instanceof ContentedError) {
+          errs.push(c)
+          continue
+        }
+        res.push(c as T)
+      }
+      const tmp = [res, errs] as Return
+      return tmp
+    }
+  })()
+}
+
 export function combine<
   E extends ContentedError,
   Ts extends Type<unknown, E>[],

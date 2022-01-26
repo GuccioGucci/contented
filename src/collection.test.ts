@@ -3,7 +3,15 @@ import assert from 'uvu/assert'
 import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
-import { at, fallback, arrayOf, MissingKey, AtKey, combine } from './collection'
+import {
+  at,
+  fallback,
+  arrayOf,
+  MissingKey,
+  AtKey,
+  combine,
+  permissiveArrayOf,
+} from './collection'
 import { InvalidCoercion } from './InvalidCoercion'
 
 test(`at leads to the value of an object's property`, function () {
@@ -130,6 +138,25 @@ test('array rejects a value upon the first missing element', function () {
   const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
   assert.equal(res, new MissingKey([0, 'a']))
+})
+
+test('permissive array accepts arrays with wrong element types', function () {
+  const permissiveArrayOfStrings = permissiveArrayOf(string)
+
+  const res = coerceTo(permissiveArrayOfStrings, ['a', 'b', 2])
+
+  assert.equal(res, [
+    ['a', 'b'],
+    [new AtKey([2], new InvalidCoercion('string', 2))],
+  ])
+})
+
+test('permissive array rejects values that are not arrays', function () {
+  const permissiveArrayOfStrings = permissiveArrayOf(string)
+
+  const res = coerceTo(permissiveArrayOfStrings, 5)
+
+  assert.equal(res, new InvalidCoercion('array', 5))
 })
 
 test(`combine accepts a function to mix-and-match other types`, function () {
