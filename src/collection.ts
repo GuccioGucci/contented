@@ -46,24 +46,43 @@ export function fallback<T, E extends ContentedError>(
 
 export function arrayOf<T, E extends ContentedError>(
   type: Type<T, E>
-): Type<T[], AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion> {
+): Type<
+  PropagateNonFatalError<[Type<T, E>], Get1stTupleOrElse<T>[]>,
+  AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion
+> {
   return new (class extends Type<
-    T[],
+    PropagateNonFatalError<[Type<T, E>], Get1stTupleOrElse<T>[]>,
     AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion
   > {
     protected coerce(value: any) {
+      type Coerce =
+        | PropagateNonFatalError<[Type<T, E>], Get1stTupleOrElse<T>[]>
+        | AtKey<InnerMostError<E>>
+        | HasMissingKey<E>
+        | InvalidCoercion
+
       if (!Array.isArray(value)) {
-        return new InvalidCoercion('array', value)
+        return new InvalidCoercion('array', value) as Coerce
       }
       const res = []
+      const nonFatal = []
+      let partial = false
       for (const [el, pos] of enumerate(value)) {
         const c = scope<T, E>([pos], coerceTo(type, el))
         if (c instanceof ContentedError) {
-          return c
+          return c as Coerce
+        } else if (Array.isArray(c)) {
+          partial = true
+          res.push(c[0])
+          nonFatal.push(...c[1].map((err: ContentedError) => scope([pos], err)))
+        } else {
+          res.push(c)
         }
-        res.push(c)
       }
-      return res
+      if (partial) {
+        return [res, nonFatal] as Coerce
+      }
+      return res as Coerce
     }
   })()
 }

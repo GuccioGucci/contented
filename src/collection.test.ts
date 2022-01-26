@@ -140,6 +140,17 @@ test('array rejects a value upon the first missing element', function () {
   assert.equal(res, new MissingKey([0, 'a']))
 })
 
+test(`array propagates non fatal errors`, function () {
+  const arrayOfPermissiveArray = arrayOf(permissiveArrayOf(number))
+
+  const res = coerceTo(arrayOfPermissiveArray, [[1, 2, 3, 'hello']])
+
+  assert.equal(res, [
+    [[1, 2, 3]],
+    [new AtKey([0, 3], new InvalidCoercion('number', 'hello'))],
+  ])
+})
+
 test('permissive array accepts arrays with wrong element types', function () {
   const permissiveArrayOfStrings = permissiveArrayOf(string)
 
