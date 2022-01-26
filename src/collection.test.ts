@@ -195,4 +195,21 @@ test(`combine rejects the combination upon the first mismatching element`, funct
   assert.equal(res, new AtKey(['a'], new InvalidCoercion('string', 10)))
 })
 
+test(`combine propagates non fatal errors`, function () {
+  const add1 = (x: number) => x + 1
+  const permissiveArrayPlus1 = combine(
+    (xs) => xs.map(add1),
+    permissiveArrayOf(number)
+  )
+  const res = coerceTo(permissiveArrayPlus1, [1, 2, 3, 'hello', true])
+
+  assert.equal(res, [
+    [2, 3, 4],
+    [
+      new AtKey([3], new InvalidCoercion('number', 'hello')),
+      new AtKey([4], new InvalidCoercion('number', true)),
+    ],
+  ])
+})
+
 test.run()

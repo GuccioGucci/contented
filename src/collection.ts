@@ -71,18 +71,21 @@ export function arrayOf<T, E extends ContentedError>(
 export function permissiveArrayOf<T, E extends ContentedError>(
   type: Type<T, E>
 ): Type<
-  [T[], (AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion)[]],
+  [
+    T[],
+    (AtKey<InnerMostError<E>> | HasMissingKey<E> | HasInvalidCoercion<E>)[]
+  ],
   InvalidCoercion
 > {
   return new (class extends Type<
-    [T[], (AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion)[]],
+    [
+      T[],
+      (AtKey<InnerMostError<E>> | HasMissingKey<E> | HasInvalidCoercion<E>)[]
+    ],
     InvalidCoercion
   > {
     protected coerce(value: any) {
-      type Return = [
-        T[],
-        (AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion)[]
-      ]
+      type Return = [T[], (AtKey<InnerMostError<E>> | HasMissingKey<E>)[]]
 
       if (!Array.isArray(value)) {
         return new InvalidCoercion('array', value)
@@ -114,18 +117,33 @@ export function combine<
 >(
   fn: (...args: [...ExpectedTypes<Ts>]) => O,
   ...types: [...Ts]
-): Type<O, ErrorTypes<Ts>[number]> {
-  return new (class extends Type<O, ErrorTypes<Ts>[number]> {
+): Type<PropagateNonFatalError<Ts, O>, ErrorTypes<Ts>[number]> {
+  type Coerce = PropagateNonFatalError<Ts, O> | ErrorTypes<Ts>[number]
+  return new (class extends Type<
+    PropagateNonFatalError<Ts, O>,
+    ErrorTypes<Ts>[number]
+  > {
     protected coerce(value: any) {
       const args = []
+      const nonFatals = []
+      let partial = false
       for (const type of types) {
         const res = coerceTo(type, value)
         if (res instanceof ContentedError) {
           return res as ErrorTypes<Ts>[number]
+        } else if (Array.isArray(res)) {
+          partial = true
+          args.push(res[0])
+          nonFatals.push(...res[1])
+        } else {
+          args.push(res)
         }
-        args.push(res)
       }
-      return fn(...(args as ExpectedTypes<Ts>))
+      const out = fn(...(args as ExpectedTypes<Ts>))
+      if (partial) {
+        return [out, nonFatals] as Coerce
+      }
+      return out as Coerce
     }
   })()
 }
@@ -181,8 +199,11 @@ type InnerMostError<E extends ContentedError> = E extends AtKey<infer U>
   : Exclude<E, MissingKey>
 
 type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never
+type HasInvalidCoercion<E> = E extends AtKey<any> ? InvalidCoercion : never
 
-type ExpectedType<T> = T extends Type<infer A, any> ? A : never
+type ExpectedType<T> = T extends Type<infer A, any>
+  ? Get1stTupleOrElse<A>
+  : never
 type ExpectedTypes<Ts> = Ts extends [infer Head, ...infer Tail]
   ? [ExpectedType<Head>, ...ExpectedTypes<Tail>]
   : []
@@ -191,3 +212,29 @@ type ErrorType<T> = T extends Type<any, infer E> ? E : never
 type ErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail]
   ? [ErrorType<Head>, ...ErrorTypes<Tail>]
   : []
+
+type ExtractNonFatalErrors<T> = T extends Type<infer A, any>
+  ? Get2ndTuple<A>
+  : never
+
+type Get1stTupleOrElse<T> = T extends [infer U, any] ? U : T
+
+type Get2ndTuple<T> = T extends [any, infer E] ? E : never
+
+type ExtractAllFatalErrors<Ts> = Ts extends [infer Head, ...infer Tail]
+  ? [ExtractNonFatalErrors<Head>[number], ...ExtractAllFatalErrors<Tail>]
+  : []
+
+type PropagateNonFatalError<Ts, O> = TupleIfNotNever<
+  [O, ExtractAllFatalErrors<Ts>[number][]]
+>
+
+type TupleIfNotNever<T> = T extends [infer O, infer E]
+  ? IsNeverType<ElementType<E>> extends true
+    ? O
+    : T
+  : never
+
+type IsNeverType<T> = [T] extends [never] ? true : false
+
+type ElementType<Ts> = Ts extends (infer U)[] ? U : never
