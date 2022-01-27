@@ -55,6 +55,24 @@ test(`pointing to a non-existing property reports when the path got interrupted`
   assert.equal(c4, new MissingKey(['a']))
 })
 
+test('at propagates non-fatal errors', function () {
+  const thirdEl = at(['a'], permissiveArrayOf(number))
+
+  const res1 = coerceTo(thirdEl, { a: 5 })
+  const res2 = coerceTo(thirdEl, { b: [] })
+  const res3 = coerceTo(thirdEl, { a: [1, 2, 'hello', 3, true] })
+
+  assert.equal(res1, new AtKey(['a'], new InvalidCoercion('array', 5)))
+  assert.equal(res2, new MissingKey(['a']))
+  assert.equal(res3, [
+    [1, 2, 3],
+    [
+      new AtKey(['a', 2], new InvalidCoercion('number', 'hello')),
+      new AtKey(['a', 4], new InvalidCoercion('number', true)),
+    ],
+  ])
+})
+
 test(`any error on the value part of a property is accompanied by the property path`, function () {
   const cToNumber = at(['a', 'b', 'c'], number)
 

@@ -6,25 +6,43 @@ import { Type, coerceTo } from './Type'
 export function at<T, E extends ContentedError>(
   path: Path,
   type: Type<T, E>
-): Type<T, MissingKey | AtKey<InnerMostError<E>> | InvalidCoercion> {
+): Type<
+  PropagateNonFatalError<[Type<T, E>], Get1stTupleOrElse<T>>,
+  MissingKey | AtKey<InnerMostError<E>> | InvalidCoercion
+> {
   return new (class extends Type<
-    T,
+    PropagateNonFatalError<[Type<T, E>], Get1stTupleOrElse<T>>,
     MissingKey | AtKey<InnerMostError<E>> | InvalidCoercion
   > {
     protected coerce(value: any) {
+      type Coerce =
+        | PropagateNonFatalError<[Type<T, E>], Get1stTupleOrElse<T>>
+        | MissingKey
+        | AtKey<InnerMostError<E>>
+        | InvalidCoercion
       if (typeof value !== 'object') {
-        return new InvalidCoercion('object', value)
+        return new InvalidCoercion('object', value) as Coerce
       }
 
       for (const [key, pos] of enumerate(path)) {
         if (value[key] === undefined) {
           const missingKey = path.slice(0, pos + 1)
-          return new MissingKey(missingKey)
+          return new MissingKey(missingKey) as Coerce
         }
         value = value[key]
       }
 
-      return scope<T, E>(path, coerceTo(type, value))
+      const res = scope<T, E>(path, coerceTo(type, value))
+      if (res instanceof ContentedError) {
+        return res as Coerce
+      } else if (Array.isArray(res)) {
+        return [
+          res[0],
+          res[1].map((err: ContentedError) => scope(path, err)),
+        ] as Coerce
+      } else {
+        return res as Coerce
+      }
     }
   })()
 }
