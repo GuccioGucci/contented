@@ -109,39 +109,64 @@ export function permissiveArrayOf<T, E extends ContentedError>(
   type: Type<T, E>
 ): Type<
   [
-    T[],
-    (AtKey<InnerMostError<E>> | HasMissingKey<E> | HasInvalidCoercion<E>)[]
+    Get1stTupleOrElse<T>[],
+    (
+      | ElementType<Get2ndTuple<T>>
+      | AtKey<InnerMostError<E>>
+      | HasMissingKey<E>
+      | HasInvalidCoercion<E>
+    )[]
   ],
   InvalidCoercion
 > {
   return new (class extends Type<
     [
-      T[],
-      (AtKey<InnerMostError<E>> | HasMissingKey<E> | HasInvalidCoercion<E>)[]
+      Get1stTupleOrElse<T>[],
+      (
+        | ElementType<Get2ndTuple<T>>
+        | AtKey<InnerMostError<E>>
+        | HasMissingKey<E>
+        | HasInvalidCoercion<E>
+      )[]
     ],
     InvalidCoercion
   > {
     protected coerce(value: any) {
-      type Return = [T[], (AtKey<InnerMostError<E>> | HasMissingKey<E>)[]]
+      type Coerce =
+        | [
+            Get1stTupleOrElse<T>[],
+            (
+              | ElementType<Get2ndTuple<T>>
+              | AtKey<InnerMostError<E>>
+              | HasMissingKey<E>
+              | HasInvalidCoercion<E>
+            )[]
+          ]
+        | InvalidCoercion
 
       if (!Array.isArray(value)) {
         return new InvalidCoercion('array', value)
       }
-      const res: T[] = []
+      const res: Get1stTupleOrElse<T>[] = []
       const errs: (
+        | ElementType<Get2ndTuple<T>>
         | AtKey<InnerMostError<E>>
         | HasMissingKey<E>
-        | InvalidCoercion
+        | HasInvalidCoercion<E>
       )[] = []
       for (const [el, pos] of enumerate(value)) {
         const c = scope<T, E>([pos], coerceTo(type, el))
         if (c instanceof ContentedError) {
           errs.push(c)
           continue
+        } else if (Array.isArray(c)) {
+          res.push(c[0] as Get1stTupleOrElse<T>)
+          errs.push(...c[1].map((err: ContentedError) => scope([pos], err)))
+        } else {
+          res.push(c as Get1stTupleOrElse<T>)
         }
-        res.push(c as T)
       }
-      const tmp = [res, errs] as Return
+      const tmp = [res, errs] as Coerce
       return tmp
     }
   })()

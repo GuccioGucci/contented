@@ -188,6 +188,28 @@ test('permissive array rejects values that are not arrays', function () {
   assert.equal(res, new InvalidCoercion('array', 5))
 })
 
+test('permissive array propagates non-fatal errors', function () {
+  const permissiveOfPermissive = permissiveArrayOf(permissiveArrayOf(number))
+
+  const res3 = coerceTo(permissiveOfPermissive, [
+    3,
+    [1, 2, 3, 'hello'],
+    [4, 5, 'world', 6],
+  ])
+
+  assert.equal(res3, [
+    [
+      [1, 2, 3],
+      [4, 5, 6],
+    ],
+    [
+      new AtKey([0], new InvalidCoercion('array', 3)),
+      new AtKey([1, 3], new InvalidCoercion('number', 'hello')),
+      new AtKey([2, 2], new InvalidCoercion('number', 'world')),
+    ],
+  ])
+})
+
 test(`combine accepts a function to mix-and-match other types`, function () {
   const id = combine(
     (a, b) => `${a}-${b}`,
