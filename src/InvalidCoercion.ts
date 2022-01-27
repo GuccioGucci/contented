@@ -6,4 +6,8 @@ export class InvalidCoercion extends ContentedError {
   }
 }
 
-type Expected = 'string' | 'number' | 'boolean' | 'array' | 'object'
+type Expected = 'string' | 'number' | 'boolean' | 'array' | 'object' | GuardName
+
+export class GuardName {
+  constructor(public readonly name: string) {}
+}
