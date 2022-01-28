@@ -26,10 +26,7 @@ export function at<T, E extends ContentedError>(
 
       const res = coerceTo(type, value)
       if (res instanceof ContentedError) {
-        return scope(path, res) as
-          | MissingKey
-          | HasAtKeyInvalidCoercion<E>
-          | InvalidCoercion
+        return scope(path, res)
       }
       if (Array.isArray(res)) {
         const [value, errors] = res
@@ -79,10 +76,7 @@ export function arrayOf<T, E extends ContentedError>(
       for (const [el, pos] of enumerate(value)) {
         const c = coerceTo(type, el)
         if (c instanceof ContentedError) {
-          return scope([pos], c) as
-            | HasAtKeyInvalidCoercion<E>
-            | HasMissingKey<E>
-            | InvalidCoercion
+          return scope([pos], c)
         } else if (Array.isArray(c)) {
           hasNonFatalErrors = true
           res.push(c[0])
@@ -167,14 +161,20 @@ export function combine<
 function scope<E extends ContentedError>(
   path: Path,
   err: E
-): AtKey<E> | MissingKey {
-  if (err instanceof AtKey) {
-    return new AtKey(path.concat(err.at), err.error)
+): HasMissingKey<E> | HasAtKeyInvalidCoercion<E> {
+  if (err instanceof AtKeyInvalidCoercion) {
+    return new AtKeyInvalidCoercion(
+      path.concat(err.at),
+      err.error
+    ) as HasAtKeyInvalidCoercion<E>
   }
   if (err instanceof MissingKey) {
-    return new MissingKey(path.concat(err.at))
+    return new MissingKey(path.concat(err.at)) as HasMissingKey<E>
   }
-  return new AtKey(path, err)
+  if (err instanceof InvalidCoercion) {
+    return new AtKeyInvalidCoercion(path, err) as HasAtKeyInvalidCoercion<E>
+  }
+  throw new Error(`Unknown error type: ${err}`)
 }
 
 type Has<U extends any, U1 extends any, Msg extends string> = [U1] extends [U]
@@ -194,11 +194,14 @@ export class MissingKey extends ContentedError {
   }
 }
 
-export class AtKey<E extends ContentedError> extends ContentedError {
+export class AtKeyInvalidCoercion extends ContentedError {
   // @ts-ignore
   private readonly atKey: symbol
 
-  constructor(public readonly at: Path, public readonly error: E) {
+  constructor(
+    public readonly at: Path,
+    public readonly error: InvalidCoercion
+  ) {
     super()
     this.atKey = AT_KEY
   }
@@ -210,7 +213,7 @@ type Path = Key[]
 type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never
 
 type HasAtKeyInvalidCoercion<E> = [InvalidCoercion] extends [E]
-  ? AtKey<InvalidCoercion>
+  ? AtKeyInvalidCoercion
   : never
 
 type ExpectedType<T> = T extends Type<infer A, any> ? ResultType<A> : never
