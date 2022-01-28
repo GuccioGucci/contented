@@ -127,22 +127,18 @@ export function combine<
 >(
   fn: (...args: [...ExpectedTypes<Ts>]) => O,
   ...types: [...Ts]
-): Type<PropagateNonFatalErrors<Ts, O>, ErrorTypes<Ts>[number]> {
-  type Coerce = PropagateNonFatalErrors<Ts, O> | ErrorTypes<Ts>[number]
-  return new (class extends Type<
-    PropagateNonFatalErrors<Ts, O>,
-    ErrorTypes<Ts>[number]
-  > {
+): Type<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> {
+  return new (class extends Type<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> {
     protected coerce(value: any) {
       const args = []
       const nonFatals = []
-      let partial = false
+      let hasNonFatalErrors = false
       for (const type of types) {
         const res = coerceTo(type, value)
         if (res instanceof ContentedError) {
-          return res as ErrorTypes<Ts>[number]
+          return res as UnionOfErrorTypes<Ts>
         } else if (Array.isArray(res)) {
-          partial = true
+          hasNonFatalErrors = true
           args.push(res[0])
           nonFatals.push(...res[1])
         } else {
@@ -150,10 +146,10 @@ export function combine<
         }
       }
       const out = fn(...(args as ExpectedTypes<Ts>))
-      if (partial) {
-        return [out, nonFatals] as Coerce
+      if (hasNonFatalErrors) {
+        return [out, nonFatals] as CombinationOf<Ts, O>
       }
-      return out as Coerce
+      return out as CombinationOf<Ts, O>
     }
   })()
 }
@@ -194,6 +190,9 @@ export class MissingKey extends ContentedError {
   }
 }
 
+// ==============================================
+// Errors
+// ==============================================
 export class AtKeyInvalidCoercion extends ContentedError {
   // @ts-ignore
   private readonly atKey: symbol
@@ -216,37 +215,52 @@ type HasAtKeyInvalidCoercion<E> = [InvalidCoercion] extends [E]
   ? AtKeyInvalidCoercion
   : never
 
-type ExpectedType<T> = T extends Type<infer A, any> ? ResultType<A> : never
+// ==============================================
+// Type-level functions for `Type<A, B>`
+// ==============================================
+type ExpectedType<T> = T extends Type<infer A, any>
+  ? A extends [infer U, any]
+    ? U
+    : A
+  : never
+
+type ErrorType<T> = T extends Type<any, infer E> ? E : never
+
+type NonFatalErrorType<T> = T extends Type<[any, (infer NF)[]], any>
+  ? NF
+  : never
+
+// ==============================================
+// Type-level functions for combine()
+// ==============================================
+type CombinationOf<Ts, O> = UnionOfNonFatalErrorTypes<Ts> extends never
+  ? O
+  : [O, UnionOfNonFatalErrorTypes<Ts>[]]
+
+type UnionOfNonFatalErrorTypes<Ts> = NonFatalErrorTypes<Ts>[number]
+
+type NonFatalErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail]
+  ? [NonFatalErrorType<Head>, ...NonFatalErrorTypes<Tail>]
+  : []
 
 type ExpectedTypes<Ts> = Ts extends [infer Head, ...infer Tail]
   ? [ExpectedType<Head>, ...ExpectedTypes<Tail>]
   : []
 
-type ErrorType<T> = T extends Type<any, infer E> ? E : never
+type UnionOfErrorTypes<Ts> = ErrorTypes<Ts>[number]
+
 type ErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail]
   ? [ErrorType<Head>, ...ErrorTypes<Tail>]
   : []
 
-type ExtractNonFatalErrors<T> = T extends Type<infer A, any>
-  ? Get2ndTuple<A>
-  : never
-
-type ResultType<T> = T extends [infer U, any] ? U : T
-
-type Get2ndTuple<T> = T extends [any, infer E] ? E : never
-
-type DoExtractAllFatalErrors<Ts> = Ts extends [infer Head, ...infer Tail]
-  ? [ExtractNonFatalErrors<Head>[number], ...DoExtractAllFatalErrors<Tail>]
-  : []
-
-type NonFatalErrorType<Ts> = DoExtractAllFatalErrors<Ts>[number]
-
-type PropagateNonFatalErrors<Ts, O> = NonFatalErrorType<Ts> extends never
-  ? O
-  : [O, NonFatalErrorType<Ts>[]]
-
+// ==============================================
+// Type-level functions for arrayOf()
+// ==============================================
 type ArrayOf<T> = T extends [infer O, infer NFs] ? [O[], NFs] : T[]
 
+// ==============================================
+// Type-level functions for permissiveArrayOf()
+// ==============================================
 type PermissiveArrayOf<T, E> = T extends [infer O, (infer NF)[]]
   ? [O[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | NF)[]]
   : [T[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E>)[]]
