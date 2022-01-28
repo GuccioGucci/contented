@@ -6,10 +6,10 @@ import { Type, coerceTo } from './Type'
 export function at<T, E extends ContentedError>(
   path: Path,
   type: Type<T, E>
-): Type<T, MissingKey | AtKey<InnerMostError<E>> | InvalidCoercion> {
+): Type<T, MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion> {
   return new (class extends Type<
     T,
-    MissingKey | AtKey<InnerMostError<E>> | InvalidCoercion
+    MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion
   > {
     protected coerce(value: any) {
       if (typeof value !== 'object') {
@@ -26,7 +26,10 @@ export function at<T, E extends ContentedError>(
 
       const res = coerceTo(type, value)
       if (res instanceof ContentedError) {
-        return scope<T, E>(path, res)
+        return scope(path, res) as
+          | MissingKey
+          | HasAtKeyInvalidCoercion<E>
+          | InvalidCoercion
       }
       if (Array.isArray(res)) {
         const [value, errors] = res
@@ -59,11 +62,11 @@ export function arrayOf<T, E extends ContentedError>(
   type: Type<T, E>
 ): Type<
   ArrayOf<T>,
-  AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion
+  HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | InvalidCoercion
 > {
   return new (class extends Type<
     ArrayOf<T>,
-    AtKey<InnerMostError<E>> | HasMissingKey<E> | InvalidCoercion
+    HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | InvalidCoercion
   > {
     protected coerce(value: any) {
       if (!Array.isArray(value)) {
@@ -74,9 +77,12 @@ export function arrayOf<T, E extends ContentedError>(
       const nonFatal = []
       let hasNonFatalErrors = false
       for (const [el, pos] of enumerate(value)) {
-        const c = scope<T, E>([pos], coerceTo(type, el))
+        const c = coerceTo(type, el)
         if (c instanceof ContentedError) {
-          return c
+          return scope([pos], c) as
+            | HasAtKeyInvalidCoercion<E>
+            | HasMissingKey<E>
+            | InvalidCoercion
         } else if (Array.isArray(c)) {
           hasNonFatalErrors = true
           res.push(c[0])
@@ -95,67 +101,27 @@ export function arrayOf<T, E extends ContentedError>(
 
 export function permissiveArrayOf<T, E extends ContentedError>(
   type: Type<T, E>
-): Type<
-  [
-    ResultType<T>[],
-    (
-      | ElementType<Get2ndTuple<T>>
-      | AtKey<InnerMostError<E>>
-      | HasMissingKey<E>
-      | HasInvalidCoercion<E>
-    )[]
-  ],
-  InvalidCoercion
-> {
-  return new (class extends Type<
-    [
-      ResultType<T>[],
-      (
-        | ElementType<Get2ndTuple<T>>
-        | AtKey<InnerMostError<E>>
-        | HasMissingKey<E>
-        | HasInvalidCoercion<E>
-      )[]
-    ],
-    InvalidCoercion
-  > {
+): Type<PermissiveArrayOf<T, E>, InvalidCoercion> {
+  return new (class extends Type<PermissiveArrayOf<T, E>, InvalidCoercion> {
     protected coerce(value: any) {
-      type Coerce =
-        | [
-            ResultType<T>[],
-            (
-              | ElementType<Get2ndTuple<T>>
-              | AtKey<InnerMostError<E>>
-              | HasMissingKey<E>
-              | HasInvalidCoercion<E>
-            )[]
-          ]
-        | InvalidCoercion
-
       if (!Array.isArray(value)) {
         return new InvalidCoercion('array', value)
       }
-      const res: ResultType<T>[] = []
-      const errs: (
-        | ElementType<Get2ndTuple<T>>
-        | AtKey<InnerMostError<E>>
-        | HasMissingKey<E>
-        | HasInvalidCoercion<E>
-      )[] = []
+      const res = []
+      const errs = []
       for (const [el, pos] of enumerate(value)) {
-        const c = scope<T, E>([pos], coerceTo(type, el))
+        const c = coerceTo(type, el)
         if (c instanceof ContentedError) {
-          errs.push(c)
+          errs.push(scope([pos], c))
           continue
         } else if (Array.isArray(c)) {
-          res.push(c[0] as ResultType<T>)
+          res.push(c[0])
           errs.push(...c[1].map((err: ContentedError) => scope([pos], err)))
         } else {
-          res.push(c as ResultType<T>)
+          res.push(c)
         }
       }
-      const tmp = [res, errs] as Coerce
-      return tmp
+      return [res, errs] as PermissiveArrayOf<T, E>
     }
   })()
 }
@@ -198,20 +164,17 @@ export function combine<
   })()
 }
 
-function scope<T, E extends ContentedError>(
+function scope<E extends ContentedError>(
   path: Path,
-  value: T | E
-): T | AtKey<InnerMostError<E>> | HasMissingKey<E> {
-  if (value instanceof ContentedError) {
-    if (value instanceof AtKey) {
-      return new AtKey(path.concat(value.at), value.error)
-    }
-    if (value instanceof MissingKey) {
-      return new MissingKey(path.concat(value.at)) as HasMissingKey<E>
-    }
-    return new AtKey(path, value) as AtKey<InnerMostError<E>>
+  err: E
+): AtKey<E> | MissingKey {
+  if (err instanceof AtKey) {
+    return new AtKey(path.concat(err.at), err.error)
   }
-  return value
+  if (err instanceof MissingKey) {
+    return new MissingKey(path.concat(err.at))
+  }
+  return new AtKey(path, err)
 }
 
 type Has<U extends any, U1 extends any, Msg extends string> = [U1] extends [U]
@@ -244,12 +207,11 @@ export class AtKey<E extends ContentedError> extends ContentedError {
 type Key = string | symbol | number
 type Path = Key[]
 
-type InnerMostError<E extends ContentedError> = E extends AtKey<infer U>
-  ? InnerMostError<U>
-  : Exclude<E, MissingKey>
-
 type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never
-type HasInvalidCoercion<E> = E extends AtKey<any> ? InvalidCoercion : never
+
+type HasAtKeyInvalidCoercion<E> = [InvalidCoercion] extends [E]
+  ? AtKey<InvalidCoercion>
+  : never
 
 type ExpectedType<T> = T extends Type<infer A, any> ? ResultType<A> : never
 
@@ -280,6 +242,8 @@ type PropagateNonFatalErrors<Ts, O> = NonFatalErrorType<Ts> extends never
   ? O
   : [O, NonFatalErrorType<Ts>[]]
 
-type ElementType<Ts> = Ts extends (infer U)[] ? U : never
+type ArrayOf<T> = T extends [infer O, infer NFs] ? [O[], NFs] : T[]
 
-type ArrayOf<T> = T extends [infer O, infer NF] ? [O[], NF] : T[]
+type PermissiveArrayOf<T, E> = T extends [infer O, (infer NF)[]]
+  ? [O[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | NF)[]]
+  : [T[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E>)[]]
