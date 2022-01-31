@@ -1,58 +1,59 @@
 import { ContentedError } from './ContentedError'
 import { enumerate } from './enumerate'
 import { InvalidCoercion } from './InvalidCoercion'
-import { Type, coerceTo } from './Type'
+import { Type, coerceTo, Coerce } from './Type'
 
 export function at<T, E extends ContentedError>(
   path: Path,
   type: Type<T, E>
 ): Type<T, MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion> {
-  return new (class extends Type<
-    T,
-    MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion
-  > {
-    protected coerce(value: any) {
-      if (typeof value !== 'object') {
-        return new InvalidCoercion('object', value)
-      }
+  type AtError = MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion
 
-      for (const [key, pos] of enumerate(path)) {
-        if (value[key] === undefined) {
-          const missingKey = path.slice(0, pos + 1)
-          return new MissingKey(missingKey)
-        }
-        value = value[key]
-      }
-
-      const res = coerceTo(type, value)
-      if (res instanceof ContentedError) {
-        return scope(path, res)
-      }
-      if (Array.isArray(res)) {
-        const [value, errors] = res
-        return [
-          value,
-          errors.map((err: ContentedError) => scope(path, err)),
-        ] as unknown as T
-      }
-      return res
+  const coerce: Coerce<T, AtError> = (value: any) => {
+    if (typeof value !== 'object') {
+      return new InvalidCoercion('object', value)
     }
-  })()
+
+    for (const [key, pos] of enumerate(path)) {
+      if (value[key] === undefined) {
+        const missingKey = path.slice(0, pos + 1)
+        return new MissingKey(missingKey)
+      }
+      value = value[key]
+    }
+
+    const res = coerceTo(type, value)
+    if (res instanceof ContentedError) {
+      return scope(path, res)
+    }
+    if (Array.isArray(res)) {
+      const [value, errors] = res
+      return [
+        value,
+        errors.map((err: ContentedError) => scope(path, err)),
+      ] as unknown as T
+    }
+    return res
+  }
+
+  return new Type(coerce)
 }
 
 export function fallback<T, E extends ContentedError>(
   type: Type<T, Has<E, MissingKey, 'Must include MissingKey'>>,
   fallback: T
 ): Type<T, Exclude<E, MissingKey>> {
-  return new (class extends Type<T, Exclude<E, MissingKey>> {
-    protected coerce(value: any): T | Exclude<E, MissingKey> {
-      const res = coerceTo(type, value)
-      if (res instanceof MissingKey) {
-        return fallback
-      }
-      return res as T | Exclude<E, MissingKey>
+  type FallbackError = Exclude<E, MissingKey>
+
+  const coerce: Coerce<T, FallbackError> = (value: any) => {
+    const res = coerceTo(type as Type<T, E>, value)
+    if (res instanceof MissingKey) {
+      return fallback
     }
-  })()
+    return res as T | Exclude<E, MissingKey>
+  }
+
+  return new Type(coerce)
 }
 
 export function arrayOf<T, E extends ContentedError>(
@@ -61,63 +62,67 @@ export function arrayOf<T, E extends ContentedError>(
   ArrayOf<T>,
   HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | InvalidCoercion
 > {
-  return new (class extends Type<
-    ArrayOf<T>,
-    HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | InvalidCoercion
-  > {
-    protected coerce(value: any) {
-      if (!Array.isArray(value)) {
-        return new InvalidCoercion('array', value)
-      }
+  type ArrayOfError =
+    | HasAtKeyInvalidCoercion<E>
+    | HasMissingKey<E>
+    | InvalidCoercion
 
-      const res = []
-      const nonFatal = []
-      let hasNonFatalErrors = false
-      for (const [el, pos] of enumerate(value)) {
-        const c = coerceTo(type, el)
-        if (c instanceof ContentedError) {
-          return scope([pos], c)
-        } else if (Array.isArray(c)) {
-          hasNonFatalErrors = true
-          res.push(c[0])
-          nonFatal.push(...c[1].map((err: ContentedError) => scope([pos], err)))
-        } else {
-          res.push(c)
-        }
-      }
-      if (hasNonFatalErrors) {
-        return [res, nonFatal] as ArrayOf<T>
-      }
-      return res as ArrayOf<T>
+  const coerce: Coerce<ArrayOf<T>, ArrayOfError> = (value: any) => {
+    if (!Array.isArray(value)) {
+      return new InvalidCoercion('array', value)
     }
-  })()
+
+    const res = []
+    const nonFatal = []
+    let hasNonFatalErrors = false
+    for (const [el, pos] of enumerate(value)) {
+      const c = coerceTo(type, el)
+      if (c instanceof ContentedError) {
+        return scope([pos], c)
+      } else if (Array.isArray(c)) {
+        hasNonFatalErrors = true
+        res.push(c[0])
+        nonFatal.push(...c[1].map((err: ContentedError) => scope([pos], err)))
+      } else {
+        res.push(c)
+      }
+    }
+    if (hasNonFatalErrors) {
+      return [res, nonFatal] as ArrayOf<T>
+    }
+    return res as ArrayOf<T>
+  }
+
+  return new Type(coerce)
 }
 
 export function permissiveArrayOf<T, E extends ContentedError>(
   type: Type<T, E>
 ): Type<PermissiveArrayOf<T, E>, InvalidCoercion> {
-  return new (class extends Type<PermissiveArrayOf<T, E>, InvalidCoercion> {
-    protected coerce(value: any) {
-      if (!Array.isArray(value)) {
-        return new InvalidCoercion('array', value)
-      }
-      const res = []
-      const errs = []
-      for (const [el, pos] of enumerate(value)) {
-        const c = coerceTo(type, el)
-        if (c instanceof ContentedError) {
-          errs.push(scope([pos], c))
-          continue
-        } else if (Array.isArray(c)) {
-          res.push(c[0])
-          errs.push(...c[1].map((err: ContentedError) => scope([pos], err)))
-        } else {
-          res.push(c)
-        }
-      }
-      return [res, errs] as PermissiveArrayOf<T, E>
+  const coerce: Coerce<PermissiveArrayOf<T, E>, InvalidCoercion> = (
+    value: any
+  ) => {
+    if (!Array.isArray(value)) {
+      return new InvalidCoercion('array', value)
     }
-  })()
+    const res = []
+    const errs = []
+    for (const [el, pos] of enumerate(value)) {
+      const c = coerceTo(type, el)
+      if (c instanceof ContentedError) {
+        errs.push(scope([pos], c))
+        continue
+      } else if (Array.isArray(c)) {
+        res.push(c[0])
+        errs.push(...c[1].map((err: ContentedError) => scope([pos], err)))
+      } else {
+        res.push(c)
+      }
+    }
+    return [res, errs] as PermissiveArrayOf<T, E>
+  }
+
+  return new Type(coerce)
 }
 
 export function combine<
@@ -128,30 +133,32 @@ export function combine<
   fn: (...args: [...ExpectedTypes<Ts>]) => O,
   ...types: [...Ts]
 ): Type<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> {
-  return new (class extends Type<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> {
-    protected coerce(value: any) {
-      const args = []
-      const nonFatals = []
-      let hasNonFatalErrors = false
-      for (const type of types) {
-        const res = coerceTo(type, value)
-        if (res instanceof ContentedError) {
-          return res as UnionOfErrorTypes<Ts>
-        } else if (Array.isArray(res)) {
-          hasNonFatalErrors = true
-          args.push(res[0])
-          nonFatals.push(...res[1])
-        } else {
-          args.push(res)
-        }
+  const coerce: Coerce<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> = (
+    value: any
+  ) => {
+    const args = []
+    const nonFatals = []
+    let hasNonFatalErrors = false
+    for (const type of types) {
+      const res = coerceTo(type, value)
+      if (res instanceof ContentedError) {
+        return res as UnionOfErrorTypes<Ts>
+      } else if (Array.isArray(res)) {
+        hasNonFatalErrors = true
+        args.push(res[0])
+        nonFatals.push(...res[1])
+      } else {
+        args.push(res)
       }
-      const out = fn(...(args as ExpectedTypes<Ts>))
-      if (hasNonFatalErrors) {
-        return [out, nonFatals] as CombinationOf<Ts, O>
-      }
-      return out as CombinationOf<Ts, O>
     }
-  })()
+    const out = fn(...(args as ExpectedTypes<Ts>))
+    if (hasNonFatalErrors) {
+      return [out, nonFatals] as CombinationOf<Ts, O>
+    }
+    return out as CombinationOf<Ts, O>
+  }
+
+  return new Type(coerce)
 }
 
 function scope<E extends ContentedError>(

@@ -1,13 +1,11 @@
-import { Type } from './Type'
+import { Coerce, Type } from './Type'
 import { InvalidCoercion } from './InvalidCoercion'
 
-class NumberType extends Type<number, InvalidCoercion> {
-  protected coerce(value: any) {
-    if (typeof value !== 'number') {
-      return new InvalidCoercion('number', value)
-    }
-    return value
+const coerce: Coerce<number, InvalidCoercion> = (value: any) => {
+  if (typeof value !== 'number') {
+    return new InvalidCoercion('number', value)
   }
+  return value
 }
 
-export const number: Type<number, InvalidCoercion> = new NumberType()
+export const number = new Type(coerce)

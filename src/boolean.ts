@@ -1,13 +1,11 @@
-import { Type } from './Type'
+import { Coerce, Type } from './Type'
 import { InvalidCoercion } from './InvalidCoercion'
 
-class BooleanType extends Type<boolean, InvalidCoercion> {
-  protected coerce(value: any) {
-    if (typeof value !== 'boolean') {
-      return new InvalidCoercion('boolean', value)
-    }
-    return value
+const coerce: Coerce<boolean, InvalidCoercion> = (value: any) => {
+  if (typeof value !== 'boolean') {
+    return new InvalidCoercion('boolean', value)
   }
+  return value
 }
 
-export const boolean: Type<boolean, InvalidCoercion> = new BooleanType()
+export const boolean = new Type(coerce)
