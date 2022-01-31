@@ -177,6 +177,7 @@ function scope<E extends ContentedError>(
   if (err instanceof InvalidCoercion) {
     return new AtKeyInvalidCoercion(path, err) as HasAtKeyInvalidCoercion<E>
   }
+  /* c8 ignore next */
   throw new Error(`Unknown error type: ${err}`)
 }
 
