@@ -184,32 +184,30 @@ type Has<U extends any, U1 extends any, Msg extends string> = [U1] extends [U]
   ? U
   : Msg
 
-const AT_KEY = Symbol()
-const MISSING_KEY = Symbol()
-
-export class MissingKey extends ContentedError {
-  // @ts-ignore
-  private readonly missingKey: symbol
-
-  constructor(public readonly at: Path) {
-    super()
-    this.missingKey = MISSING_KEY
-  }
-}
-
 // ==============================================
 // Errors
 // ==============================================
+const MISSING_KEY = Symbol()
+
+export class MissingKey extends ContentedError {
+  // @ts-expect-error
+  private readonly [MISSING_KEY]: true
+
+  constructor(public readonly at: Path) {
+    super()
+  }
+}
+
+const AT_KEY = Symbol()
 export class AtKeyInvalidCoercion extends ContentedError {
-  // @ts-ignore
-  private readonly atKey: symbol
+  // @ts-expect-error
+  private readonly [AT_KEY]: true
 
   constructor(
     public readonly at: Path,
     public readonly error: InvalidCoercion
   ) {
     super()
-    this.atKey = AT_KEY
   }
 }
 
