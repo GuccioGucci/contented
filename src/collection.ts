@@ -232,8 +232,10 @@ type ExpectedType<T> = T extends Type<infer A, any>
 
 type ErrorType<T> = T extends Type<any, infer E> ? E : never
 
-type NonFatalErrorType<T> = T extends Type<[any, (infer NF)[]], any>
-  ? NF
+type NonFatalErrorType<T> = T extends Type<infer A, any>
+  ? A extends [any, (infer NF)[]]
+    ? NF
+    : never
   : never
 
 // ==============================================
