@@ -3,6 +3,7 @@ import assert from 'uvu/assert'
 import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
+import { always } from './always'
 import {
   at,
   fallback,
@@ -176,12 +177,17 @@ test('array rejects a value upon the first missing element', function () {
 test(`array propagates non fatal errors`, function () {
   const arrayOfPermissiveArray = arrayOf(permissiveArrayOf(number))
 
-  const res = coerceTo(arrayOfPermissiveArray, [[1, 2, 3, 'hello']])
+  const res1 = coerceTo(arrayOfPermissiveArray, [[1, 2, 3, 'hello']])
+  const res2 = coerceTo(arrayOfPermissiveArray, [1, [1, 2, 3, 'hello']])
 
-  assert.equal(res, [
+  assert.equal(res1, [
     [[1, 2, 3]],
     [new AtKeyInvalidCoercion([0, 3], new InvalidCoercion('number', 'hello'))],
   ])
+  assert.equal(
+    res2,
+    new AtKeyInvalidCoercion([0], new InvalidCoercion('array', 1))
+  )
 })
 
 test('permissive array accepts arrays with wrong element types', function () {
@@ -225,6 +231,14 @@ test('permissive array propagates non-fatal errors', function () {
   ])
 })
 
+test(`permissive array does not include non-fatal errors if they are not possible`, function () {
+  const arrayOf10s = permissiveArrayOf(always(10))
+
+  const res = coerceTo(arrayOf10s, ['a', 'b', 'c'])
+
+  assert.equal(res, [10, 10, 10])
+})
+
 test(`combine accepts a function to mix-and-match other types`, function () {
   const id = combine(
     (a, b) => `${a}-${b}`,
@@ -265,15 +279,17 @@ test(`combine rejects the combination upon the first mismatching element`, funct
 })
 
 test(`combine propagates non fatal errors`, function () {
-  const add1 = (x: number) => x + 1
-  const permissiveArrayPlus1 = combine(
-    (xs) => xs.map(add1),
+  const permissiveLengths = combine(
+    (xs) => xs.length,
     permissiveArrayOf(number)
   )
-  const res = coerceTo(permissiveArrayPlus1, [1, 2, 3, 'hello', true])
 
-  assert.equal(res, [
-    [2, 3, 4],
+  const res1 = coerceTo(permissiveLengths, [1, 2, 3, 4, 5])
+  const res2 = coerceTo(permissiveLengths, [1, 2, 3, 'hello', true])
+
+  assert.equal(res1, 5)
+  assert.equal(res2, [
+    3,
     [
       new AtKeyInvalidCoercion([3], new InvalidCoercion('number', 'hello')),
       new AtKeyInvalidCoercion([4], new InvalidCoercion('number', true)),

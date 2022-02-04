@@ -74,20 +74,20 @@ export function arrayOf<T, E extends ContentedError>(
 
     const res = []
     const nonFatal = []
-    let hasNonFatalErrors = false
+    let nonFatalErrors = false
     for (const [el, pos] of enumerate(value)) {
       const c = coerceTo(type, el)
       if (c instanceof ContentedError) {
         return scope([pos], c)
-      } else if (Array.isArray(c)) {
-        hasNonFatalErrors = true
+      } else if (hasNonFatalErrors(c)) {
+        nonFatalErrors = true
         res.push(c[0])
         nonFatal.push(...c[1].map((err: ContentedError) => scope([pos], err)))
       } else {
         res.push(c)
       }
     }
-    if (hasNonFatalErrors) {
+    if (nonFatalErrors) {
       return [res, nonFatal] as ArrayOf<T>
     }
     return res as ArrayOf<T>
@@ -112,12 +112,15 @@ export function permissiveArrayOf<T, E extends ContentedError>(
       if (c instanceof ContentedError) {
         errs.push(scope([pos], c))
         continue
-      } else if (Array.isArray(c)) {
+      } else if (hasNonFatalErrors(c)) {
         res.push(c[0])
         errs.push(...c[1].map((err: ContentedError) => scope([pos], err)))
       } else {
         res.push(c)
       }
+    }
+    if (errs.length === 0) {
+      return res as PermissiveArrayOf<T, E>
     }
     return [res, errs] as PermissiveArrayOf<T, E>
   }
@@ -138,13 +141,13 @@ export function combine<
   ) => {
     const args = []
     const nonFatals = []
-    let hasNonFatalErrors = false
+    let nonFatalErrors = false
     for (const type of types) {
       const res = coerceTo(type, value)
       if (res instanceof ContentedError) {
         return res as UnionOfErrorTypes<Ts>
-      } else if (Array.isArray(res)) {
-        hasNonFatalErrors = true
+      } else if (hasNonFatalErrors(res)) {
+        nonFatalErrors = true
         args.push(res[0])
         nonFatals.push(...res[1])
       } else {
@@ -152,13 +155,21 @@ export function combine<
       }
     }
     const out = fn(...(args as ExpectedTypes<Ts>))
-    if (hasNonFatalErrors) {
+    if (nonFatalErrors) {
       return [out, nonFatals] as CombinationOf<Ts, O>
     }
     return out as CombinationOf<Ts, O>
   }
 
   return new Type(coerce)
+}
+
+function hasNonFatalErrors(res: any): res is [unknown, ContentedError[]] {
+  return (
+    Array.isArray(res) &&
+    res.length == 2 &&
+    res[1].every((err: any) => err instanceof ContentedError)
+  )
 }
 
 function scope<E extends ContentedError>(
@@ -233,8 +244,8 @@ type ExpectedType<T> = T extends Type<infer A, any>
 type ErrorType<T> = T extends Type<any, infer E> ? E : never
 
 type NonFatalErrorType<T> = T extends Type<infer A, any>
-  ? A extends [any, (infer NF)[]]
-    ? NF
+  ? HasNonFatalErrorTypes<A> extends true
+    ? _NonFatalErrorTypes<A>
     : never
   : never
 
@@ -243,7 +254,7 @@ type NonFatalErrorType<T> = T extends Type<infer A, any>
 // ==============================================
 type CombinationOf<Ts, O> = UnionOfNonFatalErrorTypes<Ts> extends never
   ? O
-  : [O, UnionOfNonFatalErrorTypes<Ts>[]]
+  : O | [O, UnionOfNonFatalErrorTypes<Ts>[]]
 
 type UnionOfNonFatalErrorTypes<Ts> = NonFatalErrorTypes<Ts>[number]
 
@@ -264,11 +275,56 @@ type ErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail]
 // ==============================================
 // Type-level functions for arrayOf()
 // ==============================================
-type ArrayOf<T> = T extends [infer O, infer NFs] ? [O[], NFs] : T[]
+type ArrayOf<T> = HasNonFatalErrorTypes<T> extends true
+  ?
+      | TypeInFatalErrorTypes<T>[]
+      | [TypeInFatalErrorTypes<T>[], _NonFatalErrorTypes<T>[]]
+  : T[]
 
 // ==============================================
 // Type-level functions for permissiveArrayOf()
 // ==============================================
-type PermissiveArrayOf<T, E> = T extends [infer O, (infer NF)[]]
-  ? [O[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | NF)[]]
-  : [T[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E>)[]]
+type PermissiveArrayOf<T, E> = HasNonFatalErrorTypes<T> extends true
+  ?
+      | TypeInFatalErrorTypes<T>[]
+      | [
+          TypeInFatalErrorTypes<T>[],
+          (
+            | HasAtKeyInvalidCoercion<E>
+            | HasMissingKey<E>
+            | _NonFatalErrorTypes<T>
+          )[]
+        ]
+  : HasAtKeyInvalidCoercion<E> | HasMissingKey<E> extends never
+  ? T[]
+  : T[] | [T[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E>)[]]
+
+type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never
+
+type _NonFatalErrorTypes<T> = T extends [any, infer NFs]
+  ? NFs extends (infer NF)[]
+    ? NF extends ContentedError
+      ? NF
+      : never
+    : never
+  : never
+
+type HasNonFatalErrorTypes<T> = And<IsUnion<T>, _Has<_NonFatalErrorTypes<T>>>
+
+type TypeInFatalErrorTypes<T> = T extends [infer U, infer NFs]
+  ? NFs extends (infer NF)[]
+    ? NF extends ContentedError
+      ? U
+      : never
+    : never
+  : never
+
+type And<T1 extends boolean, T2 extends boolean> = T1 extends true ? T2 : false
+
+type _Has<T> = T extends never ? false : true
