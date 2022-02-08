@@ -176,8 +176,8 @@ function scope<E extends ContentedError>(
   path: Path,
   err: E
 ): HasMissingKey<E> | HasAtKeyInvalidCoercion<E> {
-  if (err instanceof AtKeyInvalidCoercion) {
-    return new AtKeyInvalidCoercion(
+  if (err instanceof AtKey) {
+    return new AtKey(
       path.concat(err.at),
       err.error
     ) as HasAtKeyInvalidCoercion<E>
@@ -186,7 +186,7 @@ function scope<E extends ContentedError>(
     return new MissingKey(path.concat(err.at)) as HasMissingKey<E>
   }
   if (err instanceof InvalidCoercion) {
-    return new AtKeyInvalidCoercion(path, err) as HasAtKeyInvalidCoercion<E>
+    return new AtKey(path, err) as HasAtKeyInvalidCoercion<E>
   }
   /* c8 ignore next */
   throw new Error(`Unknown error type: ${err}`)
@@ -211,14 +211,11 @@ export class MissingKey extends ContentedError {
 }
 
 const AT_KEY = Symbol()
-export class AtKeyInvalidCoercion extends ContentedError {
+export class AtKey<E> extends ContentedError {
   // @ts-expect-error
   private readonly [AT_KEY]: true
 
-  constructor(
-    public readonly at: Path,
-    public readonly error: InvalidCoercion
-  ) {
+  constructor(public readonly at: Path, public readonly error: E) {
     super()
   }
 }
@@ -229,7 +226,7 @@ type Path = Key[]
 type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never
 
 type HasAtKeyInvalidCoercion<E> = [InvalidCoercion] extends [E]
-  ? AtKeyInvalidCoercion
+  ? AtKey<InvalidCoercion>
   : never
 
 // ==============================================

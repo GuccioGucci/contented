@@ -9,7 +9,7 @@ import {
   fallback,
   arrayOf,
   MissingKey,
-  AtKeyInvalidCoercion,
+  AtKey,
   combine,
   permissiveArrayOf,
 } from './collection'
@@ -63,19 +63,13 @@ test('at propagates non-fatal errors', function () {
   const res2 = coerceTo(thirdEl, { b: [] })
   const res3 = coerceTo(thirdEl, { a: [1, 2, 'hello', 3, true] })
 
-  assert.equal(
-    res1,
-    new AtKeyInvalidCoercion(['a'], new InvalidCoercion('array', 5))
-  )
+  assert.equal(res1, new AtKey(['a'], new InvalidCoercion('array', 5)))
   assert.equal(res2, new MissingKey(['a']))
   assert.equal(res3, [
     [1, 2, 3],
     [
-      new AtKeyInvalidCoercion(
-        ['a', 2],
-        new InvalidCoercion('number', 'hello')
-      ),
-      new AtKeyInvalidCoercion(['a', 4], new InvalidCoercion('number', true)),
+      new AtKey(['a', 2], new InvalidCoercion('number', 'hello')),
+      new AtKey(['a', 4], new InvalidCoercion('number', true)),
     ],
   ])
 })
@@ -87,10 +81,7 @@ test(`any error on the value part of a property is accompanied by the property p
 
   assert.equal(
     c1,
-    new AtKeyInvalidCoercion(
-      ['a', 'b', 'c'],
-      new InvalidCoercion('number', 'hello')
-    )
+    new AtKey(['a', 'b', 'c'], new InvalidCoercion('number', 'hello'))
   )
 })
 
@@ -149,10 +140,7 @@ test('array rejects arrays of the wrong element type', function () {
 
   const res = coerceTo(arrayOfStrings, [1, 2, 3])
 
-  assert.equal(
-    res,
-    new AtKeyInvalidCoercion([0], new InvalidCoercion('string', 1))
-  )
+  assert.equal(res, new AtKey([0], new InvalidCoercion('string', 1)))
 })
 
 test('array reports nested errors', function () {
@@ -160,10 +148,7 @@ test('array reports nested errors', function () {
 
   const res = coerceTo(arrayOfStrings, [{ a: 5 }])
 
-  assert.equal(
-    res,
-    new AtKeyInvalidCoercion([0, 'a'], new InvalidCoercion('string', 5))
-  )
+  assert.equal(res, new AtKey([0, 'a'], new InvalidCoercion('string', 5)))
 })
 
 test('array rejects a value upon the first missing element', function () {
@@ -182,12 +167,9 @@ test(`array propagates non fatal errors`, function () {
 
   assert.equal(res1, [
     [[1, 2, 3]],
-    [new AtKeyInvalidCoercion([0, 3], new InvalidCoercion('number', 'hello'))],
+    [new AtKey([0, 3], new InvalidCoercion('number', 'hello'))],
   ])
-  assert.equal(
-    res2,
-    new AtKeyInvalidCoercion([0], new InvalidCoercion('array', 1))
-  )
+  assert.equal(res2, new AtKey([0], new InvalidCoercion('array', 1)))
 })
 
 test('permissive array accepts arrays with wrong element types', function () {
@@ -197,7 +179,7 @@ test('permissive array accepts arrays with wrong element types', function () {
 
   assert.equal(res, [
     ['a', 'b'],
-    [new AtKeyInvalidCoercion([2], new InvalidCoercion('string', 2))],
+    [new AtKey([2], new InvalidCoercion('string', 2))],
   ])
 })
 
@@ -224,9 +206,9 @@ test('permissive array propagates non-fatal errors', function () {
       [4, 5, 6],
     ],
     [
-      new AtKeyInvalidCoercion([0], new InvalidCoercion('array', 3)),
-      new AtKeyInvalidCoercion([1, 3], new InvalidCoercion('number', 'hello')),
-      new AtKeyInvalidCoercion([2, 2], new InvalidCoercion('number', 'world')),
+      new AtKey([0], new InvalidCoercion('array', 3)),
+      new AtKey([1, 3], new InvalidCoercion('number', 'hello')),
+      new AtKey([2, 2], new InvalidCoercion('number', 'world')),
     ],
   ])
 })
@@ -272,10 +254,7 @@ test(`combine rejects the combination upon the first mismatching element`, funct
 
   const res = coerceTo(id, { a: 10, b: 12 })
 
-  assert.equal(
-    res,
-    new AtKeyInvalidCoercion(['a'], new InvalidCoercion('string', 10))
-  )
+  assert.equal(res, new AtKey(['a'], new InvalidCoercion('string', 10)))
 })
 
 test(`combine propagates non fatal errors`, function () {
@@ -291,8 +270,8 @@ test(`combine propagates non fatal errors`, function () {
   assert.equal(res2, [
     3,
     [
-      new AtKeyInvalidCoercion([3], new InvalidCoercion('number', 'hello')),
-      new AtKeyInvalidCoercion([4], new InvalidCoercion('number', true)),
+      new AtKey([3], new InvalidCoercion('number', 'hello')),
+      new AtKey([4], new InvalidCoercion('number', true)),
     ],
   ])
 })
