@@ -47,3 +47,17 @@ coerceTo(number, 42)
 coerceTo(number, 'hello')
 // => InvalidCoercion { expected: 'number', got: 'hello' }
 ```
+
+#### `boolean`
+
+A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself, if the input data was indeed a boolean, or in an `InvalidCoercion` error.
+
+```typescript
+import { boolean, coerceTo } from 'contented'
+
+coerceTo(boolean, true)
+// => true
+
+coerceTo(boolean, 'hello')
+// => InvalidCoercion { expected: 'boolean', got: 'hello' }
+```
