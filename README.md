@@ -18,9 +18,9 @@ const Image = combine(
   (url, size) => ({ url, size }),
   at(['url'], string),
   at(['metadata', 'size'], number)
-)
+);
 
-const image = coerceTo(Image, data /* abritrary data */)
+const image = coerceTo(Image, data /* abritrary data */);
 ```
 
 Contented may be useful every time there are expectations — but no guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, files, or any other external source.
@@ -34,12 +34,12 @@ Contented may be useful every time there are expectations — but no guarantees,
 A run-time representation of the `string` type. An attempt to coerce to `string` may result in either the string itself, if the input data was indeed a string, or in an `InvalidCoercion` error.
 
 ```typescript
-import { string, coerceTo } from 'contented'
+import { string, coerceTo } from 'contented';
 
-coerceTo(string, 'hello')
+coerceTo(string, 'hello');
 // => 'hello'
 
-coerceTo(string, 42)
+coerceTo(string, 42);
 // => InvalidCoercion { expected: 'string', got: 42 }
 ```
 
@@ -48,12 +48,12 @@ coerceTo(string, 42)
 A run-time representation of the `number` type. An attempt to coerce to `number` may result in either the number itself, if the input data was indeed a number, or in an `InvalidCoercion` error.
 
 ```typescript
-import { number, coerceTo } from 'contented'
+import { number, coerceTo } from 'contented';
 
-coerceTo(number, 42)
+coerceTo(number, 42);
 // => 42
 
-coerceTo(number, 'hello')
+coerceTo(number, 'hello');
 // => InvalidCoercion { expected: 'number', got: 'hello' }
 ```
 
@@ -62,11 +62,11 @@ coerceTo(number, 'hello')
 A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself, if the input data was indeed a boolean, or in an `InvalidCoercion` error.
 
 ```typescript
-import { boolean, coerceTo } from 'contented'
+import { boolean, coerceTo } from 'contented';
 
-coerceTo(boolean, true)
+coerceTo(boolean, true);
 // => true
 
-coerceTo(boolean, 'hello')
+coerceTo(boolean, 'hello');
 // => InvalidCoercion { expected: 'boolean', got: 'hello' }
 ```
