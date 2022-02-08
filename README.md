@@ -31,7 +31,7 @@ Contented may be useful every time there are expectations — but no guarantees,
 
 #### `string`
 
-A run-time representation of the `string` type. An attempt to coerce to `string` may result in either the string itself, if the input data was indeed a string, or in an `InvalidCoercion` error.
+A run-time representation of the `string` type. An attempt to coerce to `string` may result in either the string itself (if the input data is indeed a string) or an `InvalidCoercion` error.
 
 ```typescript
 import { string, coerceTo } from 'contented';
@@ -45,7 +45,7 @@ coerceTo(string, 42);
 
 #### `number`
 
-A run-time representation of the `number` type. An attempt to coerce to `number` may result in either the number itself, if the input data was indeed a number, or in an `InvalidCoercion` error.
+A run-time representation of the `number` type. An attempt to coerce to `number` may result in either the number itself (if the input data is indeed a number) or an `InvalidCoercion` error.
 
 ```typescript
 import { number, coerceTo } from 'contented';
@@ -59,7 +59,7 @@ coerceTo(number, 'hello');
 
 #### `boolean`
 
-A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself, if the input data was indeed a boolean, or in an `InvalidCoercion` error.
+A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself (if the input data is indeed a boolean) or an `InvalidCoercion` error.
 
 ```typescript
 import { boolean, coerceTo } from 'contented';
