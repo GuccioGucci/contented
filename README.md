@@ -1,5 +1,14 @@
 # Contented
 
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Reference](#reference)
+  - [Primitive types](#primitive-types)
+    - [`string`](#string)
+    - [`number`](#number)
+    - [`boolean`](#boolean)
+
 ## Introduction
 
 Contented is a TypeScript library for performing type coercion at run-time. To this end, Contented introduces run-time representations of primitive types, such as strings, which can be then mixed and matched to describe compound types.
@@ -16,7 +25,7 @@ const image = coerceTo(Image, data /* abritrary data */)
 
 Contented may be useful every time there are expectations — but no guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, files, or any other external source.
 
-## References
+## Reference
 
 ### Primitive types
 
