@@ -8,6 +8,8 @@
     - [`string`](#string)
     - [`number`](#number)
     - [`boolean`](#boolean)
+  - [Array types](#array-types)
+    - [`arrayOf(T)`](#arrayoft)
 
 ## Introduction
 
@@ -69,4 +71,27 @@ coerceTo(boolean, true);
 
 coerceTo(boolean, 'hello');
 // => InvalidCoercion { expected: 'boolean', got: 'hello' }
+```
+
+### Array types
+
+#### `arrayOf(T)`
+
+A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
+
+```typescript
+import { number, arrayOf, coerceTo } from 'contented';
+
+coerceTo(arrayOf(number), [3, 4, 5]);
+// => [3, 4, 5]
+
+coerceTo(arrayOf(number), 'hello');
+// => InvalidCoercion { expected: 'array', got: 'hello' }
+
+coerceTo(arrayOf(number), [3, 'a', 5]);
+/* => AtKey {
+        path: [1],
+        error: InvalidCoercion { expected: 'number', got: 'a' }
+      }
+*/
 ```
