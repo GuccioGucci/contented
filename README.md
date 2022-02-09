@@ -8,6 +8,8 @@
     - [`string`](#string)
     - [`number`](#number)
     - [`boolean`](#boolean)
+  - [Object types](#object-types)
+    - [`at(path, T)`](#atpath-t)
   - [Array types](#array-types)
     - [`arrayOf(T)`](#arrayoft)
 
@@ -71,6 +73,27 @@ coerceTo(boolean, true);
 
 coerceTo(boolean, 'hello');
 // => InvalidCoercion { expected: 'boolean', got: 'hello' }
+```
+
+### Object types
+
+#### `at(path, T)`
+
+Constructs a run-time type that expects the input data to be an object such that there exists a value of type `T` under the keys specified in `path`.
+
+```typescript
+import { string, at, coerceTo } from 'contented';
+
+const stringAtAB = at(['a', 'b'], string)
+
+coerceTo(stringAtAB, { a: { b: 'hello' } });
+// => 'hello'
+
+coerceTo(stringAtAB, { a: { c: 'hello' } });
+// => MissingKey { path: [ 'a', 'b' ] }
+
+coerceTo(stringAtAB, 'hello')
+// => InvalidCoercion { expected: 'object', got: 'hello' }
 ```
 
 ### Array types
