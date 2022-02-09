@@ -46,10 +46,10 @@ A run-time representation of the `string` type. An attempt to coerce to `string`
 import { string, coerceTo } from 'contented';
 
 coerceTo(string, 'hello');
-// => 'hello'
+// 'hello'
 
 coerceTo(string, 42);
-// => InvalidCoercion { expected: 'string', got: 42 }
+// InvalidCoercion { expected: 'string', got: 42 }
 ```
 
 #### `number`
@@ -60,10 +60,10 @@ A run-time representation of the `number` type. An attempt to coerce to `number`
 import { number, coerceTo } from 'contented';
 
 coerceTo(number, 42);
-// => 42
+// 42
 
 coerceTo(number, 'hello');
-// => InvalidCoercion { expected: 'number', got: 'hello' }
+// InvalidCoercion { expected: 'number', got: 'hello' }
 ```
 
 #### `boolean`
@@ -74,10 +74,10 @@ A run-time representation of the `boolean` type. An attempt to coerce to `boolea
 import { boolean, coerceTo } from 'contented';
 
 coerceTo(boolean, true);
-// => true
+// true
 
 coerceTo(boolean, 'hello');
-// => InvalidCoercion { expected: 'boolean', got: 'hello' }
+// InvalidCoercion { expected: 'boolean', got: 'hello' }
 ```
 
 ### Object types
@@ -92,13 +92,13 @@ import { string, at, coerceTo } from 'contented';
 const stringAtAB = at(['a', 'b'], string)
 
 coerceTo(stringAtAB, { a: { b: 'hello' } });
-// => 'hello'
+// 'hello'
 
 coerceTo(stringAtAB, { a: { c: 'hello' } });
-// => MissingKey { path: [ 'a', 'b' ] }
+// MissingKey { path: [ 'a', 'b' ] }
 
 coerceTo(stringAtAB, 'hello');
-// => InvalidCoercion { expected: 'object', got: 'hello' }
+// InvalidCoercion { expected: 'object', got: 'hello' }
 ```
 
 #### `fallback(T, substitute)`
@@ -111,10 +111,10 @@ import { number, at, fallback, coerceTo } from 'contented';
 const numberAtAB = fallback(at(['a', 'b'], number), 42);
 
 coerceTo(numberAtAB, { a: { c: 3 } });
-// => 42
+// 42
 
 coerceTo(numberAtAB, { a: { b: 3 } });
-// => 3
+// 3
 ```
 
 ### Array types
@@ -127,17 +127,13 @@ A run-time representation of an array of `T`s, where `T` denotes the run-time re
 import { number, arrayOf, coerceTo } from 'contented';
 
 coerceTo(arrayOf(number), [3, 4, 5]);
-// => [3, 4, 5]
+// [ 3, 4, 5 ]
 
 coerceTo(arrayOf(number), 'hello');
-// => InvalidCoercion { expected: 'array', got: 'hello' }
+// InvalidCoercion { expected: 'array', got: 'hello' }
 
 coerceTo(arrayOf(number), [3, 'a', 5]);
-/* => AtKey {
-        path: [1],
-        error: InvalidCoercion { expected: 'number', got: 'a' }
-      }
-*/
+// AtKey { path: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
 ```
 
 ---
