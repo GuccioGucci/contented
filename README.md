@@ -97,7 +97,7 @@ coerceTo(stringAtAB, { a: { b: 'hello' } });
 coerceTo(stringAtAB, { a: { c: 'hello' } });
 // => MissingKey { path: [ 'a', 'b' ] }
 
-coerceTo(stringAtAB, 'hello')
+coerceTo(stringAtAB, 'hello');
 // => InvalidCoercion { expected: 'object', got: 'hello' }
 ```
 
