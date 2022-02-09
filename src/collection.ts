@@ -41,7 +41,7 @@ export function at<T, E extends ContentedError>(
 
 export function fallback<T, E extends ContentedError>(
   type: Type<T, Has<E, MissingKey, 'Must include MissingKey'>>,
-  fallback: T
+  fallback: Fallback<T>
 ): Type<T, Exclude<E, MissingKey>> {
   type FallbackError = Exclude<E, MissingKey>
 
@@ -295,6 +295,13 @@ type PermissiveArrayOf<T, E> = HasNonFatalErrorTypes<T> extends true
   : HasAtKeyInvalidCoercion<E> | HasMissingKey<E> extends never
   ? T[]
   : T[] | [T[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E>)[]]
+
+// ==============================================
+// Type-level functions for fallback()
+// ==============================================
+type Fallback<T> = HasNonFatalErrorTypes<T> extends true
+  ? TypeInFatalErrorTypes<T>
+  : T
 
 type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true
 
