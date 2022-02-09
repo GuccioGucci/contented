@@ -14,6 +14,7 @@
     - [`boolean`](#boolean)
   - [Object types](#object-types)
     - [`at(path, T)`](#atpath-t)
+    - [`fallback(T, substitute)`](#fallbackt-substitute)
   - [Array types](#array-types)
     - [`arrayOf(T)`](#arrayoft)
 
@@ -98,6 +99,22 @@ coerceTo(stringAtAB, { a: { c: 'hello' } });
 
 coerceTo(stringAtAB, 'hello')
 // => InvalidCoercion { expected: 'object', got: 'hello' }
+```
+
+#### `fallback(T, substitute)`
+
+`fallback` works in tandem with `at` to provide a fallback value in case the input data does not contain the specified keys. Apart from removing the possibility of a `MissingKey` error, `fallback` retains the same behavior as the `at` it wraps.
+
+```typescript
+import { number, at, fallback, coerceTo } from 'contented';
+
+const numberAtAB = fallback(at(['a', 'b'], number), 42);
+
+coerceTo(numberAtAB, { a: { c: 3 } });
+// => 42
+
+coerceTo(numberAtAB, { a: { b: 3 } });
+// => 3
 ```
 
 ### Array types
