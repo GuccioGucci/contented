@@ -18,6 +18,9 @@
   - [Array types](#array-types)
     - [`arrayOf(T)`](#arrayoft)
     - [`permissiveArrayOf(T)`](#permissivearrayoft)
+  - [Narrowing](#narrowing)
+    - [`match(value)`](#matchvalue)
+    - [`always(value)`](#alwaysvalue)
 
 ## Introduction
 
@@ -155,6 +158,36 @@ coerceTo(permissiveArrayOf(number), [3, 'a', 5]);
      [ AtKey { path: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } } ]
    ]
 */
+```
+
+### Narrowing
+
+#### `match(value)`
+
+A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` can only succeed if `value` is provided as an input.
+
+```typescript
+import { match, coerceTo } from 'contented';
+
+coerceTo(match('hello'), 'hello')
+// 'hello'
+
+coerceTo(match('hello'), 'foo')
+// InvalidCoercion { expected: 'hello', got: 'foo' }
+```
+
+#### `always(value)`
+
+A run-time type that always succeeds with `value` regardless of the input data.
+
+```typescript
+import { always, coerceTo } from 'contented';
+
+coerceTo(always(20), 'hello')
+// 20
+
+coerceTo(always(20), false)
+// 20
 ```
 
 ---
