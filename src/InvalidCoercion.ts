@@ -1,13 +1,7 @@
 import { ContentedError } from './ContentedError'
 
 export class InvalidCoercion extends ContentedError {
-  constructor(public readonly expected: Expected, public readonly got: any) {
+  constructor(public readonly expected: string, public readonly got: any) {
     super()
   }
-}
-
-type Expected = 'string' | 'number' | 'boolean' | 'array' | 'object' | PredName
-
-export class PredName {
-  constructor(public readonly name: string) {}
 }

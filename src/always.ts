@@ -1,4 +1,4 @@
-import { InvalidCoercion, PredName } from './InvalidCoercion'
+import { InvalidCoercion } from './InvalidCoercion'
 import { Coerce, Type } from './Type'
 
 export function always<T>(value: Narrow<T>): Type<T, never> {
@@ -12,8 +12,8 @@ export function match<T extends string | number | bigint | boolean>(
     if (value === expected) {
       return value
     }
-    const predName = new PredName(`match(${expected})`)
-    return new InvalidCoercion(predName, value)
+
+    return new InvalidCoercion(`${expected}`, value)
   }
 
   return new Type(coerce)
