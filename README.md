@@ -143,6 +143,20 @@ A run-time representation of an array of `T`s, where `T` denotes the run-time re
 
 The distictive feature of a `permissiveArrayOf(T)` is that it skips elements that are not recognized as `T`s. This is different from `arrayOf(T)`, which instead stops as soon as one element is not recognized.
 
+```typescript
+import { number, permissiveArrayOf, coerceTo } from 'contented';
+
+coerceTo(permissiveArrayOf(number), [3, 4, 5]);
+// [ 3, 4, 5 ]
+
+coerceTo(permissiveArrayOf(number), [3, 'a', 5]);
+/* [
+     [ 3, 5 ],
+     [ AtKey { path: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } } ]
+   ]
+*/
+```
+
 ---
 
 Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
