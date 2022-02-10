@@ -17,6 +17,7 @@
     - [`fallback(T, substitute)`](#fallbackt-substitute)
   - [Array types](#array-types)
     - [`arrayOf(T)`](#arrayoft)
+    - [`permissiveArrayOf(T)`](#permissivearrayoft)
 
 ## Introduction
 
@@ -135,6 +136,12 @@ coerceTo(arrayOf(number), 'hello');
 coerceTo(arrayOf(number), [3, 'a', 5]);
 // AtKey { path: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
 ```
+
+#### `permissiveArrayOf(T)`
+
+A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
+
+The distictive feature of a `permissiveArrayOf(T)` is that it skips elements that are not recognized as `T`s. This is different from `arrayOf(T)`, which instead stops as soon as one element is not recognized.
 
 ---
 
