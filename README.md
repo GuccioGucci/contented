@@ -21,6 +21,8 @@
   - [Narrowing](#narrowing)
     - [`match(value)`](#matchvalue)
     - [`always(value)`](#alwaysvalue)
+  - [Combinations & Alternatives](#combinations--alternatives)
+    - [`combine(fn, ...Ts)`](#combinefn-ts)
 
 ## Introduction
 
@@ -189,6 +191,35 @@ coerceTo(always(20), 'hello')
 coerceTo(always(20), false)
 // 20
 ```
+
+### Combinations & Alternatives
+
+#### `combine(fn, ...Ts)`
+
+`combine` constructs a run-time type from some known run-time types `Ts` and a function `fn`. Coercing to `combine(fn, ...Ts)` results in an attempt to coerce the input data to each type specified in `Ts`; if every coercion ends up successful, the resulting values are passed to the function `fn`.
+
+```typescript
+const User = combine(
+  (name, surname, phone) => ({ fullname: `${name} ${surname}`, phone }),
+  at(['name'], string),
+  at(['surname'], string),
+  at(['contacts', 'phone'], string)
+)
+
+coerceTo(User, {
+  name: 'John',
+  surname: 'Smith',
+  contacts: {
+    phone: '055-123404',
+    email: 'john@smith.com',
+  }
+})
+// { fullname: 'John Smith', phone: '055-123404' }
+
+coerceTo(User, { name: 42 })
+// AtKey { at: [ 'name' ], error: InvalidCoercion { expected: 'string', got: 42 } }
+```
+
 
 ---
 
