@@ -1,17 +1,21 @@
 import { ContentedError } from './ContentedError'
 
 export class Type<T, E> {
-  constructor(private readonly coerce: Coerce<T, E>) {}
+  #coerce: Coerce<T, E>
+
+  constructor(coerce: Coerce<T, E>) {
+    this.#coerce = coerce
+  }
 
   static coerceTo<T, E extends ContentedError>(type: Type<T, E>, value: any) {
-    return type.coerce(value)
+    return type.#coerce(value)
   }
 
   or<U, F>(that: Type<U, F>): Type<T | U, OrErrors<E, F>> {
     const coerce: Coerce<T | U, OrErrors<E, F>> = (value) => {
-      const res = this.coerce(value)
+      const res = this.#coerce(value)
       if (res instanceof ContentedError) {
-        return that.coerce(value) as T | U | OrErrors<E, F>
+        return that.#coerce(value) as T | U | OrErrors<E, F>
       }
       return res as T | U | OrErrors<E, F>
     }
