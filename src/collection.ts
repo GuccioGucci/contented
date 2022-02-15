@@ -1,13 +1,20 @@
 import { ContentedError } from './ContentedError'
 import { enumerate } from './enumerate'
 import { InvalidCoercion } from './InvalidCoercion'
-import { Type, coerceTo, Coerce } from './Type'
+import { Type, coerceTo, Coerce, Joint } from './Type'
 
 export function at<T, E extends ContentedError>(
   path: Path,
   type: Type<T, E>
-): Type<T, MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion> {
-  type AtError = MissingKey | HasAtKeyInvalidCoercion<E> | InvalidCoercion
+): Type<
+  T,
+  MissingKey | InvalidCoercion | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>
+> {
+  type AtError =
+    | MissingKey
+    | InvalidCoercion
+    | HasAtKeyInvalidCoercion<E>
+    | HasJointAtKey<E>
 
   const coerce: Coerce<T, AtError> = (value: any) => {
     if (typeof value !== 'object') {
@@ -60,12 +67,16 @@ export function arrayOf<T, E extends ContentedError>(
   type: Type<T, E>
 ): Type<
   ArrayOf<T>,
-  HasAtKeyInvalidCoercion<E> | HasMissingKey<E> | InvalidCoercion
+  | InvalidCoercion
+  | HasMissingKey<E>
+  | HasAtKeyInvalidCoercion<E>
+  | HasJointAtKey<E>
 > {
   type ArrayOfError =
-    | HasAtKeyInvalidCoercion<E>
-    | HasMissingKey<E>
     | InvalidCoercion
+    | HasMissingKey<E>
+    | HasAtKeyInvalidCoercion<E>
+    | HasJointAtKey<E>
 
   const coerce: Coerce<ArrayOf<T>, ArrayOfError> = (value: any) => {
     if (!Array.isArray(value)) {
@@ -175,7 +186,7 @@ function hasNonFatalErrors(res: any): res is [unknown, ContentedError[]] {
 function scope<E extends ContentedError>(
   path: Path,
   err: E
-): HasMissingKey<E> | HasAtKeyInvalidCoercion<E> {
+): HasMissingKey<E> | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> {
   if (err instanceof AtKey) {
     return new AtKey(
       path.concat(err.at),
@@ -187,6 +198,11 @@ function scope<E extends ContentedError>(
   }
   if (err instanceof InvalidCoercion) {
     return new AtKey(path, err) as HasAtKeyInvalidCoercion<E>
+  }
+  if (err instanceof Joint) {
+    return new Joint(
+      err.errors.map((error: ContentedError) => scope(path, error))
+    ) as HasJointAtKey<E>
   }
   /* c8 ignore next */
   throw new Error(`Unknown error type: ${err}`)
@@ -228,6 +244,18 @@ type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never
 type HasAtKeyInvalidCoercion<E> = [InvalidCoercion] extends [E]
   ? AtKey<InvalidCoercion>
   : never
+
+type HasJointAtKey<E> = E extends Joint<infer U>
+  ? Joint<MapAtKeyInvalidCoercion<U>>
+  : never
+
+type MapAtKeyInvalidCoercion<U> = U extends [infer Head, ...infer Tail]
+  ? [ApplyAtKeyInvalidCoercion<Head>, ...MapAtKeyInvalidCoercion<Tail>]
+  : []
+
+type ApplyAtKeyInvalidCoercion<E> = [InvalidCoercion] extends [E]
+  ? AtKey<InvalidCoercion>
+  : E
 
 // ==============================================
 // Type-level functions for `Type<A, B>`
@@ -288,13 +316,22 @@ type PermissiveArrayOf<T, E> = HasNonFatalErrorTypes<T> extends true
           TypeInFatalErrorTypes<T>[],
           (
             | HasAtKeyInvalidCoercion<E>
+            | HasJointAtKey<E>
             | HasMissingKey<E>
             | _NonFatalErrorTypes<T>
           )[]
         ]
-  : HasAtKeyInvalidCoercion<E> | HasMissingKey<E> extends never
+  :
+      | HasAtKeyInvalidCoercion<E>
+      | HasJointAtKey<E>
+      | HasMissingKey<E> extends never
   ? T[]
-  : T[] | [T[], (HasAtKeyInvalidCoercion<E> | HasMissingKey<E>)[]]
+  :
+      | T[]
+      | [
+          T[],
+          (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E>)[]
+        ]
 
 // ==============================================
 // Type-level functions for fallback()
@@ -331,4 +368,5 @@ type TypeInFatalErrorTypes<T> = T extends [infer U, infer NFs]
 
 type And<T1 extends boolean, T2 extends boolean> = T1 extends true ? T2 : false
 
-type _Has<T> = T extends never ? false : true
+// https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887
+type _Has<T> = [T] extends [never] ? false : true

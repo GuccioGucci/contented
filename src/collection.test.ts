@@ -1,6 +1,6 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './Type'
+import { coerceTo, Joint } from './Type'
 import { number } from './number'
 import { string } from './string'
 import { always } from './always'
@@ -172,6 +172,22 @@ test(`array propagates non fatal errors`, function () {
   assert.equal(res2, new AtKey([0], new InvalidCoercion('array', 1)))
 })
 
+test(`array accepts alternatives`, function () {
+  const arrayOfAlternatives = arrayOf(string.or(at(['a'], number)))
+
+  const res1 = coerceTo(arrayOfAlternatives, ['x', 'y', { a: 12 }])
+  const res2 = coerceTo(arrayOfAlternatives, ['x', 'y', false])
+
+  assert.equal(res1, ['x', 'y', 12])
+  assert.equal(
+    res2,
+    new Joint([
+      new AtKey([2], new InvalidCoercion('string', false)),
+      new AtKey([2], new InvalidCoercion('object', false)),
+    ])
+  )
+})
+
 test('permissive array accepts arrays with wrong element types', function () {
   const permissiveArrayOfStrings = permissiveArrayOf(string)
 
@@ -219,6 +235,26 @@ test(`permissive array does not include non-fatal errors if they are not possibl
   const res = coerceTo(arrayOf10s, ['a', 'b', 'c'])
 
   assert.equal(res, [10, 10, 10])
+})
+
+test(`permissive array accepts alternatives as element type`, function () {
+  const permissiveOfAlternatives = permissiveArrayOf(
+    string.or(at(['a'], number))
+  )
+
+  const res1 = coerceTo(permissiveOfAlternatives, ['x', 'y', { a: 12 }])
+  const res2 = coerceTo(permissiveOfAlternatives, ['x', 'y', { b: 'hello' }])
+
+  assert.equal(res1, ['x', 'y', 12])
+  assert.equal(res2, [
+    ['x', 'y'],
+    [
+      new Joint([
+        new AtKey([2], new InvalidCoercion('string', { b: 'hello' })),
+        new MissingKey([2, 'a']),
+      ]),
+    ],
+  ])
 })
 
 test(`combine accepts a function to mix-and-match other types`, function () {
