@@ -47,7 +47,7 @@ const Image = combine(
 const image = coerceTo(Image, data /* abritrary data */);
 ```
 
-Contented may be useful every time there are expectations — but no guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, files, or any other external source.
+Contented may be useful every time there are expectations — but no real guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, from files, or any other external source.
 
 ## Reference
 
@@ -132,7 +132,7 @@ coerceTo(stringAtAB, 'hello');
 // InvalidCoercion { expected: 'object', got: 'hello' }
 ```
 
-When the path consists of a single key, such a key can be supplied without the need of enclosing it in an array, as in:
+When the path consists of a single key, such a key can be supplied without the need of enclosing it in an array.
 
 ```typescript
 coerceTo(at('a', string), { a: 'hello' })
