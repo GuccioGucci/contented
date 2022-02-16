@@ -3,8 +3,11 @@ import assert from 'uvu/assert'
 import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
-import { at, MissingKey, AtKey, permissiveArrayOf } from './collection'
-import { InvalidCoercion } from './InvalidCoercion'
+import { InvalidCoercion } from './error/InvalidCoercion'
+import { MissingKey } from './error/MissingKey'
+import { AtKey } from './error/AtKey'
+import { at } from './at'
+import { permissiveArrayOf } from './permissiveArrayOf'
 
 test(`at leads to the value of an object's property`, function () {
   const cToNumber = at(['a', 'b', 'c'], number)

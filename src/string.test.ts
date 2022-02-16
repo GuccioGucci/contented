@@ -2,7 +2,7 @@ import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { coerceTo } from './Type'
-import { InvalidCoercion } from './InvalidCoercion'
+import { InvalidCoercion } from './error/InvalidCoercion'
 import { string } from './string'
 
 test('string accepts string values', function () {

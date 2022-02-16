@@ -2,7 +2,8 @@ import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { coerceTo } from './Type'
 import { number } from './number'
-import { at, fallback } from './collection'
+import { at } from './at'
+import { fallback } from './fallback'
 
 test(`fallback returns a fallback value in case of an interrupted path towards a key`, function () {
   const cToNumber = fallback(at(['a', 'b', 'c'], number), 42)

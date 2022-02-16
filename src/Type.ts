@@ -1,4 +1,5 @@
-import { ContentedError } from './ContentedError'
+import { ContentedError } from './error/ContentedError'
+import { Joint } from './error/Joint'
 
 export class Type<T, E> {
   #coerce: Coerce<T, E>
@@ -31,25 +32,6 @@ export class Type<T, E> {
 export const coerceTo = Type.coerceTo
 
 export type Coerce<T, E> = (value: any) => T | E
-
-export class Joint<E extends unknown[]> extends ContentedError {
-  constructor(public readonly errors: E) {
-    super()
-  }
-
-  static of<E, F>(err1: E, err2: F) {
-    if (err1 instanceof Joint && err2 instanceof Joint) {
-      return new Joint([...err1.errors, err2.errors])
-    }
-    if (err1 instanceof Joint) {
-      return new Joint([...err1.errors, err2])
-    }
-    if (err2 instanceof Joint) {
-      return new Joint([err1, ...err2.errors])
-    }
-    return new Joint([err1, err2])
-  }
-}
 
 type OrErrors<E, F> = EnumerateErrors<
   StripJoint<E>,

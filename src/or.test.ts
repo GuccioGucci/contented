@@ -2,9 +2,12 @@ import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { number } from './number'
 import { string } from './string'
-import { coerceTo, Joint } from './Type'
-import { InvalidCoercion } from './InvalidCoercion'
-import { at, AtKey, MissingKey } from './collection'
+import { coerceTo } from './Type'
+import { InvalidCoercion } from './error/InvalidCoercion'
+import { MissingKey } from './error/MissingKey'
+import { AtKey } from './error/AtKey'
+import { Joint } from './error/Joint'
+import { at } from './at'
 
 test(`or allows specifying alternatives`, function () {
   const T = string.or(at(['b'], number))

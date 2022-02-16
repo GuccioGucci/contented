@@ -1,10 +1,15 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo, Joint } from './Type'
+import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
-import { InvalidCoercion } from './InvalidCoercion'
-import { at, arrayOf, MissingKey, AtKey, permissiveArrayOf } from './collection'
+import { InvalidCoercion } from './error/InvalidCoercion'
+import { MissingKey } from './error/MissingKey'
+import { AtKey } from './error/AtKey'
+import { Joint } from './error/Joint'
+import { at } from './at'
+import { arrayOf } from './arrayOf'
+import { permissiveArrayOf } from './permissiveArrayOf'
 
 test(`array accepts array of the indicated element type`, function () {
   const arrayOfStrings = arrayOf(string)

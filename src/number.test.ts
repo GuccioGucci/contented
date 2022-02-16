@@ -3,7 +3,7 @@ import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { coerceTo } from './Type'
 import { number } from './number'
-import { InvalidCoercion } from './InvalidCoercion'
+import { InvalidCoercion } from './error/InvalidCoercion'
 
 test('number accepts number values', function () {
   assert(property(fcNumber, (value) => equal(coerceTo(number, value), value)))

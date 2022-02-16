@@ -1,5 +1,5 @@
 import { Coerce, Type } from './Type'
-import { InvalidCoercion } from './InvalidCoercion'
+import { InvalidCoercion } from './error/InvalidCoercion'
 
 const coerce: Coerce<number, InvalidCoercion> = (value: any) => {
   if (typeof value !== 'number') {
