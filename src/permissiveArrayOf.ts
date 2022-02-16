@@ -5,13 +5,13 @@ import {
 } from './error/NonFatalErrorType'
 import { HasAtKeyInvalidCoercion } from './error/HasAtKeyInvalidCoercion'
 import { HasJointAtKey } from './error/HasJointAtKey'
-import { HasMissingKey } from './error/HasMissingKey'
 import { ContentedError } from './error/ContentedError'
 import { Coerce, coerceTo, Type } from './Type'
 import { InvalidCoercion } from './error/InvalidCoercion'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
 import { hasNonFatalErrors } from './error/hasNonFatalErrors'
+import { HasMissingKey } from './error/MissingKey'
 
 export function permissiveArrayOf<T, E extends ContentedError>(
   type: Type<T, E>

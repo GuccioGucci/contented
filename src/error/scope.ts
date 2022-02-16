@@ -1,10 +1,9 @@
 import { ContentedError } from './ContentedError'
 import { Path } from '../Path'
-import { HasMissingKey } from './HasMissingKey'
 import { HasAtKeyInvalidCoercion } from './HasAtKeyInvalidCoercion'
 import { HasJointAtKey } from './HasJointAtKey'
 import { AtKey } from './AtKey'
-import { MissingKey } from './MissingKey'
+import { HasMissingKey, MissingKey } from './MissingKey'
 import { InvalidCoercion } from './InvalidCoercion'
 import { Joint } from './Joint'
 
