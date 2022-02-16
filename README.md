@@ -7,7 +7,6 @@
 ## Table of Contents
 
 - [Contented](#contented)
-  - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Reference](#reference)
     - [Primitive types](#primitive-types)
