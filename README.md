@@ -176,7 +176,7 @@ coerceTo(permissiveArrayOf(number), [3, 'a', 5]);
 
 #### `match(value)`
 
-A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` can only succeed if `value` is provided as an input.
+A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` can succeed only if `value` is provided as an input.
 
 ```typescript
 import { match, coerceTo } from 'contented';
