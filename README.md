@@ -280,7 +280,6 @@ coerceTo(string.or(at('a', number)), { a: true });
        AtKey { at: [ 'a' ], InvalidCoercion { expected: 'number', got: true } }
      ]
    }
-}
 */
 ```
 
