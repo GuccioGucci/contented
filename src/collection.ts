@@ -4,7 +4,7 @@ import { InvalidCoercion } from './InvalidCoercion'
 import { Type, coerceTo, Coerce, Joint } from './Type'
 
 export function at<T, E extends ContentedError>(
-  path: Path,
+  pathOrKey: Key | Path,
   type: Type<T, E>
 ): Type<
   T,
@@ -21,6 +21,7 @@ export function at<T, E extends ContentedError>(
       return new InvalidCoercion('object', value)
     }
 
+    const path: Path = [pathOrKey].flatMap((x) => x)
     for (const [key, pos] of enumerate(path)) {
       if (value[key] === undefined) {
         const missingKey = path.slice(0, pos + 1)

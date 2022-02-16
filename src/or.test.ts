@@ -40,33 +40,27 @@ test(`or rejects input values that are not coercible to any given alternative`, 
 })
 
 test(`or reports the path at which the error happened`, function () {
-
-  const stringOrNumberAtA = string.or(at(['a'], number))
+  const stringOrNumberAtA = string.or(at('a', number))
 
   const res1 = coerceTo(stringOrNumberAtA, { b: 12 })
   const res2 = coerceTo(stringOrNumberAtA, { a: 'hello' })
 
   assert.equal(
     res1,
-    new Joint([
-      new InvalidCoercion('string', { b: 12 }),
-      new MissingKey(['a'])
-    ])
+    new Joint([new InvalidCoercion('string', { b: 12 }), new MissingKey(['a'])])
   )
 
   assert.equal(
     res2,
     new Joint([
       new InvalidCoercion('string', { a: 'hello' }),
-      new AtKey(['a'], new InvalidCoercion('number', 'hello'))
+      new AtKey(['a'], new InvalidCoercion('number', 'hello')),
     ])
   )
-
 })
 
 test(`or reports multi-level missing keys`, function () {
-
-  const T = at(['a'], string.or(at(['b'], number)))
+  const T = at('a', string.or(at('b', number)))
 
   const res1 = coerceTo(T, { b: 12 })
   const res2 = coerceTo(T, { a: { c: 12 } })
@@ -76,7 +70,7 @@ test(`or reports multi-level missing keys`, function () {
     res2,
     new Joint([
       new AtKey(['a'], new InvalidCoercion('string', { c: 12 })),
-      new MissingKey(['a', 'b'])
+      new MissingKey(['a', 'b']),
     ])
   )
 })

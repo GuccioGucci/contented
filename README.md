@@ -34,7 +34,7 @@ Contented is a TypeScript library for performing type coercion at run-time. To t
 ```typescript
 const Image = combine(
   (url, size) => ({ url, size }),
-  at(['url'], string),
+  at('url', string),
   at(['metadata', 'size'], number)
 );
 
@@ -108,6 +108,13 @@ coerceTo(stringAtAB, { a: { c: 'hello' } });
 
 coerceTo(stringAtAB, 'hello');
 // InvalidCoercion { expected: 'object', got: 'hello' }
+```
+
+When the path consists of a single key, such a key can be supplied without the need of enclosing it in an array, as in:
+
+```typescript
+coerceTo(at('a', string), { a: 'hello' })
+// 'hello'
 ```
 
 #### `fallback(T, substitute)`
@@ -204,8 +211,8 @@ coerceTo(always(20), false)
 ```typescript
 const User = combine(
   (name, surname, phone) => ({ fullname: `${name} ${surname}`, phone }),
-  at(['name'], string),
-  at(['surname'], string),
+  at('name', string),
+  at('surname', string),
   at(['contacts', 'phone'], string)
 )
 
@@ -240,7 +247,7 @@ coerceTo(string.or(number), true)
    }
 */
 
-coerceTo(string.or(at(['a'], number)), { a: true })
+coerceTo(string.or(at('a', number)), { a: true })
 /* Joint {
      errors: [
        InvalidCoercion { expected: 'string', got: { a: true } },

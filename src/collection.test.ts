@@ -32,7 +32,7 @@ test(`at reports when the input value is not an object`, function () {
 })
 
 test(`at supports navigating an array when numeric keys are used`, function () {
-  const lastToString = at([2], string)
+  const lastToString = at(2, string)
   const bToNumber = at(['a', 1, 'b'], number)
 
   const last = coerceTo(lastToString, ['b', 'c', 'd'])
@@ -57,7 +57,7 @@ test(`pointing to a non-existing property reports when the path got interrupted`
 })
 
 test('at propagates non-fatal errors', function () {
-  const thirdEl = at(['a'], permissiveArrayOf(number))
+  const thirdEl = at('a', permissiveArrayOf(number))
 
   const res1 = coerceTo(thirdEl, { a: 5 })
   const res2 = coerceTo(thirdEl, { b: [] })
@@ -87,7 +87,7 @@ test(`any error on the value part of a property is accompanied by the property p
 
 test(`it is the same to specify the path at once or incrementally`, function () {
   const cToNumber1 = at(['a', 'b', 'c'], number)
-  const cToNumber2 = at(['a'], at(['b'], at(['c'], number)))
+  const cToNumber2 = at('a', at('b', at('c', number)))
 
   const c1 = coerceTo(cToNumber1, { a: { b: { c: 'hello' } } })
   const c2 = coerceTo(cToNumber2, { a: { b: { c: 'hello' } } })
@@ -144,7 +144,7 @@ test('array rejects arrays of the wrong element type', function () {
 })
 
 test('array reports nested errors', function () {
-  const arrayOfStrings = arrayOf(at(['a'], string))
+  const arrayOfStrings = arrayOf(at('a', string))
 
   const res = coerceTo(arrayOfStrings, [{ a: 5 }])
 
@@ -152,7 +152,7 @@ test('array reports nested errors', function () {
 })
 
 test('array rejects a value upon the first missing element', function () {
-  const arrayOfStrings = arrayOf(at(['a'], string))
+  const arrayOfStrings = arrayOf(at('a', string))
 
   const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
@@ -173,7 +173,7 @@ test(`array propagates non fatal errors`, function () {
 })
 
 test(`array accepts alternatives`, function () {
-  const arrayOfAlternatives = arrayOf(string.or(at(['a'], number)))
+  const arrayOfAlternatives = arrayOf(string.or(at('a', number)))
 
   const res1 = coerceTo(arrayOfAlternatives, ['x', 'y', { a: 12 }])
   const res2 = coerceTo(arrayOfAlternatives, ['x', 'y', false])
@@ -282,11 +282,7 @@ test(`combine rejects the combination upon the first missing element`, function 
 })
 
 test(`combine rejects the combination upon the first mismatching element`, function () {
-  const id = combine(
-    (a, b) => `${a}-${b}`,
-    at(['a'], string),
-    at(['b'], number)
-  )
+  const id = combine((a, b) => `${a}-${b}`, at('a', string), at('b', number))
 
   const res = coerceTo(id, { a: 10, b: 12 })
 
