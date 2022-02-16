@@ -1,7 +1,6 @@
 import { ContentedError } from './error/ContentedError'
 import { Coerce, coerceTo, Type } from './Type'
 import { InvalidCoercion } from './error/InvalidCoercion'
-import { HasAtKeyInvalidCoercion } from './error/HasAtKeyInvalidCoercion'
 import { HasJointAtKey } from './error/HasJointAtKey'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
@@ -12,6 +11,7 @@ import {
   TypeInFatalErrorTypes,
 } from './error/NonFatalErrorType'
 import { HasMissingKey } from './error/MissingKey'
+import { HasAtKeyInvalidCoercion } from './error/AtKey'
 
 export function arrayOf<T, E extends ContentedError>(
   type: Type<T, E>
