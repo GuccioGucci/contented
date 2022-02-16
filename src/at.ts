@@ -3,10 +3,10 @@ import { Key, Path } from './Path'
 import { Coerce, coerceTo, Type } from './Type'
 import { MissingKey } from './error/MissingKey'
 import { InvalidCoercion } from './error/InvalidCoercion'
-import { HasJointAtKey } from './error/HasJointAtKey'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
 import { HasAtKeyInvalidCoercion } from './error/AtKey'
+import { HasJointAtKey } from './error/Joint'
 
 export function at<T, E extends ContentedError>(
   pathOrKey: Key | Path,
