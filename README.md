@@ -25,6 +25,7 @@
       - [`always(value)`](#alwaysvalue)
     - [Combinations & Alternatives](#combinations--alternatives)
       - [`combine(fn, ...Ts)`](#combinefn-ts)
+      - [`T1.or(T2)`](#t1ort2)
 
 ## Introduction
 
@@ -222,6 +223,32 @@ coerceTo(User, { name: 42 })
 // AtKey { at: [ 'name' ], error: InvalidCoercion { expected: 'string', got: 42 } }
 ```
 
+#### `T1.or(T2)`
+
+A run-time representation of the union type `T1 | T2`. In case of a failed coercion, the result encloses the errors coming from both `T1` and `T2`.
+
+```typescript
+coerceTo(string.or(number), 'hello')
+// 'hello'
+
+coerceTo(string.or(number), true)
+/* Joint {
+    errors: [
+      InvalidCoercion { expected: 'string', got: true },
+      InvalidCoercion { expected: 'number', got: true }
+    ]
+   }
+*/
+
+coerceTo(string.or(at(['a'], number)), { a: true })
+/* Joint {
+     errors: [
+       InvalidCoercion { expected: 'string', got: { a: true } },
+       AtKey { at: [ 'a' ], InvalidCoercion { expected: 'number', got: true } }
+     ]
+   }
+}
+```
 
 ---
 
