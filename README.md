@@ -141,7 +141,7 @@ coerceTo(arrayOf(number), 'hello');
 // InvalidCoercion { expected: 'array', got: 'hello' }
 
 coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { path: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+// AtKey { at: : [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
 ```
 
 #### `permissiveArrayOf(T)`
@@ -159,7 +159,7 @@ coerceTo(permissiveArrayOf(number), [3, 4, 5]);
 coerceTo(permissiveArrayOf(number), [3, 'a', 5]);
 /* [
      [ 3, 5 ],
-     [ AtKey { path: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } } ]
+     [ AtKey { at: : [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } } ]
    ]
 */
 ```
