@@ -236,7 +236,7 @@ coerceTo(User, { name: 42 });
 A run-time representation of the union type `T1 | T2`. In case of a failed coercion, the result encloses the errors coming from both `T1` and `T2`.
 
 ```typescript
-import { string, number } from 'contented';
+import { string, number, at, coerceTo } from 'contented';
 
 coerceTo(string.or(number), 'hello');
 // 'hello'
