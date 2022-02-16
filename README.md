@@ -6,25 +6,32 @@
 
 ## Table of Contents
 
-- [Contented](#contented)
-  - [Introduction](#introduction)
-  - [Reference](#reference)
-    - [Primitive types](#primitive-types)
-      - [`string`](#string)
-      - [`number`](#number)
-      - [`boolean`](#boolean)
-    - [Object types](#object-types)
-      - [`at(path, T)`](#atpath-t)
-      - [`fallback(T, substitute)`](#fallbackt-substitute)
-    - [Array types](#array-types)
-      - [`arrayOf(T)`](#arrayoft)
-      - [`permissiveArrayOf(T)`](#permissivearrayoft)
-    - [Narrowing](#narrowing)
-      - [`match(value)`](#matchvalue)
-      - [`always(value)`](#alwaysvalue)
-    - [Combinations & Alternatives](#combinations--alternatives)
-      - [`combine(fn, ...Ts)`](#combinefn-ts)
-      - [`T1.or(T2)`](#t1ort2)
+- [Introduction](#introduction)
+- [Reference](#reference)
+  - [Coercing](#coercing)
+    - [`coerceTo(T, input)`](#coercetot-input)
+  - [Primitive types](#primitive-types)
+    - [`string`](#string)
+    - [`number`](#number)
+    - [`boolean`](#boolean)
+  - [Object types](#object-types)
+    - [`at(path, T)`](#atpath-t)
+    - [`fallback(T, substitute)`](#fallbackt-substitute)
+  - [Array types](#array-types)
+    - [`arrayOf(T)`](#arrayoft)
+    - [`permissiveArrayOf(T)`](#permissivearrayoft)
+  - [Narrowing](#narrowing)
+    - [`match(value)`](#matchvalue)
+    - [`always(value)`](#alwaysvalue)
+  - [Combinations & Alternatives](#combinations--alternatives)
+    - [`combine(fn, ...Ts)`](#combinefn-ts)
+    - [`T1.or(T2)`](#t1ort2)
+  - [Errors](#errors)
+    - [`InvalidCoercion`](#invalidcoercion)
+    - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
+    - [`MissingKey`](#missingkey)
+    - [`Joint<[...Errs]>`](#jointerrs)
+
 
 ## Introduction
 
@@ -43,6 +50,22 @@ const image = coerceTo(Image, data /* abritrary data */);
 Contented may be useful every time there are expectations — but no guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, files, or any other external source.
 
 ## Reference
+
+### Coercing
+
+#### `coerceTo(T, input)`
+
+Attempts to coerce the `input` data to the type represented by `T`. Note that the specific return value, whether successful or not, depends on the the particular of `T`.
+
+```typescript
+import { string, coerceTo } from 'contented';
+
+coerceTo(string, 'hello');
+// 'hello'
+
+coerceTo(string, 42);
+// InvalidCoercion { expected: 'string', got: 42 }
+```
 
 ### Primitive types
 
@@ -258,6 +281,60 @@ coerceTo(string.or(at('a', number)), { a: true });
      ]
    }
 }
+*/
+```
+
+### Errors
+
+#### `InvalidCoercion`
+When the input data is not conforming to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expection and the actual value.
+
+```typescript
+import { string, coerceTo } from 'contented';
+
+coerceTo(string, 42);
+// InvalidCoercion { expected: 'string', got: 42 }
+```
+#### `AtKey<InvalidCoercion>`
+
+An `InvalidCoercion` error, together with the path at which to find the non-conforming data.
+
+```typescript
+import { number, arrayOf, at, coerceTo } from 'contented';
+
+coerceTo(at('x', number), { x: 'hello' });
+// AtKey { at: : [ 'x' ], error: InvalidCoercion { expected: 'number', got: 'hello' } }
+
+
+coerceTo(arrayOf(number), [3, 'a', 5]);
+// AtKey { at: : [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+```
+
+#### `MissingKey`
+
+The path at which a non-existing key in the input data was instead expected.
+
+```typescript
+import { number, at, coerceTo } from 'contented';
+
+coerceTo(at('x', number), { y: 12 });
+// MissingKey { missingKey: [ 'x' ] }
+```
+
+#### `Joint<[...Errs]>`
+
+When multiple alternatives are provided but none of them is applicable to the input data, `coerceTo` returns a `Joint` error, reporting the errors resulting from the different failed attempts.
+
+```typescript
+import { string, number, coerceTo } from 'contented';
+
+coerceTo(string.or(number), true);
+/* Joint {
+    errors: [
+      InvalidCoercion { expected: 'string', got: true },
+      InvalidCoercion { expected: 'number', got: true }
+    ]
+   }
 */
 ```
 
