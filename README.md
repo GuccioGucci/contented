@@ -181,10 +181,10 @@ A run-time representation of the narrowest type that can be constructed from `va
 ```typescript
 import { match, coerceTo } from 'contented';
 
-coerceTo(match('hello'), 'hello')
+coerceTo(match('hello'), 'hello');
 // 'hello'
 
-coerceTo(match('hello'), 'foo')
+coerceTo(match('hello'), 'foo');
 // InvalidCoercion { expected: 'hello', got: 'foo' }
 ```
 
@@ -195,10 +195,10 @@ A run-time type that always succeeds with `value` regardless of the input data.
 ```typescript
 import { always, coerceTo } from 'contented';
 
-coerceTo(always(20), 'hello')
+coerceTo(always(20), 'hello');
 // 20
 
-coerceTo(always(20), false)
+coerceTo(always(20), false);
 // 20
 ```
 
@@ -209,12 +209,14 @@ coerceTo(always(20), false)
 `combine` constructs a run-time type from some known run-time types `Ts` and a function `fn`. Coercing to `combine(fn, ...Ts)` results in an attempt to coerce the input data to each type specified in `Ts`; if every coercion ends up successful, the resulting values are passed to the function `fn`.
 
 ```typescript
+import { combine, string, coerceTo } from 'contented';
+
 const User = combine(
   (name, surname, phone) => ({ fullname: `${name} ${surname}`, phone }),
   at('name', string),
   at('surname', string),
   at(['contacts', 'phone'], string)
-)
+);
 
 coerceTo(User, {
   name: 'John',
@@ -223,10 +225,10 @@ coerceTo(User, {
     phone: '055-123404',
     email: 'john@smith.com',
   }
-})
+});
 // { fullname: 'John Smith', phone: '055-123404' }
 
-coerceTo(User, { name: 42 })
+coerceTo(User, { name: 42 });
 // AtKey { at: [ 'name' ], error: InvalidCoercion { expected: 'string', got: 42 } }
 ```
 
@@ -235,10 +237,12 @@ coerceTo(User, { name: 42 })
 A run-time representation of the union type `T1 | T2`. In case of a failed coercion, the result encloses the errors coming from both `T1` and `T2`.
 
 ```typescript
-coerceTo(string.or(number), 'hello')
+import { string, number } from 'contented';
+
+coerceTo(string.or(number), 'hello');
 // 'hello'
 
-coerceTo(string.or(number), true)
+coerceTo(string.or(number), true);
 /* Joint {
     errors: [
       InvalidCoercion { expected: 'string', got: true },
@@ -247,7 +251,7 @@ coerceTo(string.or(number), true)
    }
 */
 
-coerceTo(string.or(at('a', number)), { a: true })
+coerceTo(string.or(at('a', number)), { a: true });
 /* Joint {
      errors: [
        InvalidCoercion { expected: 'string', got: { a: true } },
@@ -255,6 +259,7 @@ coerceTo(string.or(at('a', number)), { a: true })
      ]
    }
 }
+*/
 ```
 
 ---
