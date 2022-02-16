@@ -6,23 +6,25 @@
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Reference](#reference)
-  - [Primitive types](#primitive-types)
-    - [`string`](#string)
-    - [`number`](#number)
-    - [`boolean`](#boolean)
-  - [Object types](#object-types)
-    - [`at(path, T)`](#atpath-t)
-    - [`fallback(T, substitute)`](#fallbackt-substitute)
-  - [Array types](#array-types)
-    - [`arrayOf(T)`](#arrayoft)
-    - [`permissiveArrayOf(T)`](#permissivearrayoft)
-  - [Narrowing](#narrowing)
-    - [`match(value)`](#matchvalue)
-    - [`always(value)`](#alwaysvalue)
-  - [Combinations & Alternatives](#combinations--alternatives)
-    - [`combine(fn, ...Ts)`](#combinefn-ts)
+- [Contented](#contented)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Reference](#reference)
+    - [Primitive types](#primitive-types)
+      - [`string`](#string)
+      - [`number`](#number)
+      - [`boolean`](#boolean)
+    - [Object types](#object-types)
+      - [`at(path, T)`](#atpath-t)
+      - [`fallback(T, substitute)`](#fallbackt-substitute)
+    - [Array types](#array-types)
+      - [`arrayOf(T)`](#arrayoft)
+      - [`permissiveArrayOf(T)`](#permissivearrayoft)
+    - [Narrowing](#narrowing)
+      - [`match(value)`](#matchvalue)
+      - [`always(value)`](#alwaysvalue)
+    - [Combinations & Alternatives](#combinations--alternatives)
+      - [`combine(fn, ...Ts)`](#combinefn-ts)
 
 ## Introduction
 
@@ -101,7 +103,7 @@ coerceTo(stringAtAB, { a: { b: 'hello' } });
 // 'hello'
 
 coerceTo(stringAtAB, { a: { c: 'hello' } });
-// MissingKey { path: [ 'a', 'b' ] }
+// MissingKey { missingKey: [ 'a', 'b' ] }
 
 coerceTo(stringAtAB, 'hello');
 // InvalidCoercion { expected: 'object', got: 'hello' }

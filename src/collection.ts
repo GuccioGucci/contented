@@ -194,7 +194,7 @@ function scope<E extends ContentedError>(
     ) as HasAtKeyInvalidCoercion<E>
   }
   if (err instanceof MissingKey) {
-    return new MissingKey(path.concat(err.at)) as HasMissingKey<E>
+    return new MissingKey(path.concat(err.missingKey)) as HasMissingKey<E>
   }
   if (err instanceof InvalidCoercion) {
     return new AtKey(path, err) as HasAtKeyInvalidCoercion<E>
@@ -221,7 +221,7 @@ export class MissingKey extends ContentedError {
   // @ts-expect-error
   private readonly [MISSING_KEY]: true
 
-  constructor(public readonly at: Path) {
+  constructor(public readonly missingKey: Path) {
     super()
   }
 }
