@@ -3,6 +3,7 @@ import { Coerce, coerceTo, Type } from './Type'
 import {
   hasNonFatalErrors,
   NonFatalErrorTypes,
+  TypeInFatalErrorTypes,
 } from './error/NonFatalErrorType'
 
 export function combine<
@@ -42,10 +43,11 @@ export function combine<
 }
 
 type ExpectedType<T> = T extends Type<infer A, any>
-  ? A extends [infer U, any]
-    ? U
-    : A
+  ? [TypeInFatalErrorTypes<A>] extends [never]
+    ? A
+    : TypeInFatalErrorTypes<A>
   : never
+
 type ErrorType<T> = T extends Type<any, infer E> ? E : never
 
 type CombinationOf<Ts, O> = UnionOfNonFatalErrorTypes<Ts> extends never
