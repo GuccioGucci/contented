@@ -1,5 +1,6 @@
 import { ContentedError } from './error/ContentedError'
 import { Joint } from './error/Joint'
+import { Has, IsUnion } from './_typefunc'
 
 export class Type<T, E> {
   #coerce: Coerce<T, E>
@@ -33,10 +34,27 @@ export const coerceTo = Type.coerceTo
 
 export type Coerce<T, E> = (value: any) => T | E
 
-type OrErrors<E, F> = EnumerateErrors<
-  StripJoint<E>,
-  StripJoint<F>
-> extends never
+export type NonFatalErrorType<T> = T extends Type<infer A, any>
+  ? NonFatalErrorType<A>
+  : IsUnion<T> extends true
+  ? T extends [any, (infer NF)[]]
+    ? NF extends ContentedError
+      ? NF
+      : never
+    : never
+  : never
+
+export type HasNonFatalErrors<T> = Has<NonFatalErrorType<T>>
+
+export type ExpectedType<T> = T extends Type<infer A, any>
+  ? ExpectedType<A>
+  : HasNonFatalErrors<T> extends true
+  ? T extends [infer U, any]
+    ? U
+    : never
+  : T
+
+type OrErrors<E, F> = EnumerateErrors<StripJoint<E>, StripJoint<F>> extends never
   ? never
   : Joint<EnumerateErrors<StripJoint<E>, StripJoint<F>>>
 

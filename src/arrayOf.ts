@@ -1,16 +1,11 @@
 import { ContentedError } from './error/ContentedError'
-import { Coerce, coerceTo, Type } from './Type'
+import { Coerce, coerceTo, ExpectedType, HasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
 import { HasMissingKey } from './error/MissingKey'
 import { HasJointAtKey } from './error/Joint'
 import { HasAtKeyInvalidCoercion, InvalidCoercion } from './error/InvalidCoercion'
-import {
-  _NonFatalErrorTypes,
-  hasNonFatalErrors,
-  HasNonFatalErrorTypes,
-  TypeInFatalErrorTypes,
-} from './error/NonFatalErrorType'
+import { hasNonFatalErrors } from './error/NonFatalErrorType'
 
 export function arrayOf<T, E extends ContentedError>(type: Type<T, E>) {
   type CoerceArrayOf = Coerce<
@@ -47,6 +42,6 @@ export function arrayOf<T, E extends ContentedError>(type: Type<T, E>) {
   return new Type(coerce)
 }
 
-type ArrayOf<T> = HasNonFatalErrorTypes<T> extends true
-  ? TypeInFatalErrorTypes<T>[] | [TypeInFatalErrorTypes<T>[], _NonFatalErrorTypes<T>[]]
+type ArrayOf<T> = HasNonFatalErrors<T> extends true
+  ? ExpectedType<T>[] | [ExpectedType<T>[], NonFatalErrorType<T>[]]
   : T[]

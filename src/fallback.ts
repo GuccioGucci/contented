@@ -1,6 +1,5 @@
-import { HasNonFatalErrorTypes, TypeInFatalErrorTypes } from './error/NonFatalErrorType'
 import { ContentedError } from './error/ContentedError'
-import { Coerce, coerceTo, Type } from './Type'
+import { Coerce, coerceTo, ExpectedType, Type } from './Type'
 import { MissingKey } from './error/MissingKey'
 
 export function fallback<T, E extends ContentedError>(type: Type<T, IncludesMissingKey<E>>, fallback: Fallback<T>) {
@@ -9,7 +8,7 @@ export function fallback<T, E extends ContentedError>(type: Type<T, IncludesMiss
   const coerce: CoerceFallback = (value: any) => {
     const res = coerceTo(type as Type<T, E>, value)
     if (res instanceof MissingKey) {
-      return fallback
+      return fallback as T
     }
     return res as T | Exclude<E, MissingKey>
   }
@@ -17,6 +16,6 @@ export function fallback<T, E extends ContentedError>(type: Type<T, IncludesMiss
   return new Type(coerce)
 }
 
-type IncludesMissingKey<E extends any> = [MissingKey] extends [E] ? E : 'Must include MissingKey'
+type IncludesMissingKey<E> = [MissingKey] extends [E] ? E : 'Must include MissingKey'
 
-type Fallback<T> = HasNonFatalErrorTypes<T> extends true ? TypeInFatalErrorTypes<T> : T
+type Fallback<T> = ExpectedType<T>
