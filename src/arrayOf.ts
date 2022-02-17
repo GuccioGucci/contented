@@ -1,6 +1,6 @@
 import { ContentedError } from './error/ContentedError'
 import { Coerce, coerceTo, ExpectedType, HasNonFatalErrors, NonFatalErrorType, Type } from './Type'
-import { enumerate } from './enumerate'
+import { enumerate } from './_enumerate'
 import { scope } from './error/scope'
 import { HasMissingKey } from './error/MissingKey'
 import { HasJointAtKey } from './error/Joint'
