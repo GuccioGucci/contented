@@ -23,8 +23,4 @@ export class AtKey<E extends InvalidCoercion> extends ContentedError {
   }
 }
 
-export type HasAtKeyInvalidCoercion<E, F = never> = [InvalidCoercion] extends [
-  E
-]
-  ? AtKey<InvalidCoercion>
-  : F
+export type HasAtKeyInvalidCoercion<E, F = never> = [InvalidCoercion] extends [E] ? AtKey<InvalidCoercion> : F

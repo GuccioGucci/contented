@@ -1,26 +1,21 @@
+import { ContentedError } from './error/ContentedError'
+import { Coerce, coerceTo, Type } from './Type'
+import { enumerate } from './enumerate'
+import { scope } from './error/scope'
+import { HasMissingKey } from './error/MissingKey'
+import { HasJointAtKey } from './error/Joint'
+import { HasAtKeyInvalidCoercion, InvalidCoercion } from './error/InvalidCoercion'
 import {
   _NonFatalErrorTypes,
   hasNonFatalErrors,
   HasNonFatalErrorTypes,
   TypeInFatalErrorTypes,
 } from './error/NonFatalErrorType'
-import { ContentedError } from './error/ContentedError'
-import { Coerce, coerceTo, Type } from './Type'
-import {
-  HasAtKeyInvalidCoercion,
-  InvalidCoercion,
-} from './error/InvalidCoercion'
-import { enumerate } from './enumerate'
-import { scope } from './error/scope'
-import { HasMissingKey } from './error/MissingKey'
-import { HasJointAtKey } from './error/Joint'
 
-export function permissiveArrayOf<T, E extends ContentedError>(
-  type: Type<T, E>
-): Type<PermissiveArrayOf<T, E>, InvalidCoercion> {
-  const coerce: Coerce<PermissiveArrayOf<T, E>, InvalidCoercion> = (
-    value: any
-  ) => {
+export function permissiveArrayOf<T, E extends ContentedError>(type: Type<T, E>) {
+  type CoercePermissiveArrayOf = Coerce<PermissiveArrayOf<T, E>, InvalidCoercion>
+
+  const coerce: CoercePermissiveArrayOf = (value: any) => {
     if (!Array.isArray(value)) {
       return new InvalidCoercion('array', value)
     }
@@ -52,21 +47,8 @@ type PermissiveArrayOf<T, E> = HasNonFatalErrorTypes<T> extends true
       | TypeInFatalErrorTypes<T>[]
       | [
           TypeInFatalErrorTypes<T>[],
-          (
-            | HasAtKeyInvalidCoercion<E>
-            | HasJointAtKey<E>
-            | HasMissingKey<E>
-            | _NonFatalErrorTypes<T>
-          )[]
+          (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E> | _NonFatalErrorTypes<T>)[]
         ]
-  :
-      | HasAtKeyInvalidCoercion<E>
-      | HasJointAtKey<E>
-      | HasMissingKey<E> extends never
+  : HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E> extends never
   ? T[]
-  :
-      | T[]
-      | [
-          T[],
-          (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E>)[]
-        ]
+  : T[] | [T[], (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E>)[]]

@@ -1,22 +1,14 @@
 import { ContentedError } from './error/ContentedError'
 import { Coerce, coerceTo, Type } from './Type'
-import {
-  hasNonFatalErrors,
-  NonFatalErrorTypes,
-  TypeInFatalErrorTypes,
-} from './error/NonFatalErrorType'
+import { hasNonFatalErrors, NonFatalErrorTypes, TypeInFatalErrorTypes } from './error/NonFatalErrorType'
 
-export function combine<
-  E extends ContentedError,
-  Ts extends Type<unknown, E>[],
-  O
->(
+export function combine<E extends ContentedError, Ts extends Type<unknown, E>[], O>(
   fn: (...args: [...ExpectedTypes<Ts>]) => O,
   ...types: [...Ts]
-): Type<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> {
-  const coerce: Coerce<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>> = (
-    value: any
-  ) => {
+) {
+  type CoerceCombine = Coerce<CombinationOf<Ts, O>, UnionOfErrorTypes<Ts>>
+
+  const coerce: CoerceCombine = (value: any) => {
     const args = []
     const nonFatals = []
     let nonFatalErrors = false
@@ -42,6 +34,10 @@ export function combine<
   return new Type(coerce)
 }
 
+type CombinationOf<Ts, O> = UnionOfNonFatalErrorTypes<Ts> extends never ? O : O | [O, UnionOfNonFatalErrorTypes<Ts>[]]
+
+type UnionOfNonFatalErrorTypes<Ts> = NonFatalErrorTypes<Ts>[number]
+
 type ExpectedType<T> = T extends Type<infer A, any>
   ? [TypeInFatalErrorTypes<A>] extends [never]
     ? A
@@ -50,18 +46,8 @@ type ExpectedType<T> = T extends Type<infer A, any>
 
 type ErrorType<T> = T extends Type<any, infer E> ? E : never
 
-type CombinationOf<Ts, O> = UnionOfNonFatalErrorTypes<Ts> extends never
-  ? O
-  : O | [O, UnionOfNonFatalErrorTypes<Ts>[]]
-
-type UnionOfNonFatalErrorTypes<Ts> = NonFatalErrorTypes<Ts>[number]
-
-type ExpectedTypes<Ts> = Ts extends [infer Head, ...infer Tail]
-  ? [ExpectedType<Head>, ...ExpectedTypes<Tail>]
-  : []
+type ExpectedTypes<Ts> = Ts extends [infer Head, ...infer Tail] ? [ExpectedType<Head>, ...ExpectedTypes<Tail>] : []
 
 type UnionOfErrorTypes<Ts> = ErrorTypes<Ts>[number]
 
-type ErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail]
-  ? [ErrorType<Head>, ...ErrorTypes<Tail>]
-  : []
+type ErrorTypes<Ts> = Ts extends [infer Head, ...infer Tail] ? [ErrorType<Head>, ...ErrorTypes<Tail>] : []

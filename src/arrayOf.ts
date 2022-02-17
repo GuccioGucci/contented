@@ -1,36 +1,24 @@
 import { ContentedError } from './error/ContentedError'
 import { Coerce, coerceTo, Type } from './Type'
-import {
-  HasAtKeyInvalidCoercion,
-  InvalidCoercion,
-} from './error/InvalidCoercion'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
+import { HasMissingKey } from './error/MissingKey'
+import { HasJointAtKey } from './error/Joint'
+import { HasAtKeyInvalidCoercion, InvalidCoercion } from './error/InvalidCoercion'
 import {
   _NonFatalErrorTypes,
   hasNonFatalErrors,
   HasNonFatalErrorTypes,
   TypeInFatalErrorTypes,
 } from './error/NonFatalErrorType'
-import { HasMissingKey } from './error/MissingKey'
-import { HasJointAtKey } from './error/Joint'
 
-export function arrayOf<T, E extends ContentedError>(
-  type: Type<T, E>
-): Type<
-  ArrayOf<T>,
-  | InvalidCoercion
-  | HasMissingKey<E>
-  | HasAtKeyInvalidCoercion<E>
-  | HasJointAtKey<E>
-> {
-  type ArrayOfError =
-    | InvalidCoercion
-    | HasMissingKey<E>
-    | HasAtKeyInvalidCoercion<E>
-    | HasJointAtKey<E>
+export function arrayOf<T, E extends ContentedError>(type: Type<T, E>) {
+  type CoerceArrayOf = Coerce<
+    ArrayOf<T>,
+    InvalidCoercion | HasMissingKey<E> | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>
+  >
 
-  const coerce: Coerce<ArrayOf<T>, ArrayOfError> = (value: any) => {
+  const coerce: CoerceArrayOf = (value: any) => {
     if (!Array.isArray(value)) {
       return new InvalidCoercion('array', value)
     }
@@ -59,11 +47,6 @@ export function arrayOf<T, E extends ContentedError>(
   return new Type(coerce)
 }
 
-// ==============================================
-// Type-level functions for arrayOf()
-// ==============================================
 type ArrayOf<T> = HasNonFatalErrorTypes<T> extends true
-  ?
-      | TypeInFatalErrorTypes<T>[]
-      | [TypeInFatalErrorTypes<T>[], _NonFatalErrorTypes<T>[]]
+  ? TypeInFatalErrorTypes<T>[] | [TypeInFatalErrorTypes<T>[], _NonFatalErrorTypes<T>[]]
   : T[]
