@@ -1,4 +1,5 @@
 import { ContentedError } from './ContentedError'
+import { Path } from '../Path'
 
 const INVALID_COERCION = Symbol()
 
@@ -10,3 +11,20 @@ export class InvalidCoercion extends ContentedError {
     super()
   }
 }
+
+const AT_KEY = Symbol()
+
+export class AtKey<E extends InvalidCoercion> extends ContentedError {
+  // @ts-ignore
+  private readonly [AT_KEY]: true
+
+  constructor(public readonly at: Path, public readonly error: E) {
+    super()
+  }
+}
+
+export type HasAtKeyInvalidCoercion<E, F = never> = [InvalidCoercion] extends [
+  E
+]
+  ? AtKey<InvalidCoercion>
+  : F

@@ -1,5 +1,5 @@
 import { ContentedError } from './ContentedError'
-import { HasAtKeyInvalidCoercion } from './AtKey'
+import { HasAtKeyInvalidCoercion } from './InvalidCoercion'
 
 const JOIN = Symbol()
 

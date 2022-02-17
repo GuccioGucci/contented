@@ -1,8 +1,11 @@
 import { ContentedError } from './ContentedError'
 import { Path } from '../Path'
-import { AtKey, HasAtKeyInvalidCoercion } from './AtKey'
 import { HasMissingKey, MissingKey } from './MissingKey'
-import { InvalidCoercion } from './InvalidCoercion'
+import {
+  AtKey,
+  HasAtKeyInvalidCoercion,
+  InvalidCoercion,
+} from './InvalidCoercion'
 import { HasJointAtKey, Joint } from './Joint'
 
 export function scope<E extends ContentedError>(

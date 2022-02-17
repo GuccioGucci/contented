@@ -2,10 +2,12 @@ import { ContentedError } from './error/ContentedError'
 import { Key, Path } from './Path'
 import { Coerce, coerceTo, Type } from './Type'
 import { MissingKey } from './error/MissingKey'
-import { InvalidCoercion } from './error/InvalidCoercion'
+import {
+  HasAtKeyInvalidCoercion,
+  InvalidCoercion,
+} from './error/InvalidCoercion'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
-import { HasAtKeyInvalidCoercion } from './error/AtKey'
 import { HasJointAtKey } from './error/Joint'
 
 export function at<T, E extends ContentedError>(
