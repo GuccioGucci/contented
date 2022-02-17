@@ -1,7 +1,9 @@
 import { ContentedError } from './error/ContentedError'
 import { Coerce, coerceTo, Type } from './Type'
-import { hasNonFatalErrors } from './error/hasNonFatalErrors'
-import { NonFatalErrorTypes } from './error/NonFatalErrorType'
+import {
+  hasNonFatalErrors,
+  NonFatalErrorTypes,
+} from './error/NonFatalErrorType'
 
 export function combine<
   E extends ContentedError,

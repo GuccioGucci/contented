@@ -6,9 +6,9 @@ import {
 } from './error/InvalidCoercion'
 import { enumerate } from './enumerate'
 import { scope } from './error/scope'
-import { hasNonFatalErrors } from './error/hasNonFatalErrors'
 import {
   _NonFatalErrorTypes,
+  hasNonFatalErrors,
   HasNonFatalErrorTypes,
   TypeInFatalErrorTypes,
 } from './error/NonFatalErrorType'
