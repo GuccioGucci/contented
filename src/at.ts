@@ -6,8 +6,9 @@ import { enumerate } from './enumerate'
 import { scope } from './error/scope'
 import { HasJointAtKey } from './error/Joint'
 import { HasAtKeyInvalidCoercion, InvalidCoercion } from './error/InvalidCoercion'
+import { hasNonFatalErrors } from './error/NonFatalErrorType'
 
-export function at<T, E extends ContentedError>(pathOrKey: Key | Path, type: Type<T, E>) {
+export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Type<T, E>) {
   type CoerceAt = Coerce<T, MissingKey | InvalidCoercion | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>>
 
   const coerce: CoerceAt = (value: any) => {
@@ -15,7 +16,7 @@ export function at<T, E extends ContentedError>(pathOrKey: Key | Path, type: Typ
       return new InvalidCoercion('object', value)
     }
 
-    const path: Path = [pathOrKey].flatMap((x) => x)
+    const path: Path = [pathOrKey].flat()
     for (const [key, pos] of enumerate(path)) {
       if (value[key] === undefined) {
         const missingKey = path.slice(0, pos + 1)
@@ -28,7 +29,7 @@ export function at<T, E extends ContentedError>(pathOrKey: Key | Path, type: Typ
     if (res instanceof ContentedError) {
       return scope(path, res)
     }
-    if (Array.isArray(res)) {
+    if (hasNonFatalErrors(res)) {
       const [value, errors] = res
       return [value, errors.map((err: ContentedError) => scope(path, err))] as unknown as T
     }
