@@ -5,24 +5,14 @@ import { coerceTo } from './Type'
 import { number } from './number'
 import { InvalidCoercion } from './error/InvalidCoercion'
 
-test('number accepts number values', function () {
+test(`number accepts number values`, function () {
   assert(property(fcNumber, (value) => equal(coerceTo(number, value), value)))
 })
 
 test('number rejects all but number values', function () {
-  const notANumber = fc.oneof(
-    fc.string(),
-    fc.boolean(),
-    fc.constant(null),
-    fc.constant(undefined),
-    fcSymbol
-  )
+  const notANumber = fc.oneof(fc.string(), fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)
 
-  assert(
-    property(notANumber, (value) =>
-      equal(coerceTo(number, value), new InvalidCoercion('number', value))
-    )
-  )
+  assert(property(notANumber, (value) => equal(coerceTo(number, value), new InvalidCoercion('number', value))))
 })
 
 test.run()

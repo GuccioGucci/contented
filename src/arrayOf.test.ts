@@ -18,7 +18,7 @@ test(`array accepts array of the indicated element type`, function () {
   assert.equal(res, ['a', 'b', 'c'])
 })
 
-test('array rejects values that are not arrays', function () {
+test(`array rejects values that are not arrays`, function () {
   const arrayOfStrings = arrayOf(string)
 
   const res = coerceTo(arrayOfStrings, 5)
@@ -26,7 +26,7 @@ test('array rejects values that are not arrays', function () {
   assert.equal(res, new InvalidCoercion('array', 5))
 })
 
-test('array rejects arrays of the wrong element type', function () {
+test(`array rejects arrays of the wrong element type`, function () {
   const arrayOfStrings = arrayOf(string)
 
   const res = coerceTo(arrayOfStrings, [1, 2, 3])
@@ -34,7 +34,7 @@ test('array rejects arrays of the wrong element type', function () {
   assert.equal(res, new AtKey([0], new InvalidCoercion('string', 1)))
 })
 
-test('array reports nested errors', function () {
+test(`array reports nested errors`, function () {
   const arrayOfStrings = arrayOf(at('a', string))
 
   const res = coerceTo(arrayOfStrings, [{ a: 5 }])
@@ -42,7 +42,7 @@ test('array reports nested errors', function () {
   assert.equal(res, new AtKey([0, 'a'], new InvalidCoercion('string', 5)))
 })
 
-test('array rejects a value upon the first missing element', function () {
+test(`array rejects a value upon the first missing element`, function () {
   const arrayOfStrings = arrayOf(at('a', string))
 
   const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
@@ -56,10 +56,7 @@ test(`array propagates non fatal errors`, function () {
   const res1 = coerceTo(arrayOfPermissiveArray, [[1, 2, 3, 'hello']])
   const res2 = coerceTo(arrayOfPermissiveArray, [1, [1, 2, 3, 'hello']])
 
-  assert.equal(res1, [
-    [[1, 2, 3]],
-    [new AtKey([0, 3], new InvalidCoercion('number', 'hello'))],
-  ])
+  assert.equal(res1, [[[1, 2, 3]], [new AtKey([0, 3], new InvalidCoercion('number', 'hello'))]])
   assert.equal(res2, new AtKey([0], new InvalidCoercion('array', 1)))
 })
 

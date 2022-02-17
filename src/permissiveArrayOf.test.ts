@@ -10,18 +10,15 @@ import { Joint } from './error/Joint'
 import { at } from './at'
 import { permissiveArrayOf } from './permissiveArrayOf'
 
-test('permissive array accepts arrays with wrong element types', function () {
+test(`permissive array accepts arrays with wrong element types`, function () {
   const permissiveArrayOfStrings = permissiveArrayOf(string)
 
   const res = coerceTo(permissiveArrayOfStrings, ['a', 'b', 2])
 
-  assert.equal(res, [
-    ['a', 'b'],
-    [new AtKey([2], new InvalidCoercion('string', 2))],
-  ])
+  assert.equal(res, [['a', 'b'], [new AtKey([2], new InvalidCoercion('string', 2))]])
 })
 
-test('permissive array rejects values that are not arrays', function () {
+test(`permissive array rejects values that are not arrays`, function () {
   const permissiveArrayOfStrings = permissiveArrayOf(string)
 
   const res = coerceTo(permissiveArrayOfStrings, 5)
@@ -29,14 +26,10 @@ test('permissive array rejects values that are not arrays', function () {
   assert.equal(res, new InvalidCoercion('array', 5))
 })
 
-test('permissive array propagates non-fatal errors', function () {
+test(`permissive array propagates non-fatal errors`, function () {
   const permissiveOfPermissive = permissiveArrayOf(permissiveArrayOf(number))
 
-  const res3 = coerceTo(permissiveOfPermissive, [
-    3,
-    [1, 2, 3, 'hello'],
-    [4, 5, 'world', 6],
-  ])
+  const res3 = coerceTo(permissiveOfPermissive, [3, [1, 2, 3, 'hello'], [4, 5, 'world', 6]])
 
   assert.equal(res3, [
     [
@@ -60,9 +53,7 @@ test(`permissive array does not include non-fatal errors if they are not possibl
 })
 
 test(`permissive array accepts alternatives as element type`, function () {
-  const permissiveOfAlternatives = permissiveArrayOf(
-    string.or(at(['a'], number))
-  )
+  const permissiveOfAlternatives = permissiveArrayOf(string.or(at(['a'], number)))
 
   const res1 = coerceTo(permissiveOfAlternatives, ['x', 'y', { a: 12 }])
   const res2 = coerceTo(permissiveOfAlternatives, ['x', 'y', { b: 'hello' }])
@@ -70,12 +61,7 @@ test(`permissive array accepts alternatives as element type`, function () {
   assert.equal(res1, ['x', 'y', 12])
   assert.equal(res2, [
     ['x', 'y'],
-    [
-      new Joint([
-        new AtKey([2], new InvalidCoercion('string', { b: 'hello' })),
-        new MissingKey([2, 'a']),
-      ]),
-    ],
+    [new Joint([new AtKey([2], new InvalidCoercion('string', { b: 'hello' })), new MissingKey([2, 'a'])])],
   ])
 })
 

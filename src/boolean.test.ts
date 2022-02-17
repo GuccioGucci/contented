@@ -5,25 +5,13 @@ import { coerceTo } from './Type'
 import { InvalidCoercion } from './error/InvalidCoercion'
 import { boolean } from './boolean'
 
-test('boolean accepts boolean values', function () {
-  assert(
-    property(fc.boolean(), (value) => equal(coerceTo(boolean, value), value))
-  )
+test(`boolean accepts boolean values`, function () {
+  assert(property(fc.boolean(), (value) => equal(coerceTo(boolean, value), value)))
 })
 
-test('boolean rejects all but boolean values', function () {
-  const notABoolean = fc.oneof(
-    fcNumber,
-    fc.string(),
-    fc.constant(null),
-    fc.constant(undefined),
-    fcSymbol
-  )
-  assert(
-    property(notABoolean, (value) =>
-      equal(coerceTo(boolean, value), new InvalidCoercion('boolean', value))
-    )
-  )
+test(`boolean rejects all but boolean values`, function () {
+  const notABoolean = fc.oneof(fcNumber, fc.string(), fc.constant(null), fc.constant(undefined), fcSymbol)
+  assert(property(notABoolean, (value) => equal(coerceTo(boolean, value), new InvalidCoercion('boolean', value))))
 })
 
 test.run()

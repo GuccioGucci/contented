@@ -5,26 +5,14 @@ import { coerceTo } from './Type'
 import { InvalidCoercion } from './error/InvalidCoercion'
 import { string } from './string'
 
-test('string accepts string values', function () {
-  assert(
-    property(fc.string(), (value) => equal(coerceTo(string, value), value))
-  )
+test(`string accepts string values`, function () {
+  assert(property(fc.string(), (value) => equal(coerceTo(string, value), value)))
 })
 
-test('string rejects all but string values', function () {
-  const notAString = fc.oneof(
-    fcNumber,
-    fc.boolean(),
-    fc.constant(null),
-    fc.constant(undefined),
-    fcSymbol
-  )
+test(`string rejects all but string values`, function () {
+  const notAString = fc.oneof(fcNumber, fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)
 
-  assert(
-    property(notAString, (value) =>
-      equal(coerceTo(string, value), new InvalidCoercion('string', value))
-    )
-  )
+  assert(property(notAString, (value) => equal(coerceTo(string, value), new InvalidCoercion('string', value))))
 })
 
 test.run()
