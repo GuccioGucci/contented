@@ -1,7 +1,7 @@
 import { ContentedError } from './ContentedError'
 import { Coerce, coerceTo, ExpectedType, hasNonFatalErrors, HasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 import { enumerate } from './_enumerate'
-import { _scope } from './_scope'
+import { scope } from './_scope'
 import { HasMissingKey } from './MissingKey'
 import { HasJointAtKey } from './Joint'
 import { HasAtKeyInvalidCoercion, InvalidCoercion } from './InvalidCoercion'
@@ -18,11 +18,11 @@ export function permissiveArrayOf<T, E extends ContentedError>(type: Type<T, E>)
     for (const [el, pos] of enumerate(value)) {
       const c = coerceTo(type, el)
       if (c instanceof ContentedError) {
-        errs.push(_scope([pos], c))
+        errs.push(scope([pos], c))
         continue
       } else if (hasNonFatalErrors(c)) {
         res.push(c[0])
-        errs.push(...c[1].map((err: ContentedError) => _scope([pos], err)))
+        errs.push(...c[1].map((err: ContentedError) => scope([pos], err)))
       } else {
         res.push(c)
       }

@@ -3,7 +3,7 @@ import { Key, Path } from './Path'
 import { Coerce, coerceTo, hasNonFatalErrors, Type } from './Type'
 import { MissingKey } from './MissingKey'
 import { enumerate } from './_enumerate'
-import { _scope } from './_scope'
+import { scope } from './_scope'
 import { HasJointAtKey } from './Joint'
 import { HasAtKeyInvalidCoercion, InvalidCoercion } from './InvalidCoercion'
 
@@ -26,11 +26,11 @@ export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Typ
 
     const res = coerceTo(type, value)
     if (res instanceof ContentedError) {
-      return _scope(path, res)
+      return scope(path, res)
     }
     if (hasNonFatalErrors(res)) {
       const [value, errors] = res
-      return [value, errors.map((err: ContentedError) => _scope(path, err))] as unknown as T
+      return [value, errors.map((err: ContentedError) => scope(path, err))] as unknown as T
     }
     return res
   }

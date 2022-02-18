@@ -4,7 +4,7 @@ import { HasMissingKey, MissingKey } from './MissingKey'
 import { AtKey, HasAtKeyInvalidCoercion, InvalidCoercion } from './InvalidCoercion'
 import { HasJointAtKey, Joint } from './Joint'
 
-export function _scope<E extends ContentedError>(path: Path, error: E): ScopedContentedError<E> {
+export function scope<E extends ContentedError>(path: Path, error: E): ScopedContentedError<E> {
   if (error instanceof AtKey) {
     return new AtKey(path.concat(error.atKey), error.error) as ScopedContentedError<E>
   }
@@ -15,7 +15,7 @@ export function _scope<E extends ContentedError>(path: Path, error: E): ScopedCo
     return new AtKey(path, error) as ScopedContentedError<E>
   }
   if (error instanceof Joint) {
-    return new Joint(error.errors.map((inner: ContentedError) => _scope(path, inner))) as ScopedContentedError<E>
+    return new Joint(error.errors.map((inner: ContentedError) => scope(path, inner))) as ScopedContentedError<E>
   }
   /* c8 ignore next */
   throw new Error(`Unknown error type: ${error}`)
