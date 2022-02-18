@@ -55,7 +55,7 @@ Contented may be useful every time there are expectations — but no real guaran
 
 #### `coerceTo(T, input)`
 
-Attempts to coerce the `input` data to the type represented by `T`. Note that the specific return value, whether successful or not, depends on the particular of `T`.
+Attempts to coerce the `input` data to the type represented by `T`. Note that the specific return value, whether successful or not, depends on the particular `T`.
 
 ```typescript
 import { string, coerceTo } from 'contented';
