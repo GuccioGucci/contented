@@ -37,9 +37,7 @@ export function permissiveArrayOf<T, E extends ContentedError>(type: Type<T, E>)
 }
 
 type PermissiveArrayOf<T, E> = HasNonFatalErrors<T> extends true
-  ?
-      | ExpectedType<T>[]
-      | [ExpectedType<T>[], (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E> | NonFatalErrorType<T>)[]]
+  ? ExpectedType<T>[] | [ExpectedType<T>[], (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E> | NonFatalErrorType<T>)[]]
   : HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E> extends never
-  ? T[]
-  : T[] | [T[], (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E>)[]]
+    ? T[]
+    : T[] | [T[], (HasAtKeyInvalidCoercion<E> | HasJointAtKey<E> | HasMissingKey<E>)[]]
