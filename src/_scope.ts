@@ -6,7 +6,7 @@ import { HasJointAtKey, Joint } from './Joint'
 
 export function _scope<E extends ContentedError>(path: Path, error: E): ScopedContentedError<E> {
   if (error instanceof AtKey) {
-    return new AtKey(path.concat(error.at), error.error) as ScopedContentedError<E>
+    return new AtKey(path.concat(error.atKey), error.error) as ScopedContentedError<E>
   }
   if (error instanceof MissingKey) {
     return new MissingKey(path.concat(error.missingKey)) as HasMissingKey<E>

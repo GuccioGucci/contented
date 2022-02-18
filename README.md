@@ -171,7 +171,7 @@ coerceTo(arrayOf(number), 'hello');
 // InvalidCoercion { expected: 'array', got: 'hello' }
 
 coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { at: : [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+// AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
 ```
 
 #### `permissiveArrayOf(T)`
@@ -189,7 +189,7 @@ coerceTo(permissiveArrayOf(number), [3, 4, 5]);
 coerceTo(permissiveArrayOf(number), [3, 'a', 5]);
 /* [
      [ 3, 5 ],
-     [ AtKey { at: : [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } } ]
+     [ AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } } ]
    ]
 */
 ```
@@ -251,7 +251,7 @@ coerceTo(User, {
 // { fullname: 'John Smith', phone: '055-123404' }
 
 coerceTo(User, { name: 42 });
-// AtKey { at: [ 'name' ], error: InvalidCoercion { expected: 'string', got: 42 } }
+// AtKey { atKey: [ 'name' ], error: InvalidCoercion { expected: 'string', got: 42 } }
 ```
 
 #### `T1.or(T2)`
@@ -277,7 +277,7 @@ coerceTo(string.or(at('a', number)), { a: true });
 /* Joint {
      errors: [
        InvalidCoercion { expected: 'string', got: { a: true } },
-       AtKey { at: [ 'a' ], InvalidCoercion { expected: 'number', got: true } }
+       AtKey { atKey: [ 'a' ], InvalidCoercion { expected: 'number', got: true } }
      ]
    }
 */
@@ -302,11 +302,11 @@ An `InvalidCoercion` error, together with the path at which to find the non-conf
 import { number, arrayOf, at, coerceTo } from 'contented';
 
 coerceTo(at('x', number), { x: 'hello' });
-// AtKey { at: : [ 'x' ], error: InvalidCoercion { expected: 'number', got: 'hello' } }
+// AtKey { atKey: [ 'x' ], error: InvalidCoercion { expected: 'number', got: 'hello' } }
 
 
 coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { at: : [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+// AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
 ```
 
 #### `MissingKey`

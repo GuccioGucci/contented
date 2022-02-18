@@ -18,7 +18,7 @@ export class AtKey<E extends InvalidCoercion> extends ContentedError {
   // @ts-ignore
   private readonly [AT_KEY]: true
 
-  constructor(public readonly at: Path, public readonly error: E) {
+  constructor(public readonly atKey: Path, public readonly error: E) {
     super()
   }
 }
