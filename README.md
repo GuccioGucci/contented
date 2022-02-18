@@ -1,7 +1,7 @@
 # Contented
 
 <div align="center">
-    <img src="https://www.dropbox.com/s/nyvwpzryjzdrgw5/contented.png?raw=1" width="150"/>
+  <img src="contented.svg" width="150"/>
 </div>
 
 ## Table of Contents
@@ -339,6 +339,8 @@ coerceTo(string.or(number), true);
 */
 ```
 
----
+## License
 
-Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
+Copyright 2022 Gucci.
+
+Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
