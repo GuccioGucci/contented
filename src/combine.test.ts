@@ -3,8 +3,8 @@ import assert from 'uvu/assert'
 import { coerceTo } from './Type'
 import { number } from './number'
 import { string } from './string'
-import { AtKey, InvalidCoercion } from './error/InvalidCoercion'
-import { MissingKey } from './error/MissingKey'
+import { AtKey, InvalidCoercion } from './InvalidCoercion'
+import { MissingKey } from './MissingKey'
 import { at } from './at'
 import { permissiveArrayOf } from './permissiveArrayOf'
 import { combine } from './combine'
@@ -34,10 +34,7 @@ test(`combine rejects the combination upon the first mismatching element`, funct
 })
 
 test(`combine propagates non fatal errors`, function () {
-  const permissiveLengths = combine(
-    (xs) => xs.length,
-    permissiveArrayOf(number)
-  )
+  const permissiveLengths = combine((xs) => xs.length, permissiveArrayOf(number))
 
   const res1 = coerceTo(permissiveLengths, [1, 2, 3, 4, 5])
   const res2 = coerceTo(permissiveLengths, [1, 2, 3, 'hello', true])
@@ -45,10 +42,7 @@ test(`combine propagates non fatal errors`, function () {
   assert.equal(res1, 5)
   assert.equal(res2, [
     3,
-    [
-      new AtKey([3], new InvalidCoercion('number', 'hello')),
-      new AtKey([4], new InvalidCoercion('number', true)),
-    ],
+    [new AtKey([3], new InvalidCoercion('number', 'hello')), new AtKey([4], new InvalidCoercion('number', true))],
   ])
 })
 

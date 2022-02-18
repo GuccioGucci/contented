@@ -3,9 +3,9 @@ import assert from 'uvu/assert'
 import { number } from './number'
 import { string } from './string'
 import { coerceTo } from './Type'
-import { AtKey, InvalidCoercion } from './error/InvalidCoercion'
-import { MissingKey } from './error/MissingKey'
-import { Joint } from './error/Joint'
+import { AtKey, InvalidCoercion } from './InvalidCoercion'
+import { MissingKey } from './MissingKey'
+import { Joint } from './Joint'
 import { at } from './at'
 
 test(`or allows specifying alternatives`, function () {
@@ -24,21 +24,9 @@ test(`or rejects input values that are not coercible to any given alternative`, 
   const res1 = coerceTo(stringOrNumber, true)
   const res2 = coerceTo(stringOrNumber, { a: 2 })
 
-  assert.equal(
-    res1,
-    new Joint([
-      new InvalidCoercion('string', true),
-      new InvalidCoercion('number', true),
-    ])
-  )
+  assert.equal(res1, new Joint([new InvalidCoercion('string', true), new InvalidCoercion('number', true)]))
 
-  assert.equal(
-    res2,
-    new Joint([
-      new InvalidCoercion('string', { a: 2 }),
-      new InvalidCoercion('number', { a: 2 }),
-    ])
-  )
+  assert.equal(res2, new Joint([new InvalidCoercion('string', { a: 2 }), new InvalidCoercion('number', { a: 2 })]))
 })
 
 test(`or reports the path at which the error happened`, function () {
@@ -47,17 +35,11 @@ test(`or reports the path at which the error happened`, function () {
   const res1 = coerceTo(stringOrNumberAtA, { b: 12 })
   const res2 = coerceTo(stringOrNumberAtA, { a: 'hello' })
 
-  assert.equal(
-    res1,
-    new Joint([new InvalidCoercion('string', { b: 12 }), new MissingKey(['a'])])
-  )
+  assert.equal(res1, new Joint([new InvalidCoercion('string', { b: 12 }), new MissingKey(['a'])]))
 
   assert.equal(
     res2,
-    new Joint([
-      new InvalidCoercion('string', { a: 'hello' }),
-      new AtKey(['a'], new InvalidCoercion('number', 'hello')),
-    ])
+    new Joint([new InvalidCoercion('string', { a: 'hello' }), new AtKey(['a'], new InvalidCoercion('number', 'hello'))])
   )
 })
 
@@ -70,10 +52,7 @@ test(`or reports multi-level missing keys`, function () {
   assert.equal(res1, new MissingKey(['a']))
   assert.equal(
     res2,
-    new Joint([
-      new AtKey(['a'], new InvalidCoercion('string', { c: 12 })),
-      new MissingKey(['a', 'b']),
-    ])
+    new Joint([new AtKey(['a'], new InvalidCoercion('string', { c: 12 })), new MissingKey(['a', 'b'])])
   )
 })
 

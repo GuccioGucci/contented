@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { coerceTo } from './Type'
-import { InvalidCoercion } from './error/InvalidCoercion'
+import { InvalidCoercion } from './InvalidCoercion'
 import { match } from './match'
 
 test(`match succeds only if the input and expected values are the same`, function () {

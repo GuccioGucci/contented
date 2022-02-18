@@ -25,9 +25,7 @@ export class Joint<E extends unknown[]> extends ContentedError {
   }
 }
 
-export type HasJointAtKey<E> = E extends Joint<infer U>
-  ? Joint<MapAtKeyInvalidCoercion<U>>
-  : never
+export type HasJointAtKey<E> = E extends Joint<infer U> ? Joint<MapAtKeyInvalidCoercion<U>> : never
 
 type MapAtKeyInvalidCoercion<U> = U extends [infer Head, ...infer Tail]
   ? [HasAtKeyInvalidCoercion<Head, Head>, ...MapAtKeyInvalidCoercion<Tail>]

@@ -1,5 +1,5 @@
 import { ContentedError } from './ContentedError'
-import { Path } from '../Path'
+import { Path } from './Path'
 
 const MISSING_KEY = Symbol()
 

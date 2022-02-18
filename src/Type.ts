@@ -1,5 +1,5 @@
-import { ContentedError } from './error/ContentedError'
-import { Joint } from './error/Joint'
+import { ContentedError } from './ContentedError'
+import { Joint } from './Joint'
 import { Has, IsUnion } from './_typefunc'
 
 export class Type<T, E> {
@@ -71,3 +71,7 @@ type EnumerateErrors<E, F> = E extends never
   : [E, F]
 
 type StripJoint<T> = T extends Joint<infer U> ? U : T
+
+export function hasNonFatalErrors(res: any): res is [unknown, ContentedError[]] {
+  return Array.isArray(res) && res.length == 2 && res[1].every((err: any) => err instanceof ContentedError)
+}

@@ -1,12 +1,11 @@
-import { ContentedError } from './error/ContentedError'
+import { ContentedError } from './ContentedError'
 import { Key, Path } from './Path'
-import { Coerce, coerceTo, Type } from './Type'
-import { MissingKey } from './error/MissingKey'
+import { Coerce, coerceTo, hasNonFatalErrors, Type } from './Type'
+import { MissingKey } from './MissingKey'
 import { enumerate } from './_enumerate'
-import { scope } from './error/scope'
-import { HasJointAtKey } from './error/Joint'
-import { HasAtKeyInvalidCoercion, InvalidCoercion } from './error/InvalidCoercion'
-import { hasNonFatalErrors } from './error/NonFatalErrorType'
+import { _scope } from './_scope'
+import { HasJointAtKey } from './Joint'
+import { HasAtKeyInvalidCoercion, InvalidCoercion } from './InvalidCoercion'
 
 export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Type<T, E>) {
   type CoerceAt = Coerce<T, MissingKey | InvalidCoercion | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>>
@@ -27,11 +26,11 @@ export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Typ
 
     const res = coerceTo(type, value)
     if (res instanceof ContentedError) {
-      return scope(path, res)
+      return _scope(path, res)
     }
     if (hasNonFatalErrors(res)) {
       const [value, errors] = res
-      return [value, errors.map((err: ContentedError) => scope(path, err))] as unknown as T
+      return [value, errors.map((err: ContentedError) => _scope(path, err))] as unknown as T
     }
     return res
   }

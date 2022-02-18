@@ -1,5 +1,5 @@
 import { Coerce, Type } from './Type'
-import { InvalidCoercion } from './error/InvalidCoercion'
+import { InvalidCoercion } from './InvalidCoercion'
 import { Narrow } from './_typefunc'
 
 export function match<T extends string | number | bigint | boolean>(expected: Narrow<T>): Type<T, InvalidCoercion> {

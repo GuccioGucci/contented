@@ -1,6 +1,5 @@
-import { ContentedError } from './error/ContentedError'
-import { Coerce, coerceTo, ExpectedType, NonFatalErrorType, Type } from './Type'
-import { hasNonFatalErrors } from './error/NonFatalErrorType'
+import { ContentedError } from './ContentedError'
+import { Coerce, coerceTo, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 
 export function combine<E extends ContentedError, Ts extends Type<unknown, E>[], O>(
   fn: (...args: [...ExpectedTypes<Ts>]) => O,

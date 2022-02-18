@@ -1,6 +1,6 @@
-import { ContentedError } from './error/ContentedError'
+import { ContentedError } from './ContentedError'
 import { Coerce, coerceTo, ExpectedType, Type } from './Type'
-import { MissingKey } from './error/MissingKey'
+import { MissingKey } from './MissingKey'
 
 export function fallback<T, E extends ContentedError>(type: Type<T, IncludesMissingKey<E>>, fallback: Fallback<T>) {
   type CoerceFallback = Coerce<T, Exclude<E, MissingKey>>

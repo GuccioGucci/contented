@@ -2,7 +2,7 @@ import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { coerceTo } from './Type'
-import { InvalidCoercion } from './error/InvalidCoercion'
+import { InvalidCoercion } from './InvalidCoercion'
 import { boolean } from './boolean'
 
 test(`boolean accepts boolean values`, function () {
