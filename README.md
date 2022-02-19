@@ -286,7 +286,7 @@ coerceTo(string.or(at('a', number)), { a: true });
 ### Errors
 
 #### `InvalidCoercion`
-When the input data is not conforming to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expection and the actual value.
+When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expection and the actual value.
 
 ```typescript
 import { string, coerceTo } from 'contented';
