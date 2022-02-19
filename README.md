@@ -1,5 +1,3 @@
-# Contented
-
 <div align="center">
   <img src="contented.svg" width="150"/>
 </div>
