@@ -29,7 +29,7 @@
     - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
     - [`MissingKey`](#missingkey)
     - [`Joint<[...Errs]>`](#jointerrs)
-
+  - [License](#license)
 
 ## Introduction
 
