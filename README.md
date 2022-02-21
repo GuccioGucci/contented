@@ -178,7 +178,7 @@ coerceTo(arrayOf(number), [3, 'a', 5]);
 
 A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
 
-The distictive feature of a `permissiveArrayOf(T)` is that it skips elements that are not recognized as `T`s. This is different from `arrayOf(T)`, which instead stops as soon as one element is not recognized.
+The distictive feature of a `permissiveArrayOf(T)` is that it skips elements that are not recognized as `T`. This is different from `arrayOf(T)`, which instead stops as soon as one element is not recognized.
 
 ```typescript
 import { number, permissiveArrayOf, coerceTo } from 'contented';
@@ -198,7 +198,7 @@ coerceTo(permissiveArrayOf(number), [3, 'a', 5]);
 
 #### `match(value)`
 
-A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` can succeed only if `value` is provided as an input.
+A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` succeed only when `value` is provided as an input.
 
 ```typescript
 import { match, coerceTo } from 'contented';
