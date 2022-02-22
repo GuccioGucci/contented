@@ -1,5 +1,6 @@
 {
   "name": "@gucciogucci/contented",
+  "description": "A library to coerce values at run-time.",
   "version": "0.0.0",
   "author": "Gucci <npm@gucci.com>",
   "license": "LGPL-3.0-only",
