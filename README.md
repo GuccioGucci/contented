@@ -1,6 +1,14 @@
 <div align="center">
-  <img src="contented.svg" width="150"/>
+  <img src="contented.svg" width="250"/>
 </div>
+
+<p align="center">
+  A library to coerce values at run-time.
+</p>
+
+<p align="center">
+  <a href="https://github.com/GuccioGucci/contented/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/GuccioGucci/contented/actions/workflows/ci.yml/badge.svg"></a>
+</p>
 
 ## Table of Contents
 
