@@ -34,7 +34,7 @@ export const coerceTo = Type.coerceTo
 
 export type Coerce<T, E> = (value: any) => T | E
 
-export type NonFatalErrorType<T> = T extends Type<infer A, any>
+export type NonFatalErrorType<T> = [T] extends [Type<infer A, any>]
   ? NonFatalErrorType<A>
   : IsUnion<T> extends true
   ? T extends [any, (infer NF)[]]
@@ -46,7 +46,7 @@ export type NonFatalErrorType<T> = T extends Type<infer A, any>
 
 export type HasNonFatalErrors<T> = Has<NonFatalErrorType<T>>
 
-export type ExpectedType<T> = T extends Type<infer A, any>
+export type ExpectedType<T> = [T] extends [Type<infer A, any>]
   ? ExpectedType<A>
   : HasNonFatalErrors<T> extends true
   ? T extends [infer U, any]
