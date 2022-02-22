@@ -21,7 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/GuccioGucci/contented.git"
   },
-  "keywords": [],
+  "keywords": ["data", "typescript", "schema", "runtime", "external", "coercion", "coerce", "type-inference"],
   "bugs": {
     "url": "https://github.com/GuccioGucci/contented/issues"
   },
