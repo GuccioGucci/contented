@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/GuccioGucci/contented/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/GuccioGucci/contented/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/GuccioGucci/contented/actions/workflows/test.yml"><img alt="Test" src="https://github.com/GuccioGucci/contented/actions/workflows/test.yml/badge.svg"></a>
 </p>
 
 ## Table of Contents

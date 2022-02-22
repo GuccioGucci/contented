@@ -21,7 +21,16 @@
     "type": "git",
     "url": "git+https://github.com/GuccioGucci/contented.git"
   },
-  "keywords": ["data", "typescript", "schema", "runtime", "external", "coercion", "coerce", "type-inference"],
+  "keywords": [
+    "data",
+    "typescript",
+    "schema",
+    "runtime",
+    "external",
+    "coercion",
+    "coerce",
+    "type-inference"
+  ],
   "bugs": {
     "url": "https://github.com/GuccioGucci/contented/issues"
   },
@@ -39,5 +48,8 @@
   },
   "lint-staged": {
     "*.{ts,css,md}": "prettier --write"
+  },
+  "engines": {
+    "node": ">= 12.20.0"
   }
 }
