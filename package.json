@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "pretest": "npm run ts:check",
-    "test": "c8 --include=src uvu -r tsm src .test.ts",
+    "test": "c8 --reporter=lcov --reporter=text --include=src uvu -r tsm src .test.ts",
     "build": "tsc --build tsconfig.build.json",
     "ts:check": "tsc --noEmit",
     "prepare": "husky install",
