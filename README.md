@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="contented.svg" width="250"/>
+  <img src="https://github.com/GuccioGucci/contented/blob/main/contented.svg?raw=true" width="250"/>
 </div>
 
 <p align="center">
