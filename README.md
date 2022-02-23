@@ -54,7 +54,7 @@ const Image = combine(
   at(['metadata', 'size'], number)
 );
 
-const image = coerceTo(Image, data /* abritrary data */);
+const image = coerceTo(Image, data /* arbitrary data */);
 ```
 
 Contented may be useful every time there are expectations — but no real guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, from files, or any other external source.
@@ -188,7 +188,7 @@ coerceTo(arrayOf(number), [3, 'a', 5]);
 
 A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
 
-The distictive feature of a `permissiveArrayOf(T)` is that it skips elements that are not recognized as `T`. This is different from `arrayOf(T)`, which instead stops as soon as one element is not recognized.
+The distinctive feature of a `permissiveArrayOf(T)` is that it skips elements that are not recognized as `T`. This is different from `arrayOf(T)`, which instead stops as soon as one element is not recognized.
 
 ```typescript
 import { number, permissiveArrayOf, coerceTo } from '@gucciogucci/contented';
@@ -296,7 +296,7 @@ coerceTo(string.or(at('a', number)), { a: true });
 ### Errors
 
 #### `InvalidCoercion`
-When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expection and the actual value.
+When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expectation and the actual value.
 
 ```typescript
 import { string, coerceTo } from '@gucciogucci/contented';
