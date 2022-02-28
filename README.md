@@ -145,7 +145,7 @@ coerceTo(stringAtAB, 'hello');
 When the path consists of a single key, such a key can be supplied without the need of enclosing it in an array.
 
 ```typescript
-coerceTo(at('a', string), { a: 'hello' })
+coerceTo(at('a', string), { a: 'hello' });
 // 'hello'
 ```
 
