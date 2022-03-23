@@ -34,6 +34,7 @@
   - [Combinations & Alternatives](#combinations--alternatives)
     - [`combine(fn, ...Ts)`](#combinefn-ts)
     - [`T1.or(T2)`](#t1ort2)
+    - [`optional(T)`](#optionalt)
   - [Errors](#errors)
     - [`InvalidCoercion`](#invalidcoercion)
     - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
@@ -293,6 +294,17 @@ coerceTo(string.or(at('a', number)), { a: true });
      ]
    }
 */
+```
+
+#### `optional(T)`
+
+Marks the type `T` as optional. That is, not only `optional(T)` succeeds for every valid value of type `T`, but also when `undefined` is passed as an input. It is equivalent to `T.or(always(undefined))`.
+
+```typescript
+import { optional, string, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(optional(string), undefined);
+// undefined
 ```
 
 ### Errors
