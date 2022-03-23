@@ -39,6 +39,8 @@
     - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
     - [`MissingKey`](#missingkey)
     - [`Joint<[...Errs]>`](#jointerrs)
+  - [Utility types](#utility-types)
+    - [`Infer<typeof T>`](#infertypeof-t)
 - [License](#license)
 
 ## Introduction
@@ -346,6 +348,29 @@ coerceTo(string.or(number), true);
    }
 */
 ```
+
+### Utility types
+
+#### `Infer<typeof T>`
+
+`Infer` comes in handy every time it is necessary to infer the compile-time type corresponding to some run-time representation `T`.
+
+```typescript
+import { Infer, coerceTo } from '@gucciogucci/contented';
+
+const User = combine(
+  (name, surname, phone) => ({ fullname: `${name} ${surname}`, phone }),
+  at('name', string),
+  at('surname', string),
+  at(['contacts', 'phone'], string)
+);
+
+function fn(user: Infer<typeof User>) {
+  // here, user : { fullname: string, phone: string }
+}
+```
+
+
 
 ## License
 
