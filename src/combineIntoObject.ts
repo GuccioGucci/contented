@@ -1,9 +1,7 @@
 import { ContentedError } from './ContentedError'
 import { Coerce, coerceTo, ErrorType, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 
-export function combineIntoObject<E extends ContentedError, O extends Record<string, Type<unknown, E>>>(
-  obj: O
-): Type<ObjectOf<O>, ErrorTypeInObject<O>> {
+export function combineIntoObject<E extends ContentedError, O extends Record<string, Type<unknown, E>>>(obj: O) {
   type CoerceObject = Coerce<ObjectOf<O>, ErrorTypeInObject<O>>
   const coerce: CoerceObject = (value: any) => {
     const out: Partial<ExpectedTypeInObject<O>> = {}
