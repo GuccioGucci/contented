@@ -133,7 +133,7 @@ Constructs a run-time type that expects the input data to be an object such that
 ```typescript
 import { string, at, coerceTo } from '@gucciogucci/contented';
 
-const stringAtAB = at(['a', 'b'], string)
+const stringAtAB = at(['a', 'b'], string);
 
 coerceTo(stringAtAB, { a: { b: 'hello' } });
 // 'hello'
