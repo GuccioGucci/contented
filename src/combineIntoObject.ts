@@ -30,15 +30,36 @@ export function combineIntoObject<E extends ContentedError, O extends Record<str
 }
 
 type ObjectOf<O extends ObjectOfTypes> = IsWithoutNonFatalErrors<O> extends true
-  ? ExpectedTypeInObject<O>
-  : ExpectedTypeInObject<O> | [ExpectedTypeInObject<O>, NonFatalErrorTypesInObject<O>[]]
+  ? ExpandRecursively<ExpectedTypeInObject<O>>
+  :
+      | ExpandRecursively<ExpectedTypeInObject<O>>
+      | [ExpandRecursively<ExpectedTypeInObject<O>>, NonFatalErrorTypesInObject<O>[]]
 
 type IsWithoutNonFatalErrors<O extends ObjectOfTypes> = NonFatalErrorTypesInObject<O> extends never ? true : false
 
 type NonFatalErrorTypesInObject<O extends ObjectOfTypes> = { [K in keyof O]: NonFatalErrorType<O[K]> }[keyof O]
 
-type ExpectedTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ExpectedType<O[K]> }
+type ExpectedTypeInObject<O extends ObjectOfTypes> = EnforceOptionality<{ [K in keyof O]: ExpectedType<O[K]> }>
 
-type ErrorTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O]
+// `| never` is to force IntelliSense to expand the union type
+type ErrorTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O] | never
 
 type ObjectOfTypes = Record<string, Type<unknown, unknown>>
+
+type EnforceOptionality<T> = Optional<T, OptionalKeys<T>>
+
+// https://github.com/Microsoft/TypeScript/issues/25760#issuecomment-705137615
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>
+
+type OptionalKeys<O extends {}> = {
+  [K in keyof O]-?: [O[K] & undefined] extends [never] ? never : K
+}[keyof O]
+
+// https://stackoverflow.com/a/57683652
+type ExpandRecursively<T> = T extends object
+  ? T extends infer O
+    ? { [K in keyof O]: ExpandRecursively<O[K]> }
+    : never
+  : T
+
+// See also: https://stackoverflow.com/a/63990350
