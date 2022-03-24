@@ -1,5 +1,5 @@
 import { ContentedError } from './ContentedError'
-import { Coerce, coerceTo, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
+import { Coerce, coerceTo, ErrorType, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 
 export function combine<E extends ContentedError, Ts extends Type<unknown, E>[], O>(
   fn: (...args: [...ExpectedTypes<Ts>]) => O,
@@ -36,8 +36,6 @@ export function combine<E extends ContentedError, Ts extends Type<unknown, E>[],
 type CombinationOf<Ts, O> = UnionOfNonFatalErrorTypes<Ts> extends never ? O : O | [O, UnionOfNonFatalErrorTypes<Ts>[]]
 
 type UnionOfNonFatalErrorTypes<Ts> = NonFatalErrorTypes<Ts>[number]
-
-type ErrorType<T> = T extends Type<any, infer E> ? E : never
 
 type ExpectedTypes<Ts> = Ts extends [infer Head, ...infer Tail] ? [ExpectedType<Head>, ...ExpectedTypes<Tail>] : []
 

@@ -33,6 +33,7 @@
     - [`always(value)`](#alwaysvalue)
   - [Combinations & Alternatives](#combinations--alternatives)
     - [`combine(fn, ...Ts)`](#combinefn-ts)
+    - [`combineIntoObject({ [...Keys]: [...Ts] })`](#combineintoobject-keys-ts-)
     - [`T1.or(T2)`](#t1ort2)
     - [`optional(T)`](#optionalt)
   - [Errors](#errors)
@@ -265,6 +266,35 @@ coerceTo(User, {
 
 coerceTo(User, { name: 42 });
 // AtKey { atKey: [ 'name' ], error: InvalidCoercion { expected: 'string', got: 42 } }
+```
+
+#### `combineIntoObject({ [...Keys]: [...Ts] })`
+
+`combineIntObject` is a convenience function that may be used every time there is the need of combining some known run-time types `Ts` into an object of known keys. In other words, instead of writing the following:
+
+```typescript
+import { string, number, at, combine, coerceTo } from '@gucciogucci/contented';
+
+const Image = combine(
+  (url, size) => ({ url, size }),
+  at('url', string),
+  at(['metadata', 'size'], number)
+);
+
+const image = coerceTo(Image, data);
+```
+
+One may simply write:
+
+```typescript
+import { string, number, at, combineIntoObject, coerceTo } from '@gucciogucci/contented';
+
+const Image = combineIntoObject({
+  url: at('url', string),
+  size: at(['metadata', 'size'], number)
+});
+
+const image = coerceTo(Image, data);
 ```
 
 #### `T1.or(T2)`
