@@ -34,10 +34,10 @@ test(`combine rejects the combination upon the first mismatching element`, funct
 })
 
 test(`combine propagates non fatal errors`, function () {
-  const permissiveLengths = combine((xs) => xs.length, permissiveArrayOf(number))
+  const permissiveLength = combine((xs) => xs.length, permissiveArrayOf(number))
 
-  const res1 = coerceTo(permissiveLengths, [1, 2, 3, 4, 5])
-  const res2 = coerceTo(permissiveLengths, [1, 2, 3, 'hello', true])
+  const res1 = coerceTo(permissiveLength, [1, 2, 3, 4, 5])
+  const res2 = coerceTo(permissiveLength, [1, 2, 3, 'hello', true])
 
   assert.equal(res1, 5)
   assert.equal(res2, [
