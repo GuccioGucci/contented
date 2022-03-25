@@ -2,7 +2,7 @@ import { ContentedError } from './ContentedError'
 import { Coerce, coerceTo, ErrorType, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 
 export function combineIntoObject<E extends ContentedError, O extends Record<string, Type<unknown, E>>>(obj: O) {
-  type CoerceObject = Coerce<ObjectOf<O>, ErrorTypeInObject<O>>
+  type CoerceObject = Coerce<CombineIntoObjectOf<O>, ErrorTypeInObject<O>>
   const coerce: CoerceObject = (value: any) => {
     const out: Partial<ExpectedTypeInObject<O>> = {}
     const nonFatals = []
@@ -22,27 +22,27 @@ export function combineIntoObject<E extends ContentedError, O extends Record<str
       }
     }
     if (nonFatalErrors) {
-      return [out, nonFatals] as ObjectOf<O>
+      return [out, nonFatals] as CombineIntoObjectOf<O>
     }
-    return out as ObjectOf<O>
+    return out as CombineIntoObjectOf<O>
   }
   return new Type(coerce)
 }
 
-type ObjectOf<O extends ObjectOfTypes> = IsWithoutNonFatalErrors<O> extends true
+export type CombineIntoObjectOf<O extends ObjectOfTypes> = IsWithoutNonFatalErrors<O> extends true
   ? ExpandRecursively<ExpectedTypeInObject<O>>
   :
       | ExpandRecursively<ExpectedTypeInObject<O>>
       | [ExpandRecursively<ExpectedTypeInObject<O>>, NonFatalErrorTypesInObject<O>[]]
+
+// `| never` is to force IntelliSense to expand the union type
+export type ErrorTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O] | never
 
 type IsWithoutNonFatalErrors<O extends ObjectOfTypes> = NonFatalErrorTypesInObject<O> extends never ? true : false
 
 type NonFatalErrorTypesInObject<O extends ObjectOfTypes> = { [K in keyof O]: NonFatalErrorType<O[K]> }[keyof O]
 
 type ExpectedTypeInObject<O extends ObjectOfTypes> = EnforceOptionality<{ [K in keyof O]: ExpectedType<O[K]> }>
-
-// `| never` is to force IntelliSense to expand the union type
-type ErrorTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O] | never
 
 type ObjectOfTypes = Record<string, Type<unknown, unknown>>
 

@@ -23,17 +23,20 @@
     - [`number`](#number)
     - [`boolean`](#boolean)
   - [Object types](#object-types)
-    - [`at(path, T)`](#atpath-t)
-    - [`fallback(T, substitute)`](#fallbackt-substitute)
+    - [`object`](#object)
   - [Array types](#array-types)
     - [`arrayOf(T)`](#arrayoft)
     - [`permissiveArrayOf(T)`](#permissivearrayoft)
   - [Narrowing](#narrowing)
     - [`match(value)`](#matchvalue)
     - [`always(value)`](#alwaysvalue)
-  - [Combinations & Alternatives](#combinations--alternatives)
+  - [Projections](#projections)
+    - [`at(path, T)`](#atpath-t)
+    - [`fallback(T, substitute)`](#fallbackt-substitute)
+  - [Combinations](#combinations)
     - [`combine(fn, ...Ts)`](#combinefn-ts)
     - [`combineIntoObject({ [...Keys]: [...Ts] })`](#combineintoobject-keys-ts-)
+  - [Alternatives](#alternatives)
     - [`T1.or(T2)`](#t1ort2)
     - [`optional(T)`](#optionalt)
   - [Errors](#errors)
@@ -127,46 +130,17 @@ coerceTo(boolean, 'hello');
 
 ### Object types
 
-#### `at(path, T)`
+#### `object`
 
-Constructs a run-time type that expects the input data to be an object such that there exists a value of type `T` under the keys specified in `path`.
-
-```typescript
-import { string, at, coerceTo } from '@gucciogucci/contented';
-
-const stringAtAB = at(['a', 'b'], string);
-
-coerceTo(stringAtAB, { a: { b: 'hello' } });
-// 'hello'
-
-coerceTo(stringAtAB, { a: { c: 'hello' } });
-// MissingKey { missingKey: [ 'a', 'b' ] }
-
-coerceTo(stringAtAB, 'hello');
-// InvalidCoercion { expected: 'object', got: 'hello' }
-```
-
-When the path consists of a single key, such a key can be supplied without the need of enclosing it in an array.
+A run-time representaton of an object.
 
 ```typescript
-coerceTo(at('a', string), { a: 'hello' });
-// 'hello'
-```
+import { number, object, coerceTo } from '@gucciogucci/contented';
 
-#### `fallback(T, substitute)`
+const Point = object({ x: number, y: number });
 
-`fallback` works in tandem with `at` to provide a fallback value in case the input data does not contain the specified keys. Apart from removing the possibility of a `MissingKey` error, `fallback` retains the same behavior as the `at` it wraps.
-
-```typescript
-import { number, at, fallback, coerceTo } from '@gucciogucci/contented';
-
-const numberAtAB = fallback(at(['a', 'b'], number), 42);
-
-coerceTo(numberAtAB, { a: { c: 3 } });
-// 42
-
-coerceTo(numberAtAB, { a: { b: 3 } });
-// 3
+coerceTo(Point, { x: 10, y : 20 });
+// { x: 10, y: 20 }
 ```
 
 ### Array types
@@ -238,7 +212,52 @@ coerceTo(always(20), false);
 // 20
 ```
 
-### Combinations & Alternatives
+### Projections
+
+#### `at(path, T)`
+
+Constructs a run-time type that expects the input data to be an object such that there exists a value of type `T` under the keys specified in `path`.
+
+```typescript
+import { string, at, coerceTo } from '@gucciogucci/contented';
+
+const stringAtAB = at(['a', 'b'], string);
+
+coerceTo(stringAtAB, { a: { b: 'hello' } });
+// 'hello'
+
+coerceTo(stringAtAB, { a: { c: 'hello' } });
+// MissingKey { missingKey: [ 'a', 'b' ] }
+
+coerceTo(stringAtAB, 'hello');
+// InvalidCoercion { expected: 'object', got: 'hello' }
+```
+
+When the path consists of a single key, such a key can be supplied without the need of enclosing it in an array.
+
+```typescript
+coerceTo(at('a', string), { a: 'hello' });
+// 'hello'
+```
+
+#### `fallback(T, substitute)`
+
+`fallback` works in tandem with `at` to provide a fallback value in case the input data does not contain the specified keys. Apart from removing the possibility of a `MissingKey` error, `fallback` retains the same behavior as the `at` it wraps.
+
+```typescript
+import { number, at, fallback, coerceTo } from '@gucciogucci/contented';
+
+const numberAtAB = fallback(at(['a', 'b'], number), 42);
+
+coerceTo(numberAtAB, { a: { c: 3 } });
+// 42
+
+coerceTo(numberAtAB, { a: { b: 3 } });
+// 3
+```
+
+
+### Combinations
 
 #### `combine(fn, ...Ts)`
 
@@ -270,7 +289,7 @@ coerceTo(User, { name: 42 });
 
 #### `combineIntoObject({ [...Keys]: [...Ts] })`
 
-`combineIntObject` is a convenience function that may be used every time there is the need of combining some known run-time types `Ts` into an object of known keys. In other words, instead of writing the following:
+`combineIntObject` is a convenience function that may be used every time there is the need of combining some known run-time types `Ts` into an object of known keys. In other words, instead of writing:
 
 ```typescript
 import { string, number, at, combine, coerceTo } from '@gucciogucci/contented';
@@ -296,6 +315,10 @@ const Image = combineIntoObject({
 
 const image = coerceTo(Image, data);
 ```
+
+Note that if there is a 1:1 correspondence between source and target keys, [`object`](#object) might be a better choice.
+
+### Alternatives
 
 #### `T1.or(T2)`
 

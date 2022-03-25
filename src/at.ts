@@ -37,3 +37,7 @@ export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Typ
 
   return new Type(coerce)
 }
+
+export type At<T> = T extends Type<infer R, infer E>
+  ? Type<R, MissingKey | InvalidCoercion | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>>
+  : never
