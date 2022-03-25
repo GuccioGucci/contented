@@ -1,7 +1,7 @@
 {
   "name": "@gucciogucci/contented",
   "description": "A library to coerce values at run-time.",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "author": "Gucci <npm@gucci.com>",
   "license": "LGPL-3.0-only",
   "types": "dist/index.d.ts",
