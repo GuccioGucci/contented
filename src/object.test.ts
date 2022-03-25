@@ -58,3 +58,5 @@ test(`object marks optional fields as optional`, function () {
 
   assert.ok(test)
 })
+
+test.run()

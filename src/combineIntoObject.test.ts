@@ -56,3 +56,5 @@ test(`combineIntoObject marks optional fields as optional`, function () {
 
   assert.ok(test)
 })
+
+test.run()
