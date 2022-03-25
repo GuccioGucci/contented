@@ -132,7 +132,7 @@ coerceTo(boolean, 'hello');
 
 #### `object`
 
-A run-time representaton of an object.
+A run-time representation of an object.
 
 ```typescript
 import { number, object, coerceTo } from '@gucciogucci/contented';
@@ -141,6 +141,23 @@ const Point = object({ x: number, y: number });
 
 coerceTo(Point, { x: 10, y : 20 });
 // { x: 10, y: 20 }
+```
+
+As with compile-time types, optional properties are marked by adding a `?` at the end of their names:
+
+```typescript
+import { number, object, coerceTo } from '@gucciogucci/contented';
+
+const Point = object({ x: number, y: number, 'z?': number })
+
+coerceTo(Point, {x: 10, y: 20 })
+// { x: 10, y: 20 }
+
+coerceTo(Point, { x: 10, y: 20, z: 30 })
+// { x: 10, y: 20, z: 30 }
+
+coerceTo(Point, { x: 10, y: 20, z: undefined })
+// { x: 10, y: 20, z: undefined }
 ```
 
 ### Array types

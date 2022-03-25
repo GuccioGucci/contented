@@ -11,3 +11,6 @@ export type Narrow<A> =
 export type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never
+
+// https://stackoverflow.com/a/57683652
+export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never

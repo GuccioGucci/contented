@@ -1,35 +1,33 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { Infer } from './Infer'
 import { AtKey, InvalidCoercion } from './InvalidCoercion'
 import { MissingKey } from './MissingKey'
 import { number } from './number'
 import { object } from './object'
-import { optional } from './optional'
 import { permissiveArrayOf } from './permissiveArrayOf'
 import { string } from './string'
 import { coerceTo } from './Type'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
-  const xyObject = object({ x: string, y: number })
+  const Point = object({ x: string, y: number })
 
-  const res = coerceTo(xyObject, { x: 'hello', y: 12 })
+  const res = coerceTo(Point, { x: 'hello', y: 12 })
 
   assert.equal(res, { x: 'hello', y: 12 })
 })
 
 test(`object rejects the input data upon the first missing element`, function () {
-  const xyObject = object({ x: string, y: number })
+  const XY = object({ x: string, y: number })
 
-  const res = coerceTo(xyObject, { x: 'hello' })
+  const res = coerceTo(XY, { x: 'hello' })
 
   assert.equal(res, new MissingKey(['y']))
 })
 
 test(`object rejects the input data upon the first mismatching element`, function () {
-  const xyObject = object({ x: string, y: number })
+  const XY = object({ x: string, y: number })
 
-  const res = coerceTo(xyObject, { x: 'hello', y: false })
+  const res = coerceTo(XY, { x: 'hello', y: false })
 
   assert.equal(res, new AtKey(['y'], new InvalidCoercion('number', false)))
 })
@@ -50,13 +48,16 @@ test(`object propagates non fatal errors`, function () {
   ])
 })
 
-test(`object marks optional fields as optional`, function () {
-  const obj = object({ x: optional(string), y: number })
-  type ExpectedObj = Infer<typeof obj>
+test(`object marks optional fields by ending keys with ?`, function () {
+  const obj = object({ 'x?': string, y: number })
 
-  const test: ExpectedObj = { y: 12 }
+  const res1 = coerceTo(obj, { x: 'hello', y: 20 })
+  const res2 = coerceTo(obj, { x: undefined, y: 20 })
+  const res3 = coerceTo(obj, { y: 20 })
 
-  assert.ok(test)
+  assert.equal(res1, { x: 'hello', y: 20 })
+  assert.equal(res2, { x: undefined, y: 20 })
+  assert.equal(res3, { y: 20 })
 })
 
 test.run()
