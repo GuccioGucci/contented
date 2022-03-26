@@ -1,10 +1,10 @@
 import { At } from './at'
-import { ObjectOf, ErrorTypeInObject as ObjectOfError } from './combineIntoObject'
 import { ContentedError } from './ContentedError'
 import { InvalidCoercion } from './InvalidCoercion'
 import { MissingKey } from './MissingKey'
-import { Coerce, coerceTo, hasNonFatalErrors, Type } from './Type'
+import { Coerce, coerceTo, ErrorType, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 import { scope } from './_scope'
+import { Expand } from './_typefunc'
 
 export function object<E extends ContentedError, O extends Record<string, Type<unknown, E>>>(obj: O) {
   type CoerceObject = Coerce<ObjectOf<AtInObject<O>>, InvalidCoercion | ObjectOfError<AtInObject<O>>>
@@ -59,4 +59,28 @@ type AtInObject<O extends ObjectOfTypes> = {
 
 type RemoveMissingKey<T> = [T] extends [Type<infer A, infer E>] ? Type<A, Exclude<E, MissingKey>> : never
 
+export type ObjectOf<O extends ObjectOfTypes> = IsWithoutNonFatalErrors<O> extends true
+  ? Expand<EnforceOptionality<ExpectedTypeInObject<O>>>
+  :
+      | Expand<EnforceOptionality<ExpectedTypeInObject<O>>>
+      | [Expand<EnforceOptionality<ExpectedTypeInObject<O>>>, NonFatalErrorTypeInObject<O>[]]
+
+// `| never` is to force IntelliSense to expand the union type
+export type ObjectOfError<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O] | never
+
+type IsWithoutNonFatalErrors<O extends ObjectOfTypes> = NonFatalErrorTypeInObject<O> extends never ? true : false
+
+type NonFatalErrorTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: NonFatalErrorType<O[K]> }[keyof O]
+
+export type ExpectedTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ExpectedType<O[K]> }
+
 type ObjectOfTypes = Record<string, Type<unknown, unknown>>
+
+type EnforceOptionality<T> = RemoveQuestionMarkFromKey<Optional<T, KeysEndingInQuestionMark<T>>>
+
+// https://github.com/Microsoft/TypeScript/issues/25760#issuecomment-705137615
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>
+
+type KeysEndingInQuestionMark<O extends {}> = { [K in keyof O]: K extends `${any}?` ? K : never }[keyof O]
+
+type RemoveQuestionMarkFromKey<O extends {}> = { [K in keyof O as K extends `${infer K2}?` ? K2 : K]: O[K] }
