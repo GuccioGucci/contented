@@ -75,5 +75,9 @@ type EnumerateErrors<E, F> = E extends never
 type StripJoint<T> = T extends Joint<infer U> ? U : T
 
 export function hasNonFatalErrors(res: any): res is [unknown, ContentedError[]] {
-  return Array.isArray(res) && res.length == 2 && res[1].every((err: any) => err instanceof ContentedError)
+  if (!Array.isArray(res)) return false
+  if (res.length !== 2) return false
+  if (!Array.isArray(res[1])) return false
+
+  return res[1].every((err: any) => err instanceof ContentedError)
 }
