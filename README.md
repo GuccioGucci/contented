@@ -148,13 +148,13 @@ import { number, object, coerceTo } from '@gucciogucci/contented';
 
 const Point = object({ x: number, y: number, 'z?': number })
 
-coerceTo(Point, {x: 10, y: 20 })
+coerceTo(Point, {x: 10, y: 20 });
 // { x: 10, y: 20 }
 
-coerceTo(Point, { x: 10, y: 20, z: 30 })
+coerceTo(Point, { x: 10, y: 20, z: 30 });
 // { x: 10, y: 20, z: 30 }
 
-coerceTo(Point, { x: 10, y: 20, z: undefined })
+coerceTo(Point, { x: 10, y: 20, z: undefined });
 // { x: 10, y: 20, z: undefined }
 ```
 
