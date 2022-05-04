@@ -30,6 +30,7 @@
   - [Narrowing](#narrowing)
     - [`match(value)`](#matchvalue)
     - [`always(value)`](#alwaysvalue)
+    - [`satisfy(guard)`](#satisfyguard)
   - [Projections](#projections)
     - [`at(path, T)`](#atpath-t)
     - [`fallback(T, substitute)`](#fallbackt-substitute)
@@ -226,6 +227,31 @@ coerceTo(always(20), 'hello');
 coerceTo(always(20), false);
 // 20
 ```
+
+#### `satisfy(guard)`
+
+A run-time representation of a type that satisfies some user-defined type `guard`.
+
+```typescript
+import { satisfy, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(satisfy(isOdd), 11);
+// 11
+
+coerceTo(satisfy(isOdd), 12);
+// InvalidCoercion { expected: 'isOdd', got: 12 }
+```
+
+`satisfy` accepts an optional parameter to personalize the name of the `expected` part in an `InvalidCoercion`.
+
+```typescript
+import { satisfy, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(satisfy(isOdd, 'oddNumber'), 12);
+// InvalidCoercion { expected: 'oddNumber', got: 12 }
+```
+
+In case of an anonymous type-guard, and in the absence of any explicit indication, the `expected` property will take on the result of `guard.toString()`.
 
 ### Projections
 
