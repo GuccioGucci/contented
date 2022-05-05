@@ -7,7 +7,12 @@ import { scope } from './_scope'
 import { HasJointAtKey } from './Joint'
 import { HasAtKeyInvalidCoercion, InvalidCoercion } from './InvalidCoercion'
 
-export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Type<T, E>) {
+export function at<T, E extends ContentedError, K extends Key>(pathOrKey: K, type: Type<T, E>): At<typeof type>
+export function at<T, E extends ContentedError, P extends Path>(pathOrKey: [...P], type: Type<T, E>): At<typeof type>
+export function at<T, E extends ContentedError, P extends Path, K extends Key>(
+  pathOrKey: [...P] | K,
+  type: Type<T, E>
+) {
   type CoerceAt = Coerce<T, MissingKey | InvalidCoercion | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>>
 
   const coerce: CoerceAt = (value: any) => {
@@ -15,7 +20,7 @@ export function at<T, E extends ContentedError>(pathOrKey: Path | Key, type: Typ
       return new InvalidCoercion('object', value)
     }
 
-    const path: Path = [pathOrKey].flat()
+    const path = Array.isArray(pathOrKey) ? pathOrKey : [pathOrKey]
     for (const [key, pos] of enumerate(path)) {
       if (value[key] === undefined) {
         const missingKey = path.slice(0, pos + 1)
