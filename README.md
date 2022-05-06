@@ -283,7 +283,7 @@ coerceTo(at('a', string), { a: 'hello' });
 // 'hello'
 ```
 
-Similarly to [`object`](#object), optional properties are marked by adding a `?` at the end of their names; `at` returns `undefined` is some optional key is missing:
+Similarly to [`object`](#object), optional properties are marked by adding a `?` at the end of their names; `at` returns `undefined` is some optional key is missing.
 
 ```typescript
 import { string, at, coerceTo } from '@gucciogucci/contented';
