@@ -377,7 +377,7 @@ coerceTo(string.or(at('a', number)), { a: true });
 
 #### `oneOf(...Ts)`
 
-Repeated applications of `T1.or(T2)` may produce a significant amount of syntactic noise. In constrat, `oneOf` may produce better results in situations where more than two or three alternatives are needed.
+Repeated applications of `T1.or(T2)` may produce a significant amount of syntactic noise. By contrast, `oneOf` may produce better results in situations where more than two or three alternatives are needed.
 
 ```typescript
 import { oneOf, match, coerceTo } from '@gucciogucci/contented';
