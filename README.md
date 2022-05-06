@@ -235,6 +235,8 @@ A run-time representation of a type that satisfies some user-defined type `guard
 ```typescript
 import { satisfy, coerceTo } from '@gucciogucci/contented';
 
+const isOdd = (x: any): x is number => typeof x != 'number' ? false : x % 2 === 1
+
 coerceTo(satisfy(isOdd), 11);
 // 11
 
