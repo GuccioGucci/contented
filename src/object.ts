@@ -54,10 +54,8 @@ export function object<E extends ContentedError, O extends Record<string, Type<u
 }
 
 type AtInObject<O extends ObjectOfTypes> = {
-  [K in keyof O]: K extends `${any}?` ? RemoveMissingKey<At<O[K]>> : At<O[K]>
+  [K in keyof O]: At<O[K], [K]>
 }
-
-type RemoveMissingKey<T> = [T] extends [Type<infer A, infer E>] ? Type<A, Exclude<E, MissingKey>> : never
 
 export type ObjectOf<O extends ObjectOfTypes> = IsWithoutNonFatalErrors<O> extends true
   ? Expand<EnforceOptionality<ExpectedTypeInObject<O>>>
@@ -66,13 +64,13 @@ export type ObjectOf<O extends ObjectOfTypes> = IsWithoutNonFatalErrors<O> exten
       | [Expand<EnforceOptionality<ExpectedTypeInObject<O>>>, NonFatalErrorTypeInObject<O>[]]
 
 // `| never` is to force IntelliSense to expand the union type
-export type ObjectOfError<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O] | never
+type ObjectOfError<O extends ObjectOfTypes> = { [K in keyof O]: ErrorType<O[K]> }[keyof O] | never
 
 type IsWithoutNonFatalErrors<O extends ObjectOfTypes> = NonFatalErrorTypeInObject<O> extends never ? true : false
 
 type NonFatalErrorTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: NonFatalErrorType<O[K]> }[keyof O]
 
-export type ExpectedTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ExpectedType<O[K]> }
+type ExpectedTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ExpectedType<O[K]> }
 
 type ObjectOfTypes = Record<string, Type<unknown, unknown>>
 

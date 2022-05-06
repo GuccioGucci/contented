@@ -281,6 +281,20 @@ coerceTo(at('a', string), { a: 'hello' });
 // 'hello'
 ```
 
+Similarly to [`object`](#object), optional properties are marked by adding a `?` at the end of their names; `at` returns `undefined` is some optional key is missing:
+
+```typescript
+import { string, at, coerceTo } from '@gucciogucci/contented';
+
+const stringAtAB = at(['a?', 'b'], string);
+
+coerceTo(stringAtAB, { d: 3 })
+// undefined
+
+coerceTo(stringAtAB, { a: { c: 'hello' } });
+// MissingKey { missingKey: [ 'a', 'b' ] }
+```
+
 #### `fallback(T, substitute)`
 
 `fallback` works in tandem with `at` to provide a fallback value in case the input data does not contain the specified keys. Apart from removing the possibility of a `MissingKey` error, `fallback` retains the same behavior as the `at` it wraps.

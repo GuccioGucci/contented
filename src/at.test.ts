@@ -37,16 +37,19 @@ test(`at supports navigating an array when numeric keys are used`, function () {
 
 test(`pointing to a non-existing property reports when the path got interrupted`, function () {
   const cToNumber = at(['a', 'b', 'c'], number)
+  const bToNumber = at(['a?', 'b'], number)
 
   const c1 = coerceTo(cToNumber, { a: 2 })
   const c2 = coerceTo(cToNumber, { a: { b: 3 } })
   const c3 = coerceTo(cToNumber, { a: { b: { d: 3 } } })
   const c4 = coerceTo(cToNumber, {})
+  const b1 = coerceTo(bToNumber, { a: { d: 3 } })
 
   assert.equal(c1, new MissingKey(['a', 'b']))
   assert.equal(c2, new MissingKey(['a', 'b', 'c']))
   assert.equal(c3, new MissingKey(['a', 'b', 'c']))
   assert.equal(c4, new MissingKey(['a']))
+  assert.equal(b1, new MissingKey(['a', 'b']))
 })
 
 test(`at propagates non-fatal errors`, function () {
@@ -87,6 +90,25 @@ test(`it is the same to specify the path at once or incrementally`, function () 
 
   assert.equal(c1, c2)
   assert.equal(c3, c4)
+})
+
+test(`at returns undefined if some intermediate key is missing`, function () {
+  const cToNumber = at(['a?', 'b?', 'c'], number)
+  const sndToString = at('2?', string)
+
+  const res1 = coerceTo(cToNumber, {})
+  const res2 = coerceTo(sndToString, ['a', 'b'])
+
+  assert.is(res1, undefined)
+  assert.is(res2, undefined)
+})
+
+test(`at returns undefined if the final key is optional`, function () {
+  const cToNumber = at(['a?', 'b?', 'c?'], number)
+
+  const res = coerceTo(cToNumber, { a: { b: { d: 3 } } })
+
+  assert.is(res, undefined)
 })
 
 test.run()
