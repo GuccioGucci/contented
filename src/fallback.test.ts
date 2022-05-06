@@ -6,7 +6,7 @@ import { at } from './at'
 import { fallback } from './fallback'
 
 test(`fallback returns a fallback value in case of an interrupted path towards a key`, function () {
-  const cToNumber = fallback(at(['a', 'b', 'c'], number), 42)
+  const cToNumber = fallback(at(['a', 'b?', 'c?'], number), 42)
 
   const c1 = coerceTo(cToNumber, { a: 2 })
   const c2 = coerceTo(cToNumber, { a: { b: 3 } })

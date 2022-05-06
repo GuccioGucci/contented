@@ -1,21 +1,18 @@
 import { ContentedError } from './ContentedError'
 import { Coerce, coerceTo, ExpectedType, Type } from './Type'
-import { MissingKey } from './MissingKey'
 
-export function fallback<T, E extends ContentedError>(type: Type<T, IncludesMissingKey<E>>, fallback: Fallback<T>) {
-  type CoerceFallback = Coerce<T, Exclude<E, MissingKey>>
+export function fallback<T, E extends ContentedError>(type: Type<T, E>, fallback: Fallback<T>) {
+  type CoerceFallback = Coerce<Fallback<T>, E>
 
   const coerce: CoerceFallback = (value: any) => {
-    const res = coerceTo(type as Type<T, E>, value)
-    if (res instanceof MissingKey) {
-      return fallback as T
+    const res = coerceTo(type, value)
+    if (res === undefined) {
+      return fallback as Fallback<T>
     }
-    return res as T | Exclude<E, MissingKey>
+    return res as Fallback<T>
   }
 
   return new Type(coerce)
 }
 
-type IncludesMissingKey<E> = [MissingKey] extends [E] ? E : 'Must include MissingKey'
-
-type Fallback<T> = ExpectedType<T>
+type Fallback<T> = Exclude<ExpectedType<T>, undefined>

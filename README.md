@@ -297,12 +297,12 @@ coerceTo(stringAtAB, { a: { c: 'hello' } });
 
 #### `fallback(T, substitute)`
 
-`fallback` works in tandem with `at` to provide a fallback value in case the input data does not contain the specified keys. Apart from removing the possibility of a `MissingKey` error, `fallback` retains the same behavior as the `at` it wraps.
+`fallback` works in tandem with `at` to provide a fallback value in case the input data does not contain the specified keys. Apart from replacing possible `undefined` return value with `substitute`, `fallback` preserves the behavior of the `at` it wraps.
 
 ```typescript
 import { number, at, fallback, coerceTo } from '@gucciogucci/contented';
 
-const numberAtAB = fallback(at(['a', 'b'], number), 42);
+const numberAtAB = fallback(at(['a', 'b?'], number), 42);
 
 coerceTo(numberAtAB, { a: { c: 3 } });
 // 42
@@ -310,7 +310,6 @@ coerceTo(numberAtAB, { a: { c: 3 } });
 coerceTo(numberAtAB, { a: { b: 3 } });
 // 3
 ```
-
 
 ### Combinations
 
