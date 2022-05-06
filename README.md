@@ -38,6 +38,7 @@
     - [`combine(fn, ...Ts)`](#combinefn-ts)
   - [Alternatives](#alternatives)
     - [`T1.or(T2)`](#t1ort2)
+    - [`oneOf(...Ts)`](#oneofts)
   - [Errors](#errors)
     - [`InvalidCoercion`](#invalidcoercion)
     - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
@@ -373,6 +374,30 @@ coerceTo(string.or(at('a', number)), { a: true });
    }
 */
 ```
+
+#### `oneOf(...Ts)`
+
+Repeated applications of `T1.or(T2)` may produce a significant amount of syntactic noise. In constrat, `oneOf` may produce better results in situations where more than two or three alternatives are needed.
+
+```typescript
+import { oneOf, match, coerceTo } from '@gucciogucci/contented';
+
+const abc = oneOf(match('a'), match('b'), match('c')); // the same as match('a').or(match('b')).or(match('c'))
+
+coerceTo(abc, 'a');
+// 'a'
+
+coerceTo(abc, 'd');
+/* Joint {
+    errors: [
+      InvalidCoercion { expected: 'a', got: 'd' },
+      InvalidCoercion { expected: 'b', got: 'd' },
+      InvalidCoercion { expected: 'c', got: 'd' }
+    ]
+   }
+*/
+```
+
 
 ### Errors
 

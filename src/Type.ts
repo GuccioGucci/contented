@@ -56,7 +56,7 @@ export type ExpectedType<T> = [T] extends [Type<infer A, any>]
 
 export type ErrorType<T> = T extends Type<any, infer E> ? E : never
 
-type OrErrors<E, F> = EnumerateErrors<StripJoint<E>, StripJoint<F>> extends never
+export type OrErrors<E, F> = EnumerateErrors<StripJoint<E>, StripJoint<F>> extends never
   ? never
   : Joint<EnumerateErrors<StripJoint<E>, StripJoint<F>>>
 
