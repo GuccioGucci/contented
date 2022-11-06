@@ -1,9 +1,9 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerceTo } from './Type'
+import { coerceTo } from './v4/coerceTo'
+import { string } from './v4/Type'
 import { InvalidCoercion } from './InvalidCoercion'
-import { string } from './string'
 
 test(`string accepts string values`, function () {
   assert(property(fc.string(), (value) => equal(coerceTo(string, value), value)))
