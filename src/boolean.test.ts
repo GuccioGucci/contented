@@ -1,9 +1,9 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerceTo } from './Type'
+import { boolean } from './v4/Type'
 import { InvalidCoercion } from './InvalidCoercion'
-import { boolean } from './boolean'
+import { coerceTo } from './v4/coerceTo'
 
 test(`boolean accepts boolean values`, function () {
   assert(property(fc.boolean(), (value) => equal(coerceTo(boolean, value), value)))
