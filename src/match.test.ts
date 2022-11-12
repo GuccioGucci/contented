@@ -1,8 +1,8 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './Type'
+import { coerceTo } from './v4/coerceTo'
 import { InvalidCoercion } from './InvalidCoercion'
-import { match } from './match'
+import { match } from './v4/Type'
 
 test(`match succeds only if the input and expected values are the same`, function () {
   const ten = match(10)
