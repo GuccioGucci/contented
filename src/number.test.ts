@@ -1,8 +1,8 @@
 import { test } from 'uvu'
 import { equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerceTo } from './Type'
-import { number } from './number'
+import { number } from './v4/Type'
+import { coerceTo } from './v4/coerceTo'
 import { InvalidCoercion } from './InvalidCoercion'
 
 test(`number accepts number values`, function () {

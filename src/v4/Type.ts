@@ -4,6 +4,8 @@ export interface Type<E> {
   to: To
 }
 
-export type To = 'string'
+export type To = 'string' | 'number'
 
 export const string: Type<string> = { to: 'string' }
+
+export const number: Type<number> = { to: 'number' }
