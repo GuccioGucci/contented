@@ -10,13 +10,11 @@ export type Schema<E> = Primitive | Match<E>
 // ======================================================================
 // Primitive
 // ======================================================================
-export type Primitive = typeof PRIMITIVES[number]
+export type Primitive = 'string' | 'boolean' | 'number'
 
 export function isPrimitive<E>(schema: Schema<E>): schema is Primitive {
-  return PRIMITIVES.includes(schema as Primitive)
+  return schema === 'string' || schema === 'boolean' || schema === 'number'
 }
-
-const PRIMITIVES = ['string', 'number', 'boolean'] as const
 
 // ======================================================================
 // Match
