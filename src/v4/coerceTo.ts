@@ -1,18 +1,18 @@
 import { InvalidCoercion } from '../InvalidCoercion'
-import { Type, Primitive, Match, isPrimitive } from './Type'
+import { Type, Primitive, isPrimitive, Schema } from './Type'
 
 export function coerceTo<E>(type: Type<E>, value: any): E | InvalidCoercion {
-  const { to } = type
-  return coerce(to, value) as E | InvalidCoercion
+  const { schema } = type
+  return coerce(schema, value) as E | InvalidCoercion
 }
 
-function coerce<E>(to: Primitive | Match<E>, value: any) {
-  if (isPrimitive(to)) {
-    return coercePrimitive(to, value)
+function coerce<E>(schema: Schema<E>, value: any) {
+  if (isPrimitive(schema)) {
+    return coercePrimitive(schema, value)
   }
-  return to.match === value ? value : new InvalidCoercion(`${to.match}`, value)
+  return schema.match === value ? value : new InvalidCoercion(`${schema.match}`, value)
 }
 
-function coercePrimitive(to: Primitive, value: any) {
-  return typeof value === to ? value : new InvalidCoercion(to, value)
+function coercePrimitive(schema: Primitive, value: any) {
+  return typeof value === schema ? value : new InvalidCoercion(schema, value)
 }
