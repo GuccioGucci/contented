@@ -1,12 +1,12 @@
 import { InvalidCoercion } from '../InvalidCoercion'
 import { Type, Primitive, isPrimitive, Schema } from './Type'
 
-export function coerceTo<E>(type: Type<E>, value: any): E | InvalidCoercion {
+export function coerceTo<R>(type: Type<R>, value: any): R | InvalidCoercion {
   const { schema } = type
-  return coerce(schema, value) as E | InvalidCoercion
+  return coerce(schema, value) as R | InvalidCoercion
 }
 
-function coerce<E>(schema: Schema<E>, value: any) {
+function coerce<R>(schema: Schema<R>, value: any) {
   if (isPrimitive(schema)) {
     return coercePrimitive(schema, value)
   }
