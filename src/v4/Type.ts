@@ -1,4 +1,4 @@
-import { Narrow } from '../_typefunc'
+import { IsTypeOf, Narrow, Any } from '../_typefunc'
 
 // Type<R> is an interface because the user need not know what constitues a Type<R> (IntelliSense does not expand interfaces)
 export interface Type<R> {
@@ -15,6 +15,8 @@ export type Primitive = 'string' | 'boolean' | 'number'
 export function isPrimitive<R>(schema: Schema<R>): schema is Primitive {
   return schema === 'string' || schema === 'boolean' || schema === 'number'
 }
+
+export type IsPrimitive<R> = Any<[IsTypeOf<R, string>, IsTypeOf<R, boolean>, IsTypeOf<R, number>]>
 
 // ======================================================================
 // Match
