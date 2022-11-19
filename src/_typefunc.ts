@@ -27,3 +27,13 @@ export type Any<Ps> = Ps extends [infer H extends boolean, ...infer Ts extends b
     ? true
     : Any<Ts>
   : false
+
+export type Every<Ps> = Ps extends [infer H extends boolean, ...infer Ts extends boolean[]]
+  ? H extends false
+    ? false
+    : Every<Ts>
+  : true
+
+export type Not<P extends boolean> = P extends true ? false : true
+
+export type ExtendsObject<O> = O extends {} ? true : false
