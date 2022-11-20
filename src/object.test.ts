@@ -15,6 +15,14 @@ test(`object succeeds if the input data is an object adhering to the expectation
   assert.equal(res, { x: 'hello', y: 12 })
 })
 
+test(`object fails if the input data is not an object`, function () {
+  const Point = object({ x: string, y: number })
+
+  const res = coerceTo(Point, 'hello')
+
+  assert.equal(res, new InvalidCoercion('object', 'hello'))
+})
+
 test(`object rejects the input data upon the first missing element`, function () {
   const XY = object({ x: string, y: number })
 
