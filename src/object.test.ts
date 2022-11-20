@@ -24,17 +24,17 @@ test(`object fails if the input data is not an object`, function () {
 })
 
 test(`object rejects the input data upon the first missing element`, function () {
-  const XY = object({ x: string, y: number })
+  const Point = object({ x: string, y: number })
 
-  const res = coerceTo(XY, { x: 'hello' })
+  const res = coerceTo(Point, { x: 'hello' })
 
   assert.equal(res, new MissingKey(['y']))
 })
 
 test(`object rejects the input data upon the first mismatching element`, function () {
-  const XY = object({ x: string, y: number })
+  const Point = object({ x: string, y: number })
 
-  const res = coerceTo(XY, { x: 'hello', y: false })
+  const res = coerceTo(Point, { x: 'hello', y: false })
 
   assert.equal(res, new AtKey(['y'], new InvalidCoercion('number', false)))
 })
