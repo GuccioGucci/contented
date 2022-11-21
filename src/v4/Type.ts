@@ -7,14 +7,14 @@ export interface Type<R> {
 
 export type Infer<T> = T extends Type<infer R> ? R : never
 
-export type Schema<R> = Primitive | Match<R> | Object_
+export type Schema<R> = PrimitiveSchema | MatchSchema<R> | ObjectSchema
 
 // ======================================================================
 // Primitive
 // ======================================================================
-export type Primitive = 'string' | 'boolean' | 'number'
+export type PrimitiveSchema = 'string' | 'boolean' | 'number'
 
-export function isPrimitive<R>(schema: Schema<R>): schema is Primitive {
+export function isPrimitiveSchema<R>(schema: Schema<R>): schema is PrimitiveSchema {
   return schema === 'string' || schema === 'boolean' || schema === 'number'
 }
 
@@ -23,16 +23,16 @@ export type IsPrimitive<R> = Any<[IsTypeOf<R, string>, IsTypeOf<R, boolean>, IsT
 // ======================================================================
 // Match
 // ======================================================================
-export type Match<R> = { match: R }
+export type MatchSchema<R> = { match: R }
 
-export function isMatch<R>(schema: Schema<R>): schema is Match<R> {
+export function isMatchSchema<R>(schema: Schema<R>): schema is MatchSchema<R> {
   return typeof schema === 'object' && 'match' in schema
 }
 
 // ======================================================================
 // Object
 // ======================================================================
-export type Object_ = { object: Record<string, Schema<unknown>> }
+export type ObjectSchema = { object: Record<string, Schema<unknown>> }
 
 export type IsObject<R> = Every<[Not<IsPrimitive<R>>, ExtendsObject<R>]>
 

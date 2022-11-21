@@ -2,7 +2,17 @@ import { ContentedError } from '../ContentedError'
 import { InvalidCoercion } from '../InvalidCoercion'
 import { MissingKey } from '../MissingKey'
 import { scope } from '../_scope'
-import { Type, Primitive, isPrimitive, Schema, IsPrimitive, isMatch, Match, Object_, IsObject } from './Type'
+import {
+  Type,
+  PrimitiveSchema,
+  isPrimitiveSchema,
+  Schema,
+  IsPrimitive,
+  isMatchSchema,
+  MatchSchema,
+  ObjectSchema,
+  IsObject,
+} from './Type'
 
 export function coerceTo<R>(type: Type<R>, value: any): R | Unexpected<R> {
   const { schema } = type
@@ -10,24 +20,24 @@ export function coerceTo<R>(type: Type<R>, value: any): R | Unexpected<R> {
 }
 
 function coerce<R>(schema: Schema<R>, value: any): R | Unexpected<R> {
-  if (isPrimitive(schema)) {
+  if (isPrimitiveSchema(schema)) {
     return coercePrimitive(schema, value)
   }
-  if (isMatch(schema)) {
+  if (isMatchSchema(schema)) {
     return coerceMatch(schema, value)
   }
   return coerceObject(schema, value)
 }
 
-function coercePrimitive(schema: Primitive, value: any) {
+function coercePrimitive(schema: PrimitiveSchema, value: any) {
   return typeof value === schema ? value : new InvalidCoercion(schema, value)
 }
 
-function coerceMatch<R>(schema: Match<R>, value: any) {
+function coerceMatch<R>(schema: MatchSchema<R>, value: any) {
   return schema.match === value ? value : new InvalidCoercion(`${schema.match}`, value)
 }
 
-function coerceObject(schema: Object_, value: any) {
+function coerceObject(schema: ObjectSchema, value: any) {
   if (typeof value !== 'object') {
     return new InvalidCoercion('object', value)
   }
