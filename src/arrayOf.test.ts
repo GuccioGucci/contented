@@ -6,9 +6,9 @@ import { string } from './string'
 import { AtKey, InvalidCoercion } from './InvalidCoercion'
 import { MissingKey } from './MissingKey'
 import { Joint } from './Joint'
-import { at } from './at'
 import { arrayOf } from './arrayOf'
 import { permissiveArrayOf } from './permissiveArrayOf'
+import { object } from './object'
 
 test(`array accepts array of the indicated element type`, function () {
   const arrayOfStrings = arrayOf(string)
@@ -35,7 +35,7 @@ test(`array rejects arrays of the wrong element type`, function () {
 })
 
 test(`array reports nested errors`, function () {
-  const arrayOfStrings = arrayOf(at('a', string))
+  const arrayOfStrings = arrayOf(object({ a: string }))
 
   const res = coerceTo(arrayOfStrings, [{ a: 5 }])
 
@@ -43,7 +43,7 @@ test(`array reports nested errors`, function () {
 })
 
 test(`array rejects a value upon the first missing element`, function () {
-  const arrayOfStrings = arrayOf(at('a', string))
+  const arrayOfStrings = arrayOf(object({ a: string }))
 
   const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
@@ -61,7 +61,7 @@ test(`array propagates non fatal errors`, function () {
 })
 
 test(`array accepts alternatives`, function () {
-  const arrayOfAlternatives = arrayOf(string.or(at('a', number)))
+  const arrayOfAlternatives = arrayOf(string.or(object({ a: string })))
 
   const res1 = coerceTo(arrayOfAlternatives, ['x', 'y', { a: 12 }])
   const res2 = coerceTo(arrayOfAlternatives, ['x', 'y', false])
