@@ -37,3 +37,45 @@ export type Every<Ps> = Ps extends [infer H extends boolean, ...infer Ts extends
 export type Not<P extends boolean> = P extends true ? false : true
 
 export type ExtendsObject<O> = O extends {} ? true : false
+
+export type CrossProduct<E, F> = E extends never
+  ? never
+  : F extends never
+  ? never
+  : E extends unknown[]
+  ? F extends unknown[]
+    ? [...E, ...F]
+    : [...E, F]
+  : F extends unknown[]
+  ? [E, ...F]
+  : [E, F]
+
+// See: https://www.hacklewayne.com/typescript-convert-union-to-tuple-array-yes-but-how
+export type UnionToTuple<T> =
+    PickOne<T> extends infer U
+    ? Exclude<T, U> extends never
+        ? [T]
+        : [...UnionToTuple<Exclude<T, U>>, U]
+    : never;
+
+type PickOne<T> = InferContra<InferContra<Contra<Contra<T>>>>;
+
+type Contra<T> =
+  T extends any
+  ? (arg: T) => void
+  : never;
+
+type InferContra<T> =
+    [T] extends [(arg: infer I) => void]
+    ? I
+    : never;
+
+// See: https://github.com/sindresorhus/type-fest/blob/main/source/required-keys-of.d.ts
+export type RequiredKeysOf<BaseType> = Exclude<{
+	[Key in keyof BaseType]: BaseType extends Record<Key, BaseType[Key]>
+		? Key
+		: never
+}[keyof BaseType], undefined>;
+
+// See: https://github.com/sindresorhus/type-fest/blob/main/source/has-required-keys.d.ts
+export type HasRequiredKeys<BaseType> = RequiredKeysOf<BaseType> extends never ? false : true;
