@@ -1,20 +1,20 @@
-import { IsTypeOf, Narrow, Any, Expand, Not, Every, ExtendsObject } from '../_typefunc'
+import { IsTypeOf, Narrow, Any, Expand, IsUnion, Not, Every } from '../_typefunc'
 
 // Type<R> is an interface because the user need not know what constitues a Type<R> (IntelliSense does not expand interfaces)
-export interface Type<R> {
-  schema: Schema<R>
+export interface Type<_R> {
+  schema: Schema
 }
 
 export type Infer<T> = T extends Type<infer R> ? R : never
 
-export type Schema<R> = PrimitiveSchema | MatchSchema<R> | ObjectSchema
+export type Schema = PrimitiveSchema | MatchSchema | ObjectSchema | OneOfSchema
 
 // ======================================================================
 // Primitive
 // ======================================================================
 export type PrimitiveSchema = 'string' | 'boolean' | 'number'
 
-export function isPrimitiveSchema<R>(schema: Schema<R>): schema is PrimitiveSchema {
+export function isPrimitiveSchema(schema: Schema): schema is PrimitiveSchema {
   return schema === 'string' || schema === 'boolean' || schema === 'number'
 }
 
@@ -23,18 +23,40 @@ export type IsPrimitive<R> = Any<[IsTypeOf<R, string>, IsTypeOf<R, boolean>, IsT
 // ======================================================================
 // Match
 // ======================================================================
-export type MatchSchema<R> = { match: R }
+export type MatchSchema = { match: unknown }
 
-export function isMatchSchema<R>(schema: Schema<R>): schema is MatchSchema<R> {
+export function isMatchSchema(schema: Schema): schema is MatchSchema {
   return typeof schema === 'object' && 'match' in schema
 }
+
+export type IsMatch<R> = Every<
+  [
+    Not<IsUnion<R>>,
+    Any<[R extends string ? true : false, R extends number ? true : false, R extends boolean ? true : false]>
+  ]
+>
 
 // ======================================================================
 // Object
 // ======================================================================
-export type ObjectSchema = { object: Record<string, Schema<unknown>> }
+export type ObjectSchema = { object: Record<string, Schema> }
 
-export type IsObject<R> = Every<[Not<IsPrimitive<R>>, ExtendsObject<R>]>
+export function isObjectSchema(schema: Schema): schema is ObjectSchema {
+  return typeof schema === 'object' && 'object' in schema
+}
+
+export type IsObject<R> = [R] extends [object] ? true : false
+
+// ======================================================================
+// OneOf
+// ======================================================================
+export type OneOfSchema = { oneOf: Schema[] }
+
+export function isOneOfSchema(schema: Schema): schema is OneOfSchema {
+  return typeof schema === 'object' && 'oneOf' in schema
+}
+
+export type IsOneOf<R> = IsUnion<R>
 
 // ======================================================================
 // Programs
@@ -49,8 +71,15 @@ export function match<R extends string | number | boolean>(match: Narrow<R>): Ty
   return { schema: { match } }
 }
 
+export function oneOf<Types extends Type<unknown>[]>(...types: Types): Type<OneOf<Types>> {
+  const oneOf = types.map((type) => type.schema)
+  return { schema: { oneOf } }
+}
+
+type OneOf<Types> = Types extends [infer Head, ...infer Rest] ? Infer<Head> | OneOf<Rest> : never
+
 export function object<O extends Record<string, Type<unknown>>>(obj: O): Type<SequenceObject<O>> {
-  const object: Record<string, Schema<unknown>> = {}
+  const object: Record<string, Schema> = {}
   for (const [key, type] of Object.entries(obj)) {
     object[key] = type.schema
   }
@@ -58,17 +87,17 @@ export function object<O extends Record<string, Type<unknown>>>(obj: O): Type<Se
   return { schema: { object } }
 }
 
-type SequenceObject<O extends {}> = Expand<
+type SequenceObject<O extends object> = Expand<
   InferObject<RemoveQuestionMarkFromKeys<SetKeysOptional<SetValuesOptional<O>>>>
 >
 
-type SetValuesOptional<O extends {}> = { [K in keyof O]: K extends `${string}?` ? O[K] | undefined : O[K] }
+type SetValuesOptional<O extends object> = { [K in keyof O]: K extends `${string}?` ? O[K] | undefined : O[K] }
 
 // https://github.com/Microsoft/TypeScript/issues/25760#issuecomment-705137615
-type SetKeysOptional<O extends {}> = Omit<O, KeysEndingInQuestionMark<O>> & Partial<O>
+type SetKeysOptional<O extends object> = Omit<O, KeysEndingInQuestionMark<O>> & Partial<O>
 
-type KeysEndingInQuestionMark<O extends {}> = { [K in keyof O]: K extends `${any}?` ? K : never }[keyof O]
+type KeysEndingInQuestionMark<O extends object> = { [K in keyof O]: K extends `${any}?` ? K : never }[keyof O]
 
-type RemoveQuestionMarkFromKeys<O extends {}> = { [K in keyof O as K extends `${infer K2}?` ? K2 : K]: O[K] }
+type RemoveQuestionMarkFromKeys<O extends object> = { [K in keyof O as K extends `${infer K2}?` ? K2 : K]: O[K] }
 
-type InferObject<O extends {}> = { [K in keyof O]: Infer<O[K]> }
+type InferObject<O extends object> = { [K in keyof O]: Infer<O[K]> }

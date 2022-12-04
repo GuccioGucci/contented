@@ -77,6 +77,3 @@ export type RequiredKeysOf<BaseType> = Exclude<
 
 // See: https://github.com/sindresorhus/type-fest/blob/main/source/has-required-keys.d.ts
 export type HasRequiredKeys<BaseType> = RequiredKeysOf<BaseType> extends never ? false : true
-
-// See: https://github.com/microsoft/TypeScript/issues/28374#issuecomment-538052842
-export type DeepNonNullable<T> = { [P in keyof T]-?: NonNullable<T[P]> } & NonNullable<T>

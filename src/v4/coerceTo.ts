@@ -1,43 +1,55 @@
 import { ContentedError } from '../ContentedError'
-import { InvalidCoercion } from '../InvalidCoercion'
+import { AtKey, InvalidCoercion } from '../InvalidCoercion'
+import { Joint } from '../Joint'
 import { MissingKey } from '../MissingKey'
 import { scope } from '../_scope'
+import { HasRequiredKeys, UnionToTuple } from '../_typefunc'
 import {
   Type,
   PrimitiveSchema,
   isPrimitiveSchema,
   Schema,
-  IsPrimitive,
   isMatchSchema,
   MatchSchema,
   ObjectSchema,
   IsObject,
+  isObjectSchema,
+  IsOneOf,
+  isOneOfSchema,
+  OneOfSchema,
+  IsPrimitive,
+  IsMatch,
 } from './Type'
 
-export function coerceTo<R>(type: Type<R>, value: any): R | Unexpected<R> {
+export function coerceTo<R>(type: Type<R>, value: any): R | Expand<WhyValueIsNot<R>> {
   const { schema } = type
   return coerce(schema, value)
 }
 
-function coerce<R>(schema: Schema<R>, value: any): R | Unexpected<R> {
+function coerce(schema: Schema, value: any): any {
   if (isPrimitiveSchema(schema)) {
     return coercePrimitive(schema, value)
   }
   if (isMatchSchema(schema)) {
     return coerceMatch(schema, value)
   }
-  return coerceObject(schema, value)
+  if (isObjectSchema(schema)) {
+    return coerceObject(schema, value)
+  }
+  if (isOneOfSchema(schema)) {
+    return coerceOneOf(schema, value)
+  }
 }
 
-function coercePrimitive(schema: PrimitiveSchema, value: any) {
+function coercePrimitive(schema: PrimitiveSchema, value: any): any {
   return typeof value === schema ? value : new InvalidCoercion(schema, value)
 }
 
-function coerceMatch<R>(schema: MatchSchema<R>, value: any) {
+function coerceMatch(schema: MatchSchema, value: any): any {
   return schema.match === value ? value : new InvalidCoercion(`${schema.match}`, value)
 }
 
-function coerceObject(schema: ObjectSchema, value: any) {
+function coerceObject(schema: ObjectSchema, value: any): any {
   if (typeof value !== 'object') {
     return new InvalidCoercion('object', value)
   }
@@ -60,7 +72,203 @@ function coerceObject(schema: ObjectSchema, value: any) {
   return value
 }
 
-type Unexpected<R> =
-  | (IsPrimitive<R> extends true ? InvalidCoercion : never)
-  | (IsObject<R> extends true ? { [K in keyof R]: Unexpected<R[K]> }[keyof R] : never)
-  | InvalidCoercion // match
+function coerceOneOf(schema: OneOfSchema, value: any): any {
+  const schemas = schema.oneOf
+  const errors: any[] = []
+  for (let schema of schemas) {
+    const res = coerce(schema, value)
+    if (!(res instanceof ContentedError)) {
+      return res
+    }
+    errors.push(res)
+  }
+  return new Joint(errors)
+}
+
+// ======================================================================
+// Why value is not...
+// ======================================================================
+type WhyValueIsNot<R, Cont = DoneCont> = IsPrimitive<R> extends true
+  ? Resume<Cont, InvalidCoercion>
+  : IsMatch<R> extends true
+  ? Resume<Cont, InvalidCoercion>
+  : IsOneOf<R> extends true
+  ? WhyValueIsNotOneOf<R, Cont>
+  : IsObject<R> extends true
+  ? WhyValueIsNotObject<R, Cont>
+  : 'UKNOWN SCHEMA'
+
+// TODO: move isMatch as implicit else case
+
+// ----------------------------------------------------------------------
+// ...a oneOf
+// ----------------------------------------------------------------------
+type WhyValueIsNotOneOf<R, Cont> = Map_WhyWalueIsNotOneOf<UnionToTuple<R>, JointCont<Cont>>
+
+type Map_WhyWalueIsNotOneOf<Rs, Cont> = Rs extends [infer Head, ...infer Tail]
+  ? WhyValueIsNot<Head, OneOfTailCont<Tail, Cont>>
+  : Resume<Cont, []>
+
+// ----------------------------------------------------------------------
+// ...an object
+// ----------------------------------------------------------------------
+type WhyValueIsNotObject<R, Cont> = Map_WhyValueIsNotObject<ToObjectValues<Required<R>>, MissingKeyCont<R, Cont>>
+
+type Map_WhyValueIsNotObject<Entries, Cont> = Entries extends [[infer Head], ...infer Tail]
+  ? WhyValueIsNot<Head, ScopeCont<ObjectTailCont<Tail, Cont>>>
+  : Resume<Cont, InvalidCoercion> // the base error case of object is that the input is not an object
+
+type ToObjectValues<O> = UnionToTuple<{ [K in keyof O]: [O[K]] }[keyof O]> // We wrap it in a tuple so that we preserve union types
+
+// As a error associated with an object property, Joint<> never appears as part
+// of a union type
+type Scope<Why, C> = [Why] extends [Joint<infer Ws>] ? Map_Scope<Ws, JointCont<C>> : Resume<C, ScopeOverUnion<Why>>
+
+type ScopeOverUnion<Why> = Why extends any ? (Why extends InvalidCoercion ? AtKey<InvalidCoercion> : Why) : never
+
+type Map_Scope<Ws, Cont> = Ws extends [infer Head, ...infer Tail]
+  ? Scope<Head, ScopeTailCont<Tail, Cont>>
+  : Resume<Cont, []>
+
+// ======================================================================
+// Continuations
+// ======================================================================
+type Resume<C, Arg> =
+  | (Is_DoneCont<C> extends true ? Resume_DoneCont<C, Arg> : never)
+  | (Is_JointCont<C> extends true ? Resume_JointCont<C, Arg> : never)
+  | (Is_OneOfTailCont<C> extends true ? Resume_OneOfTailCont<C, Arg> : never)
+  | (Is_AppendWhyCont<C> extends true ? Resume_AppendWhyCont<C, Arg> : never)
+  | (Is_MissingKeyCont<C> extends true ? Resume_MissingKeyCont<C, Arg> : never)
+  | (Is_ScopeCont<C> extends true ? Resume_ScopeCont<C, Arg> : never)
+  | (Is_ScopeTailCont<C> extends true ? Resume_ScopeTailCont<C, Arg> : never)
+  | (Is_ObjectTailCont<C> extends true ? Resume_ObjectTailCont<C, Arg> : never)
+  | (Is_DisjoinWhyCont<C> extends true ? Resume_DisjoinWhyCont<C, Arg> : never)
+  | never
+
+type Resume_DoneCont<_C, Arg> = Arg
+
+type Resume_JointCont<C, Arg> = Arg extends unknown[] ? Resume<JointCont_Cont<C>, Joint<Arg>> : never
+
+type Resume_OneOfTailCont<C, Arg> = Map_WhyWalueIsNotOneOf<
+  OneOfTailCont_Tail<C>,
+  AppendWhyCont<Arg, OneOfTailCont_Cont<C>>
+>
+
+type Resume_AppendWhyCont<C, Arg> = Arg extends unknown[]
+  ? Resume<AppendWhyCont_Cont<C>, [AppendWhyCont_Why<C>, ...Arg]>
+  : never
+
+type Resume_MissingKeyCont<C, Arg> = HasRequiredKeys<MissingKeyCont_Obj<C>> extends true
+  ? Resume<MissingKeyCont_Cont<C>, MissingKey | Arg>
+  : Resume<MissingKeyCont_Cont<C>, Arg>
+
+type Resume_ScopeCont<C, Arg> = Scope<Arg, ScopeCont_Cont<C>>
+
+type Resume_ScopeTailCont<C, Arg> = Map_Scope<ScopeTailCont_Tail<C>, AppendWhyCont<Arg, ScopeTailCont_Cont<C>>>
+
+type Resume_ObjectTailCont<C, Arg> = Map_WhyValueIsNotObject<
+  ObjectTailCont_Tail<C>,
+  DisjoinWhyCont<Arg, ObjectTailCont_Cont<C>>
+>
+
+type Resume_DisjoinWhyCont<C, Arg> = Resume<DisjoinWhyCont_Cont<C>, Arg | DisjoinWhyCont_Why<C>>
+
+// ----------------------------------------------------------------------
+// DontCont
+// ----------------------------------------------------------------------
+type DoneCont = 'done-cont'
+
+type Is_DoneCont<C> = C extends 'done-cont' ? true : false
+
+// ----------------------------------------------------------------------
+// JointCont
+// ----------------------------------------------------------------------
+type JointCont<Cont> = ['joint-cont', Cont]
+
+type JointCont_Cont<C> = C extends ['joint-cont', infer NextCont] ? NextCont : never
+
+type Is_JointCont<C> = C extends ['joint-cont', any] ? true : false
+
+// ----------------------------------------------------------------------
+// OneOfTailCont
+// ----------------------------------------------------------------------
+type OneOfTailCont<Tail, Cont> = ['one-of-tail-cont', Tail, Cont]
+
+type Is_OneOfTailCont<C> = C extends ['one-of-tail-cont', any, any] ? true : false
+
+type OneOfTailCont_Cont<C> = C extends ['one-of-tail-cont', any, infer NextCont] ? NextCont : never
+
+type OneOfTailCont_Tail<C> = C extends ['one-of-tail-cont', infer Tail, any] ? Tail : never
+
+// ----------------------------------------------------------------------
+// AppendWhyCont
+// ----------------------------------------------------------------------
+type AppendWhyCont<Why, Cont> = ['append-why-cont', Why, Cont]
+
+type Is_AppendWhyCont<C> = C extends ['append-why-cont', any, any] ? true : false
+
+type AppendWhyCont_Why<C> = C extends ['append-why-cont', infer Why, any] ? Why : never
+
+type AppendWhyCont_Cont<C> = C extends ['append-why-cont', any, infer NextCont] ? NextCont : never
+
+// ----------------------------------------------------------------------
+// MissingKeyCont
+// ----------------------------------------------------------------------
+type MissingKeyCont<O, Cont> = ['missing-key-cont', O, Cont]
+
+type Is_MissingKeyCont<C> = C extends ['missing-key-cont', any, any] ? true : false
+
+type MissingKeyCont_Cont<C> = C extends ['missing-key-cont', any, infer NextCont] ? NextCont : never
+
+type MissingKeyCont_Obj<C> = C extends ['missing-key-cont', infer O, any] ? O : never
+
+// ----------------------------------------------------------------------
+// ScopeCont
+// ----------------------------------------------------------------------
+type ScopeCont<Cont> = ['scope-cont', Cont]
+
+type Is_ScopeCont<C> = C extends ['scope-cont', any] ? true : false
+
+type ScopeCont_Cont<C> = C extends ['scope-cont', infer NextCont] ? NextCont : never
+
+// ----------------------------------------------------------------------
+// ScopeTailCont
+// ----------------------------------------------------------------------
+type ScopeTailCont<Tail, Cont> = ['scope-tail-cont', Tail, Cont]
+
+type Is_ScopeTailCont<C> = C extends ['scope-tail-cont', any, any] ? true : false
+
+type ScopeTailCont_Cont<C> = C extends ['scope-tail-cont', any, infer NextCont] ? NextCont : never
+
+type ScopeTailCont_Tail<C> = C extends ['scope-tail-cont', infer Tail, any] ? Tail : never
+
+// ----------------------------------------------------------------------
+// ObjectTailCont
+// ----------------------------------------------------------------------
+type ObjectTailCont<Tail, Cont> = ['object-tail-cont', Tail, Cont]
+
+type Is_ObjectTailCont<C> = C extends ['object-tail-cont', any, any] ? true : false
+
+type ObjectTailCont_Cont<C> = C extends ['object-tail-cont', any, infer NextCont] ? NextCont : never
+
+type ObjectTailCont_Tail<C> = C extends ['object-tail-cont', infer Tail, any] ? Tail : never
+
+// ----------------------------------------------------------------------
+// DisjoinWhyCont
+// ----------------------------------------------------------------------
+type DisjoinWhyCont<Why, Cont> = ['disjoin-why-cont', Why, Cont]
+
+type Is_DisjoinWhyCont<C> = C extends ['disjoin-why-cont', any, any] ? true : false
+
+type DisjoinWhyCont_Why<C> = C extends ['disjoin-why-cont', infer Why, any] ? Why : never
+
+type DisjoinWhyCont_Cont<C> = C extends ['disjoin-why-cont', any, infer NextCont] ? NextCont : never
+
+// ======================================================================
+// Expand
+// ======================================================================
+type Expand<R> = InferCov<Cov<R>>
+
+type Cov<T> = T extends any ? () => T : never
+
+type InferCov<T> = [T] extends [() => infer I] ? I : never
