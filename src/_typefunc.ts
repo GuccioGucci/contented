@@ -51,31 +51,32 @@ export type CrossProduct<E, F> = E extends never
   : [E, F]
 
 // See: https://www.hacklewayne.com/typescript-convert-union-to-tuple-array-yes-but-how
-export type UnionToTuple<T> =
-    PickOne<T> extends infer U
-    ? Exclude<T, U> extends never
-        ? [T]
-        : [...UnionToTuple<Exclude<T, U>>, U]
-    : never;
+export type UnionToTuple<T> = PickOne<T> extends infer U
+  ? Exclude<T, U> extends never
+    ? [T]
+    : [...UnionToTuple<Exclude<T, U>>, U]
+  : never
 
-type PickOne<T> = InferContra<InferContra<Contra<Contra<T>>>>;
+type PickOne<T> = InferContra<InferContra<Contra<Contra<T>>>>
 
-type Contra<T> =
-  T extends any
-  ? (arg: T) => void
-  : never;
+// boolean distributes over conditional types as true | false, which is not
+// what we want. So we treat it separately from the general case.
+type Contra<T> = T extends boolean ? Contra_<Exclude<T, boolean>> | ((arg: boolean) => void) : Contra_<T>
 
-type InferContra<T> =
-    [T] extends [(arg: infer I) => void]
-    ? I
-    : never;
+type Contra_<T> = T extends any ? (arg: T) => void : never
+
+type InferContra<T> = [T] extends [(arg: infer I) => void] ? I : never
 
 // See: https://github.com/sindresorhus/type-fest/blob/main/source/required-keys-of.d.ts
-export type RequiredKeysOf<BaseType> = Exclude<{
-	[Key in keyof BaseType]: BaseType extends Record<Key, BaseType[Key]>
-		? Key
-		: never
-}[keyof BaseType], undefined>;
+export type RequiredKeysOf<BaseType> = Exclude<
+  {
+    [Key in keyof BaseType]: BaseType extends Record<Key, BaseType[Key]> ? Key : never
+  }[keyof BaseType],
+  undefined
+>
 
 // See: https://github.com/sindresorhus/type-fest/blob/main/source/has-required-keys.d.ts
-export type HasRequiredKeys<BaseType> = RequiredKeysOf<BaseType> extends never ? false : true;
+export type HasRequiredKeys<BaseType> = RequiredKeysOf<BaseType> extends never ? false : true
+
+// See: https://github.com/microsoft/TypeScript/issues/28374#issuecomment-538052842
+export type DeepNonNullable<T> = { [P in keyof T]-?: NonNullable<T[P]> } & NonNullable<T>
