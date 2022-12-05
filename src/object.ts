@@ -74,7 +74,7 @@ type ExpectedTypeInObject<O extends ObjectOfTypes> = { [K in keyof O]: ExpectedT
 
 type ObjectOfTypes = Record<string, Type<unknown, unknown>>
 
-type EnforceOptionality<T> = RemoveQuestionMarkFromKey<Optional<T, KeysEndingInQuestionMark<T>>>
+type EnforceOptionality<T extends {}> = RemoveQuestionMarkFromKey<Optional<T, KeysEndingInQuestionMark<T>>>
 
 // https://github.com/Microsoft/TypeScript/issues/25760#issuecomment-705137615
 type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>
