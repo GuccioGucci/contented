@@ -14,7 +14,7 @@ export class InvalidCoercion extends ContentedError {
 
 const AT_KEY = Symbol()
 
-export class AtKey<E extends InvalidCoercion> extends ContentedError {
+export class AtKey<E> extends ContentedError {
   // @ts-ignore
   private readonly [AT_KEY]: true
 
