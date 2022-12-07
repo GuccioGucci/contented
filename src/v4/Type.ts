@@ -7,7 +7,7 @@ export interface Type<_R> {
 
 export type Infer<T> = T extends Type<infer R> ? R : never
 
-export type Schema = PrimitiveSchema | MatchSchema | ObjectSchema | OneOfSchema
+export type Schema = PrimitiveSchema | MatchSchema | ObjectSchema | OneOfSchema | ArrayOfSchema
 
 // ======================================================================
 // Primitive
@@ -59,6 +59,17 @@ export function isOneOfSchema(schema: Schema): schema is OneOfSchema {
 export type IsOneOf<R> = IsUnion<R>
 
 // ======================================================================
+// Object
+// ======================================================================
+export type ArrayOfSchema = { arrayOf: Schema }
+
+export function isArrayOfSchema(schema: Schema): schema is ArrayOfSchema {
+  return typeof schema === 'object' && 'arrayOf' in schema
+}
+
+export type IsArray<R> = [R] extends [any[]] ? true : false
+
+// ======================================================================
 // Programs
 // ======================================================================
 export const string: Type<string> = { schema: 'string' }
@@ -77,6 +88,10 @@ export function oneOf<Types extends Type<unknown>[]>(...types: Types): Type<OneO
 }
 
 type OneOf<Types> = Types extends [infer Head, ...infer Rest] ? Infer<Head> | OneOf<Rest> : never
+
+export function arrayOf<R>(type: Type<R>): Type<R[]> {
+  return { schema: { arrayOf: type.schema } }
+}
 
 export function object<O extends Record<string, Type<unknown>>>(obj: O): Type<SequenceObject<O>> {
   const object: Record<string, Schema> = {}

@@ -1,25 +1,25 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { number } from './number'
-import { string } from './string'
-import { coerceTo } from './Type'
+import { number } from './v4/Type'
+import { string } from './v4/Type'
+import { coerceTo } from './v4/coerceTo'
 import { AtKey, InvalidCoercion } from './InvalidCoercion'
 import { MissingKey } from './MissingKey'
 import { Joint } from './Joint'
-import { at } from './at'
-import { oneOf } from './oneOf'
-import { boolean } from './boolean'
-import { match } from './match'
+import { oneOf } from './v4/Type'
+import { boolean } from './v4/Type'
+import { match } from './v4/Type'
+import { object } from './v4/Type'
 
 test(`oneOf allows specifying alternatives`, function () {
-  const T = oneOf(string, at(['b'], number), boolean)
+  const T = oneOf(string, object({ b: number }), boolean)
 
   const res1 = coerceTo(T, 'hello')
   const res2 = coerceTo(T, { b: 15 })
   const res3 = coerceTo(T, true)
 
   assert.is(res1, 'hello')
-  assert.is(res2, 15)
+  assert.equal(res2, { b: 15 })
   assert.is(res3, true)
 })
 
@@ -44,7 +44,7 @@ test(`oneOf rejects input values that are not coercible to any given alternative
 })
 
 test(`oneOf reports the path at which the error happened`, function () {
-  const stringOrNumberAtA = oneOf(string, at('a', number))
+  const stringOrNumberAtA = oneOf(string, object({ a: number }))
 
   const res1 = coerceTo(stringOrNumberAtA, { b: 12 })
   const res2 = coerceTo(stringOrNumberAtA, { a: 'hello' })
@@ -58,7 +58,7 @@ test(`oneOf reports the path at which the error happened`, function () {
 })
 
 test(`oneOf reports multi-level missing keys`, function () {
-  const T = at('a', oneOf(string, at('b', number)))
+  const T = object({ a: oneOf(string, object({ b: number })) })
 
   const res1 = coerceTo(T, { b: 12 })
   const res2 = coerceTo(T, { a: { c: 12 } })

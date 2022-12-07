@@ -1,14 +1,14 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './Type'
-import { number } from './number'
-import { string } from './string'
+import { coerceTo } from './v4/coerceTo'
+import { number } from './v4/Type'
+import { string } from './v4/Type'
 import { AtKey, InvalidCoercion } from './InvalidCoercion'
 import { MissingKey } from './MissingKey'
 import { Joint } from './Joint'
-import { arrayOf } from './arrayOf'
-import { permissiveArrayOf } from './permissiveArrayOf'
-import { object } from './object'
+import { arrayOf } from './v4/Type'
+import { object } from './v4/Type'
+import { oneOf } from './v4/Type'
 
 test(`array accepts array of the indicated element type`, function () {
   const arrayOfStrings = arrayOf(string)
@@ -50,28 +50,26 @@ test(`array rejects a value upon the first missing element`, function () {
   assert.equal(res, new MissingKey([0, 'a']))
 })
 
-test(`array propagates non fatal errors`, function () {
-  const arrayOfPermissiveArray = arrayOf(permissiveArrayOf(number))
-
-  const res1 = coerceTo(arrayOfPermissiveArray, [[1, 2, 3, 'hello']])
-  const res2 = coerceTo(arrayOfPermissiveArray, [1, [1, 2, 3, 'hello']])
-
-  assert.equal(res1, [[[1, 2, 3]], [new AtKey([0, 3], new InvalidCoercion('number', 'hello'))]])
-  assert.equal(res2, new AtKey([0], new InvalidCoercion('array', 1)))
-})
-
 test(`array accepts alternatives`, function () {
-  const arrayOfAlternatives = arrayOf(string.or(object({ a: string })))
+  const arrayOfAlternatives = arrayOf(oneOf(string, object({ a: number })))
 
   const res1 = coerceTo(arrayOfAlternatives, ['x', 'y', { a: 12 }])
   const res2 = coerceTo(arrayOfAlternatives, ['x', 'y', false])
+  const res3 = coerceTo(arrayOfAlternatives, ['x', 'y', { a: 'hello' }])
 
-  assert.equal(res1, ['x', 'y', 12])
+  assert.equal(res1, ['x', 'y', { a: 12 }])
   assert.equal(
     res2,
     new Joint([
       new AtKey([2], new InvalidCoercion('string', false)),
       new AtKey([2], new InvalidCoercion('object', false)),
+    ])
+  )
+  assert.equal(
+    res3,
+    new Joint([
+      new AtKey([2], new InvalidCoercion('string', { a: 'hello' })),
+      new AtKey([2, 'a'], new InvalidCoercion('number', 'hello')),
     ])
   )
 })
