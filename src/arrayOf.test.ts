@@ -9,6 +9,7 @@ import { Joint } from './Joint'
 import { arrayOf } from './v4/Type'
 import { object } from './v4/Type'
 import { oneOf } from './v4/Type'
+import { expectType } from 'ts-expect'
 
 test(`array accepts array of the indicated element type`, function () {
   const arrayOfStrings = arrayOf(string)
@@ -16,6 +17,9 @@ test(`array accepts array of the indicated element type`, function () {
   const res = coerceTo(arrayOfStrings, ['a', 'b', 'c'])
 
   assert.equal(res, ['a', 'b', 'c'])
+
+  type R = string[] | InvalidCoercion | AtKey<InvalidCoercion>
+  expectType<R>(res)
 })
 
 test(`array rejects values that are not arrays`, function () {
@@ -24,6 +28,9 @@ test(`array rejects values that are not arrays`, function () {
   const res = coerceTo(arrayOfStrings, 5)
 
   assert.equal(res, new InvalidCoercion('array', 5))
+
+  type R = string[] | InvalidCoercion | AtKey<InvalidCoercion>
+  expectType<R>(res)
 })
 
 test(`array rejects arrays of the wrong element type`, function () {
@@ -32,22 +39,31 @@ test(`array rejects arrays of the wrong element type`, function () {
   const res = coerceTo(arrayOfStrings, [1, 2, 3])
 
   assert.equal(res, new AtKey([0], new InvalidCoercion('string', 1)))
+
+  type R = string[] | InvalidCoercion | AtKey<InvalidCoercion>
+  expectType<R>(res)
 })
 
 test(`array reports nested errors`, function () {
-  const arrayOfStrings = arrayOf(object({ a: string }))
+  const arrayOfObjs = arrayOf(object({ a: string }))
 
-  const res = coerceTo(arrayOfStrings, [{ a: 5 }])
+  const res = coerceTo(arrayOfObjs, [{ a: 5 }])
 
   assert.equal(res, new AtKey([0, 'a'], new InvalidCoercion('string', 5)))
+
+  type R = InvalidCoercion | AtKey<InvalidCoercion> | { a: string }[] | MissingKey
+  expectType<R>(res)
 })
 
 test(`array rejects a value upon the first missing element`, function () {
-  const arrayOfStrings = arrayOf(object({ a: string }))
+  const arrayOfObjs = arrayOf(object({ a: string }))
 
-  const res = coerceTo(arrayOfStrings, [{ b: 0 }, { b: 1 }, { b: 2 }])
+  const res = coerceTo(arrayOfObjs, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
   assert.equal(res, new MissingKey([0, 'a']))
+
+  type R = InvalidCoercion | AtKey<InvalidCoercion> | { a: string }[] | MissingKey
+  expectType<R>(res)
 })
 
 test(`array accepts alternatives`, function () {
@@ -72,6 +88,14 @@ test(`array accepts alternatives`, function () {
       new AtKey([2, 'a'], new InvalidCoercion('number', 'hello')),
     ])
   )
+
+  type R =
+    | InvalidCoercion
+    | (string | { a: number })[]
+    | Joint<[AtKey<InvalidCoercion>, AtKey<InvalidCoercion> | MissingKey]>
+  expectType<R>(res1)
+  expectType<R>(res2)
+  expectType<R>(res3)
 })
 
 test.run()
