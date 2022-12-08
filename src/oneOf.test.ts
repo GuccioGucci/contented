@@ -10,6 +10,7 @@ import { oneOf } from './v4/Type'
 import { boolean } from './v4/Type'
 import { match } from './v4/Type'
 import { object } from './v4/Type'
+import { expectType } from 'ts-expect'
 
 test(`oneOf allows specifying alternatives`, function () {
   const T = oneOf(string, object({ b: number }), boolean)
@@ -21,6 +22,15 @@ test(`oneOf allows specifying alternatives`, function () {
   assert.is(res1, 'hello')
   assert.equal(res2, { b: 15 })
   assert.is(res3, true)
+
+  type R =
+    | string
+    | boolean
+    | { b: number }
+    | Joint<[InvalidCoercion, InvalidCoercion, InvalidCoercion | AtKey<InvalidCoercion> | MissingKey]>
+  expectType<R>(res1)
+  expectType<R>(res2)
+  expectType<R>(res3)
 })
 
 test(`oneOf rejects input values that are not coercible to any given alternative`, function () {
@@ -41,6 +51,10 @@ test(`oneOf rejects input values that are not coercible to any given alternative
       new InvalidCoercion('c', { a: 2 }),
     ])
   )
+
+  type R = 'a' | 'b' | 'c' | Joint<[InvalidCoercion, InvalidCoercion, InvalidCoercion]>
+  expectType<R>(res1)
+  expectType<R>(res2)
 })
 
 test(`oneOf reports the path at which the error happened`, function () {
@@ -50,11 +64,14 @@ test(`oneOf reports the path at which the error happened`, function () {
   const res2 = coerceTo(stringOrNumberAtA, { a: 'hello' })
 
   assert.equal(res1, new Joint([new InvalidCoercion('string', { b: 12 }), new MissingKey(['a'])]))
-
   assert.equal(
     res2,
     new Joint([new InvalidCoercion('string', { a: 'hello' }), new AtKey(['a'], new InvalidCoercion('number', 'hello'))])
   )
+
+  type R = string | { a: number } | Joint<[InvalidCoercion, InvalidCoercion | AtKey<InvalidCoercion> | MissingKey]>
+  expectType<R>(res1)
+  expectType<R>(res2)
 })
 
 test(`oneOf reports multi-level missing keys`, function () {
@@ -68,6 +85,14 @@ test(`oneOf reports multi-level missing keys`, function () {
     res2,
     new Joint([new AtKey(['a'], new InvalidCoercion('string', { c: 12 })), new MissingKey(['a', 'b'])])
   )
+
+  type R =
+    | InvalidCoercion
+    | MissingKey
+    | { a: string | { b: number } }
+    | Joint<[AtKey<InvalidCoercion>, AtKey<InvalidCoercion> | MissingKey]>
+  expectType<R>(res1)
+  expectType<R>(res2)
 })
 
 test.run()
