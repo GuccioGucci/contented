@@ -82,8 +82,12 @@ export function match<R extends string | number | boolean>(match: Narrow<R>): Ty
   return { schema: { match } }
 }
 
-export function oneOf<Types extends Type<unknown>[]>(...types: Types): Type<OneOf<Types>> {
-  const oneOf = types.map((type) => type.schema)
+export function oneOf<T1 extends Type<unknown>, T2 extends Type<unknown>, Types extends Type<unknown>[]>(
+  first: T1,
+  second: T2,
+  ...rest: Types
+): Type<OneOf<[T1, T2, ...Types]>> {
+  const oneOf = [first, second, ...rest].map((type) => type.schema)
   return { schema: { oneOf } }
 }
 
