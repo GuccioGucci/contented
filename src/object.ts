@@ -1,6 +1,6 @@
-import { At } from './at'
 import { ContentedError } from './ContentedError'
-import { InvalidCoercion } from './InvalidCoercion'
+import { HasAtKeyInvalidCoercion, InvalidCoercion } from './InvalidCoercion'
+import { HasJointAtKey } from './Joint'
 import { MissingKey } from './MissingKey'
 import { Coerce, coerceTo, ErrorType, ExpectedType, hasNonFatalErrors, NonFatalErrorType, Type } from './Type'
 import { scope } from './_scope'
@@ -82,3 +82,25 @@ type Optional<T, K extends keyof T> = Omit<T, K> & Partial<T>
 type KeysEndingInQuestionMark<O extends {}> = { [K in keyof O]: K extends `${any}?` ? K : never }[keyof O]
 
 type RemoveQuestionMarkFromKey<O extends {}> = { [K in keyof O as K extends `${infer K2}?` ? K2 : K]: O[K] }
+
+export type At<T, P = []> = T extends Type<infer R, infer E>
+  ? Type<PossiblyUndefined<R, P>, MissingKeyInPath<P> | InvalidCoercion | HasAtKeyInvalidCoercion<E> | HasJointAtKey<E>>
+  : never
+
+type PossiblyUndefined<R, P> = SomeAreOptional<P> extends true ? R | undefined : R
+
+type MissingKeyInPath<P> = AllAreOptional<P> extends true ? never : MissingKey
+
+type SomeAreOptional<T, A = false> = A extends true
+  ? A
+  : T extends [infer Head, ...infer Tail]
+  ? SomeAreOptional<Tail, IsOptional<Head>>
+  : A
+
+type AllAreOptional<T, A = true> = A extends false
+  ? A
+  : T extends [infer Head, ...infer Tail]
+  ? AllAreOptional<Tail, IsOptional<Head>>
+  : A
+
+type IsOptional<T> = T extends `${any}?` ? true : false
