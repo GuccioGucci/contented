@@ -22,21 +22,18 @@
     - [`string`](#string)
     - [`number`](#number)
     - [`boolean`](#boolean)
-  - [Object types](#object-types)
-    - [`object`](#object)
-  - [Array types](#array-types)
-    - [`arrayOf(T)`](#arrayoft)
-  - [Narrowing](#narrowing)
     - [`match(value)`](#matchvalue)
-  - [Alternatives](#alternatives)
+  - [Compound types](#compound-types)
+    - [`object`](#object)
+    - [`arrayOf(T)`](#arrayoft)
     - [`oneOf(T1, T2, ...Ts)`](#oneoft1-t2-ts)
+  - [Utility types](#utility-types)
+    - [`Infer<typeof T>`](#infertypeof-t)
   - [Errors](#errors)
     - [`InvalidCoercion`](#invalidcoercion)
     - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
     - [`MissingKey`](#missingkey)
     - [`Joint<[...Errs]>`](#jointerrs)
-  - [Utility types](#utility-types)
-    - [`Infer<typeof T>`](#infertypeof-t)
 - [License](#license)
 
 ## Introduction
@@ -118,7 +115,21 @@ coerceTo(boolean, 'hello');
 // InvalidCoercion { expected: 'boolean', got: 'hello' }
 ```
 
-### Object types
+#### `match(value)`
+
+A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` succeed only when `value` is provided as an input.
+
+```typescript
+import { match, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(match('hello'), 'hello');
+// 'hello'
+
+coerceTo(match('hello'), 'foo');
+// InvalidCoercion { expected: 'hello', got: 'foo' }
+```
+
+### Compound types
 
 #### `object`
 
@@ -169,27 +180,9 @@ coerceTo(arrayOf(number), [3, 'a', 5]);
 // AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
 ```
 
-### Narrowing
-
-#### `match(value)`
-
-A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` succeed only when `value` is provided as an input.
-
-```typescript
-import { match, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(match('hello'), 'hello');
-// 'hello'
-
-coerceTo(match('hello'), 'foo');
-// InvalidCoercion { expected: 'hello', got: 'foo' }
-```
-
-### Alternatives
-
 #### `oneOf(T1, T2, ...Ts)`
 
-A run-time representation of the union type `T1 | T2 | ...Ts`. In case of a failed coercion, the result encloses the errors coming from both `T1` and `T2`, and all subsequent alternatives.
+A run-time representation of the union type `T1 | T2 | ...Ts`. In case of a failed coercion, the result encloses the errors coming from both `T1`, `T2`, and all subsequent alternatives.
 
 
 ```typescript
@@ -206,60 +199,6 @@ coerceTo(abc, 'd');
       InvalidCoercion { expected: 'a', got: 'd' },
       InvalidCoercion { expected: 'b', got: 'd' },
       InvalidCoercion { expected: 'c', got: 'd' }
-    ]
-   }
-*/
-```
-
-### Errors
-
-#### `InvalidCoercion`
-When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expectation and the actual value.
-
-```typescript
-import { string, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(string, 42);
-// InvalidCoercion { expected: 'string', got: 42 }
-```
-#### `AtKey<InvalidCoercion>`
-
-An `InvalidCoercion` error, together with the path at which to find the non-conforming data.
-
-```typescript
-import { number, arrayOf, at, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(at('x', number), { x: 'hello' });
-// AtKey { atKey: [ 'x' ], error: InvalidCoercion { expected: 'number', got: 'hello' } }
-
-
-coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
-```
-
-#### `MissingKey`
-
-The path at which a non-existing key in the input data was instead expected.
-
-```typescript
-import { number, at, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(at('x', number), { y: 12 });
-// MissingKey { missingKey: [ 'x' ] }
-```
-
-#### `Joint<[...Errs]>`
-
-When multiple alternatives are provided but none of them is applicable to the input data, `coerceTo` returns a `Joint` error, reporting the errors resulting from the different failed attempts.
-
-```typescript
-import { string, number, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(string.or(number), true);
-/* Joint {
-    errors: [
-      InvalidCoercion { expected: 'string', got: true },
-      InvalidCoercion { expected: 'number', got: true }
     ]
    }
 */
@@ -283,6 +222,59 @@ const User = object({
 function fn(user: Infer<typeof User>) {
   // here, user : { name: string; surname: string; contacts: { phone: string } }
 }
+```
+
+### Errors
+
+#### `InvalidCoercion`
+When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expectation and the actual value.
+
+```typescript
+import { string, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(string, 42);
+// InvalidCoercion { expected: 'string', got: 42 }
+```
+#### `AtKey<InvalidCoercion>`
+
+An `InvalidCoercion` error, together with the path at which to find the non-conforming data.
+
+```typescript
+import { number, arrayOf, object, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(object({ 'x': number }), { x: 'hello' });
+// AtKey { atKey: [ 'x' ], error: InvalidCoercion { expected: 'number', got: 'hello' } }
+
+coerceTo(arrayOf(number), [3, 'a', 5]);
+// AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+```
+
+#### `MissingKey`
+
+The path at which a non-existing key in the input data was instead expected.
+
+```typescript
+import { number, at, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(object({ 'x': number }), { y: 12 });
+// MissingKey { missingKey: [ 'x' ] }
+```
+
+#### `Joint<[...Errs]>`
+
+When multiple alternatives are provided but none of them is applicable to the input data, `coerceTo` returns a `Joint` error, reporting the errors resulting from the different failed attempts.
+
+```typescript
+import { string, number, oneOf, coerceTo } from '@gucciogucci/contented';
+
+coerceTo(oneOf(string, number), true);
+/* Joint {
+    errors: [
+      InvalidCoercion { expected: 'string', got: true },
+      InvalidCoercion { expected: 'number', got: true }
+    ]
+   }
+*/
 ```
 
 ## License
