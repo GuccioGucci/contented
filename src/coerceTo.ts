@@ -1,9 +1,9 @@
-import { ContentedError } from '../ContentedError'
-import { AtKey, InvalidCoercion } from '../InvalidCoercion'
-import { Joint } from '../Joint'
-import { MissingKey } from '../MissingKey'
-import { scope } from '../_scope'
-import { HasRequiredKeys, UnionToTuple } from '../_typefunc'
+import { ContentedError } from './ContentedError'
+import { AtKey, InvalidCoercion } from './InvalidCoercion'
+import { Joint } from './Joint'
+import { MissingKey } from './MissingKey'
+import { scope } from './_scope'
+import { HasRequiredKeys, UnionToTuple } from './_typefunc'
 import {
   Type,
   PrimitiveSchema,
