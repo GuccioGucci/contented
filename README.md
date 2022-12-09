@@ -7,8 +7,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/GuccioGucci/contented/actions/workflows/test.yml"><img alt="Test" src="https://github.com/GuccioGucci/contented/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://www.npmjs.com/package/@gucciogucci/contented">
+    <img alt="NPM" src="https://badgen.net/npm/v/@gucciogucci/contented"/>
+  </a>
   <img alt="Node.js" src="https://img.shields.io/node/v/@gucciogucci/contented.svg">
+  <a href="https://github.com/GuccioGucci/contented/actions/workflows/test.yml"><img alt="Test" src="https://github.com/GuccioGucci/contented/actions/workflows/test.yml/badge.svg"></a>
   <a href="https://bundlephobia.com/package/@gucciogucci/contented"><img alt="Bundlephobia Minified" src="https://img.shields.io/bundlephobia/min/@gucciogucci/contented.svg"></a>
 </p>
 
