@@ -1,5 +1,4 @@
 import { Any, Every, HasRequiredKeys, IsTypeOf, IsUnion, Not, UnionToTuple } from './_typefunc'
-import { Path } from './Path'
 import {
   Type,
   PrimitiveSchema,
@@ -180,6 +179,13 @@ export class Joint<E extends unknown[]> extends ContentedError {
     super()
   }
 }
+
+// ----------------------------------------------------------------------
+// Path
+// ----------------------------------------------------------------------
+type Path = Key[]
+
+type Key = string | symbol | number
 
 // ======================================================================
 // Why value is not...

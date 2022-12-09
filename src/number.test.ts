@@ -3,7 +3,7 @@ import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { expectType } from 'ts-expect'
 import { number } from './number'
-import { coerceTo, InvalidCoercion } from './coerceTo'
+import { coerceTo, InvalidCoercion } from './coercion'
 
 test(`number accepts number values`, function () {
   assert(

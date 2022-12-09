@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { expectType } from 'ts-expect'
-import { AtKey, InvalidCoercion, MissingKey, Joint, coerceTo } from './coerceTo'
+import { AtKey, InvalidCoercion, MissingKey, Joint, coerceTo } from './coercion'
 import { number } from './number'
 import { string } from './string'
 import { arrayOf } from './arrayOf'
