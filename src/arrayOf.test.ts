@@ -1,15 +1,12 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './coerceTo'
+import { expectType } from 'ts-expect'
+import { AtKey, InvalidCoercion, MissingKey, Joint, coerceTo } from './coerceTo'
 import { number } from './number'
 import { string } from './string'
-import { AtKey, InvalidCoercion } from './InvalidCoercion'
-import { MissingKey } from './MissingKey'
-import { Joint } from './Joint'
 import { arrayOf } from './arrayOf'
 import { object } from './object'
 import { oneOf } from './oneOf'
-import { expectType } from 'ts-expect'
 
 test(`array accepts array of the indicated element type`, function () {
   const arrayOfStrings = arrayOf(string)

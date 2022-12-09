@@ -1,10 +1,9 @@
 import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { number } from './number'
-import { coerceTo } from './coerceTo'
-import { InvalidCoercion } from './InvalidCoercion'
 import { expectType } from 'ts-expect'
+import { number } from './number'
+import { coerceTo, InvalidCoercion } from './coerceTo'
 
 test(`number accepts number values`, function () {
   assert(

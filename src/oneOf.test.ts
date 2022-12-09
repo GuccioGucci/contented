@@ -2,15 +2,12 @@ import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { number } from './number'
 import { string } from './string'
-import { coerceTo } from './coerceTo'
-import { AtKey, InvalidCoercion } from './InvalidCoercion'
-import { MissingKey } from './MissingKey'
-import { Joint } from './Joint'
+import { expectType } from 'ts-expect'
+import { AtKey, InvalidCoercion, MissingKey, Joint, coerceTo } from './coerceTo'
 import { oneOf } from './oneOf'
 import { boolean } from './boolean'
 import { match } from './match'
 import { object } from './object'
-import { expectType } from 'ts-expect'
 
 test(`oneOf allows specifying alternatives`, function () {
   const T = oneOf(string, object({ b: number }), boolean)

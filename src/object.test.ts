@@ -1,12 +1,10 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { AtKey, InvalidCoercion } from './InvalidCoercion'
-import { MissingKey } from './MissingKey'
+import { expectType } from 'ts-expect'
+import { AtKey, InvalidCoercion, MissingKey, coerceTo } from './coerceTo'
 import { number } from './number'
 import { object } from './object'
 import { string } from './string'
-import { coerceTo } from './coerceTo'
-import { expectType } from 'ts-expect'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
   const Point = object({ x: string, y: number })

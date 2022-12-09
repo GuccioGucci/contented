@@ -1,7 +1,3 @@
-import { ContentedError } from './ContentedError'
-import { AtKey, InvalidCoercion } from './InvalidCoercion'
-import { Joint } from './Joint'
-import { MissingKey } from './MissingKey'
 import { Any, Every, HasRequiredKeys, IsTypeOf, IsUnion, Not, UnionToTuple } from './_typefunc'
 import { Path } from './Path'
 import {
@@ -117,6 +113,72 @@ function scope(path: Path, error: ContentedError): ContentedError {
   }
   /* c8 ignore next */
   throw new Error(`Unknown error type: ${error}`)
+}
+
+// ======================================================================
+// Contented Errors
+// ======================================================================
+const CONTENTED_ERROR = Symbol()
+
+export abstract class ContentedError {
+  //@ts-ignore
+  private readonly [CONTENTED_ERROR]: true
+}
+
+// ----------------------------------------------------------------------
+// InvalidCoercion
+// ----------------------------------------------------------------------
+const INVALID_COERCION = Symbol()
+
+export class InvalidCoercion extends ContentedError {
+  // @ts-ignore
+  private readonly [INVALID_COERCION]: true
+
+  constructor(public readonly expected: string, public readonly got: any) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// AtKey
+// ----------------------------------------------------------------------
+const AT_KEY = Symbol()
+
+export class AtKey<E> extends ContentedError {
+  // @ts-ignore
+  private readonly [AT_KEY]: true
+
+  constructor(public readonly atKey: Path, public readonly error: E) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// MissingKey
+// ----------------------------------------------------------------------
+const MISSING_KEY = Symbol()
+
+export class MissingKey extends ContentedError {
+  // @ts-ignore
+  private readonly [MISSING_KEY]: true
+
+  constructor(public readonly missingKey: Path) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// Joint
+// ----------------------------------------------------------------------
+const JOINT = Symbol()
+
+export class Joint<E extends unknown[]> extends ContentedError {
+  // @ts-ignore
+  private readonly [JOINT]: true
+
+  constructor(public readonly errors: E) {
+    super()
+  }
 }
 
 // ======================================================================
