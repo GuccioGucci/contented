@@ -1,5 +1,4 @@
 import { Infer, Schema, Type } from './Type'
-import { Expand } from './_typefunc'
 
 export function object<O extends Record<string, Type<unknown>>>(obj: O): Type<SequenceObject<O>> {
   const object: Record<string, Schema> = {}
@@ -16,7 +15,7 @@ type SequenceObject<O extends object> = Expand<
 
 type SetValuesOptional<O extends object> = { [K in keyof O]: K extends `${string}?` ? O[K] | undefined : O[K] }
 
-// https://github.com/Microsoft/TypeScript/issues/25760#issuecomment-705137615
+// See: https://github.com/Microsoft/TypeScript/issues/25760#issuecomment-705137615
 type SetKeysOptional<O extends object> = Omit<O, KeysEndingInQuestionMark<O>> & Partial<O>
 
 type KeysEndingInQuestionMark<O extends object> = { [K in keyof O]: K extends `${any}?` ? K : never }[keyof O]
@@ -24,3 +23,6 @@ type KeysEndingInQuestionMark<O extends object> = { [K in keyof O]: K extends `$
 type RemoveQuestionMarkFromKeys<O extends object> = { [K in keyof O as K extends `${infer K2}?` ? K2 : K]: O[K] }
 
 type InferObject<O extends object> = { [K in keyof O]: Infer<O[K]> }
+
+// See: https://stackoverflow.com/a/57683652
+type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never
