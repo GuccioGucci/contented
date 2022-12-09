@@ -1,5 +1,4 @@
 import { ContentedError } from './ContentedError'
-import { HasAtKeyInvalidCoercion } from './InvalidCoercion'
 
 const JOIN = Symbol()
 
@@ -24,9 +23,3 @@ export class Joint<E extends unknown[]> extends ContentedError {
     return new Joint([err1, err2])
   }
 }
-
-export type HasJointAtKey<E> = E extends Joint<infer U> ? Joint<MapAtKeyInvalidCoercion<U>> : never
-
-type MapAtKeyInvalidCoercion<U> = U extends [infer Head, ...infer Tail]
-  ? [HasAtKeyInvalidCoercion<Head, Head>, ...MapAtKeyInvalidCoercion<Tail>]
-  : []

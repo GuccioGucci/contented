@@ -2,8 +2,8 @@ import { ContentedError } from './ContentedError'
 import { AtKey, InvalidCoercion } from './InvalidCoercion'
 import { Joint } from './Joint'
 import { MissingKey } from './MissingKey'
-import { scope } from './_scope'
 import { Any, Every, HasRequiredKeys, IsTypeOf, IsUnion, Not, UnionToTuple } from './_typefunc'
+import { Path } from './Path'
 import {
   Type,
   PrimitiveSchema,
@@ -100,6 +100,23 @@ function coerceOneOf(schema: OneOfSchema, value: any): any {
     errors.push(res)
   }
   return new Joint(errors)
+}
+
+function scope(path: Path, error: ContentedError): ContentedError {
+  if (error instanceof AtKey) {
+    return new AtKey(path.concat(error.atKey), error.error)
+  }
+  if (error instanceof MissingKey) {
+    return new MissingKey(path.concat(error.missingKey))
+  }
+  if (error instanceof InvalidCoercion) {
+    return new AtKey(path, error)
+  }
+  if (error instanceof Joint) {
+    return new Joint(error.errors.map((inner: ContentedError) => scope(path, inner)))
+  }
+  /* c8 ignore next */
+  throw new Error(`Unknown error type: ${error}`)
 }
 
 // ======================================================================

@@ -11,5 +11,3 @@ export class MissingKey extends ContentedError {
     super()
   }
 }
-
-export type HasMissingKey<E> = [MissingKey] extends [E] ? MissingKey : never

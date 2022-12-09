@@ -22,5 +22,3 @@ export class AtKey<E> extends ContentedError {
     super()
   }
 }
-
-export type HasAtKeyInvalidCoercion<E, F = never> = [InvalidCoercion] extends [E] ? AtKey<InvalidCoercion> : F
