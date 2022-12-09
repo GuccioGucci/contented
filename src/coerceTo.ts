@@ -3,7 +3,7 @@ import { AtKey, InvalidCoercion } from './InvalidCoercion'
 import { Joint } from './Joint'
 import { MissingKey } from './MissingKey'
 import { scope } from './_scope'
-import { HasRequiredKeys, UnionToTuple } from './_typefunc'
+import { Any, Every, HasRequiredKeys, IsTypeOf, IsUnion, Not, UnionToTuple } from './_typefunc'
 import {
   Type,
   PrimitiveSchema,
@@ -12,14 +12,9 @@ import {
   isMatchSchema,
   MatchSchema,
   ObjectSchema,
-  IsObject,
   isObjectSchema,
-  IsOneOf,
   isOneOfSchema,
   OneOfSchema,
-  IsPrimitive,
-  IsMatch,
-  IsArray,
   isArrayOfSchema,
   ArrayOfSchema,
 } from './Type'
@@ -309,6 +304,24 @@ type Is_DisjoinWhyCont<C> = C extends ['disjoin-why-cont', any, any] ? true : fa
 type DisjoinWhyCont_Why<C> = C extends ['disjoin-why-cont', infer Why, any] ? Why : never
 
 type DisjoinWhyCont_Cont<C> = C extends ['disjoin-why-cont', any, infer NextCont] ? NextCont : never
+
+// ======================================================================
+// Type-level predicates
+// ======================================================================
+export type IsPrimitive<R> = Any<[IsTypeOf<R, string>, IsTypeOf<R, boolean>, IsTypeOf<R, number>]>
+
+export type IsMatch<R> = Every<
+  [
+    Not<IsUnion<R>>,
+    Any<[R extends string ? true : false, R extends number ? true : false, R extends boolean ? true : false]>
+  ]
+>
+
+export type IsOneOf<R> = IsUnion<R>
+
+export type IsObject<R> = [R] extends [object] ? true : false
+
+export type IsArray<R> = [R] extends [any[]] ? true : false
 
 // ======================================================================
 // Expand
