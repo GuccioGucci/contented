@@ -1,6 +1,6 @@
 export { arrayOf } from './arrayOf'
 export { boolean } from './boolean'
-export { match } from './match'
+export { literal } from './literal'
 export { number } from './number'
 export { object } from './object'
 export { oneOf } from './oneOf'

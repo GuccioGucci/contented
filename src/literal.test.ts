@@ -1,10 +1,10 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { InvalidCoercion, coerceTo } from './coercion'
-import { match } from './match'
+import { literal } from './literal'
 
-test(`match succeds only if the input and expected values are the same`, function () {
-  const ten = match(10)
+test(`literal succeds only if the input and expected values are the same`, function () {
+  const ten = literal(10)
 
   const res1 = coerceTo(ten, 10)
   const res2 = coerceTo(ten, 'hello')

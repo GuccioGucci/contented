@@ -1,11 +1,11 @@
-import { Any, Every, HasRequiredKeys, IsTypeOf, IsUnion, Not, UnionToTuple } from './_typefunc'
+import type { Any, Every, HasRequiredKeys, IsTypeOf, IsUnion, Not, UnionToTuple } from './_typefunc'
 import {
   Type,
   PrimitiveSchema,
   isPrimitiveSchema,
   Schema,
-  isMatchSchema,
-  MatchSchema,
+  isLiteralSchema,
+  LiteralSchema,
   ObjectSchema,
   isObjectSchema,
   isOneOfSchema,
@@ -23,8 +23,8 @@ function coerce(schema: Schema, value: any): any {
   if (isPrimitiveSchema(schema)) {
     return coercePrimitive(schema, value)
   }
-  if (isMatchSchema(schema)) {
-    return coerceMatch(schema, value)
+  if (isLiteralSchema(schema)) {
+    return coerceLiteral(schema, value)
   }
   if (isObjectSchema(schema)) {
     return coerceObject(schema, value)
@@ -41,8 +41,8 @@ function coercePrimitive(schema: PrimitiveSchema, value: any): any {
   return typeof value === schema ? value : new InvalidCoercion(schema, value)
 }
 
-function coerceMatch(schema: MatchSchema, value: any): any {
-  return schema.match === value ? value : new InvalidCoercion(`${schema.match}`, value)
+function coerceLiteral(schema: LiteralSchema, value: any): any {
+  return schema.literal === value ? value : new InvalidCoercion(`${schema.literal}`, value)
 }
 
 function coerceObject(schema: ObjectSchema, value: any): any {

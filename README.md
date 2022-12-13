@@ -25,7 +25,8 @@
     - [`string`](#string)
     - [`number`](#number)
     - [`boolean`](#boolean)
-    - [`match(value)`](#matchvalue)
+  - [Literal types](#literal-types)
+    - [`literal`](#literal)
   - [Compound types](#compound-types)
     - [`object`](#object)
     - [`arrayOf(T)`](#arrayoft)
@@ -118,17 +119,19 @@ coerceTo(boolean, 'hello');
 // InvalidCoercion { expected: 'boolean', got: 'hello' }
 ```
 
-#### `match(value)`
+## Literal types
 
-A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `match(value)` succeed only when `value` is provided as an input.
+#### `literal`
+
+A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `literal(value)` succeed only when `value` is provided as an input.
 
 ```typescript
-import { match, coerceTo } from '@gucciogucci/contented';
+import { literal, coerceTo } from '@gucciogucci/contented';
 
-coerceTo(match('hello'), 'hello');
+coerceTo(literal('hello'), 'hello');
 // 'hello'
 
-coerceTo(match('hello'), 'foo');
+coerceTo(literal('hello'), 'foo');
 // InvalidCoercion { expected: 'hello', got: 'foo' }
 ```
 

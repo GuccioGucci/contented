@@ -12,7 +12,7 @@ export type Infer<T> = T extends Type<infer R> ? R : never
 // ======================================================================
 // Schema
 // ======================================================================
-export type Schema = PrimitiveSchema | MatchSchema | ObjectSchema | OneOfSchema | ArrayOfSchema
+export type Schema = PrimitiveSchema | LiteralSchema | ObjectSchema | OneOfSchema | ArrayOfSchema
 
 // ----------------------------------------------------------------------
 // Primitive
@@ -24,12 +24,12 @@ export function isPrimitiveSchema(schema: Schema): schema is PrimitiveSchema {
 }
 
 // ----------------------------------------------------------------------
-// Match
+// Literal
 // ----------------------------------------------------------------------
-export type MatchSchema = { match: unknown }
+export type LiteralSchema = { literal: unknown }
 
-export function isMatchSchema(schema: Schema): schema is MatchSchema {
-  return typeof schema === 'object' && 'match' in schema
+export function isLiteralSchema(schema: Schema): schema is LiteralSchema {
+  return typeof schema === 'object' && 'literal' in schema
 }
 
 // ----------------------------------------------------------------------

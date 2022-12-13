@@ -6,7 +6,7 @@ import { expectType } from 'ts-expect'
 import { AtKey, InvalidCoercion, MissingKey, Joint, coerceTo } from './coercion'
 import { oneOf } from './oneOf'
 import { boolean } from './boolean'
-import { match } from './match'
+import { literal } from './literal'
 import { object } from './object'
 
 test(`oneOf allows specifying alternatives`, function () {
@@ -31,7 +31,7 @@ test(`oneOf allows specifying alternatives`, function () {
 })
 
 test(`oneOf rejects input values that are not coercible to any given alternative`, function () {
-  const T = oneOf(match('a'), match('b'), match('c'))
+  const T = oneOf(literal('a'), literal('b'), literal('c'))
 
   const res1 = coerceTo(T, true)
   const res2 = coerceTo(T, { a: 2 })
