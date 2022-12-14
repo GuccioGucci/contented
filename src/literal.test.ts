@@ -1,6 +1,6 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { InvalidCoercion, coerceTo } from './coercion'
+import { InvalidType, coerceTo } from './coercion'
 import { literal } from './literal'
 
 test(`literal succeds only if the input and expected values are the same`, function () {
@@ -11,8 +11,8 @@ test(`literal succeds only if the input and expected values are the same`, funct
   const res3 = coerceTo(ten, { a: 1, b: 2 })
 
   assert.is(res1, 10)
-  assert.equal(res2, new InvalidCoercion('10', 'hello'))
-  assert.equal(res3, new InvalidCoercion('10', { a: 1, b: 2 }))
+  assert.equal(res2, new InvalidType('10', 'hello'))
+  assert.equal(res3, new InvalidType('10', { a: 1, b: 2 }))
 })
 
 test.run()

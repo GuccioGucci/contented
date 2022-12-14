@@ -2,7 +2,7 @@ import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { expectType } from 'ts-expect'
-import { InvalidCoercion, coerceTo } from './coercion'
+import { InvalidType, coerceTo } from './coercion'
 import { string } from './string'
 
 test(`string accepts string values`, function () {
@@ -10,7 +10,7 @@ test(`string accepts string values`, function () {
     property(fc.string(), (value) => {
       const res = coerceTo(string, value)
 
-      expectType<string | InvalidCoercion>(res)
+      expectType<string | InvalidType>(res)
       is(res, value)
     })
   )
@@ -21,8 +21,8 @@ test(`string rejects all but string values`, function () {
     property(notAString, (value) => {
       const res = coerceTo(string, value)
 
-      expectType<string | InvalidCoercion>(res)
-      equal(res, new InvalidCoercion('string', value))
+      expectType<string | InvalidType>(res)
+      equal(res, new InvalidType('string', value))
     })
   )
 })

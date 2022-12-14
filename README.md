@@ -34,8 +34,8 @@
   - [Utility types](#utility-types)
     - [`Infer<typeof T>`](#infertypeof-t)
   - [Errors](#errors)
-    - [`InvalidCoercion`](#invalidcoercion)
-    - [`AtKey<InvalidCoercion>`](#atkeyinvalidcoercion)
+    - [`InvalidType`](#invalidtype)
+    - [`AtKey<InvalidType>`](#atkeyinvalidcoercion)
     - [`MissingKey`](#missingkey)
     - [`Joint<[...Errs]>`](#jointerrs)
 - [License](#license)
@@ -72,14 +72,14 @@ coerceTo(string, 'hello');
 // 'hello'
 
 coerceTo(string, 42);
-// InvalidCoercion { expected: 'string', got: 42 }
+// InvalidType { expected: 'string', got: 42 }
 ```
 
 ### Primitive types
 
 #### `string`
 
-A run-time representation of the `string` type. An attempt to coerce to `string` may result in either the string itself (if the input data is indeed a string) or an `InvalidCoercion` error.
+A run-time representation of the `string` type. An attempt to coerce to `string` may result in either the string itself (if the input data is indeed a string) or an `InvalidType` error.
 
 ```typescript
 import { string, coerceTo } from '@gucciogucci/contented';
@@ -88,12 +88,12 @@ coerceTo(string, 'hello');
 // 'hello'
 
 coerceTo(string, 42);
-// InvalidCoercion { expected: 'string', got: 42 }
+// InvalidType { expected: 'string', got: 42 }
 ```
 
 #### `number`
 
-A run-time representation of the `number` type. An attempt to coerce to `number` may result in either the number itself (if the input data is indeed a number) or an `InvalidCoercion` error.
+A run-time representation of the `number` type. An attempt to coerce to `number` may result in either the number itself (if the input data is indeed a number) or an `InvalidType` error.
 
 ```typescript
 import { number, coerceTo } from '@gucciogucci/contented';
@@ -102,12 +102,12 @@ coerceTo(number, 42);
 // 42
 
 coerceTo(number, 'hello');
-// InvalidCoercion { expected: 'number', got: 'hello' }
+// InvalidType { expected: 'number', got: 'hello' }
 ```
 
 #### `boolean`
 
-A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself (if the input data is indeed a boolean) or an `InvalidCoercion` error.
+A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself (if the input data is indeed a boolean) or an `InvalidType` error.
 
 ```typescript
 import { boolean, coerceTo } from '@gucciogucci/contented';
@@ -116,7 +116,7 @@ coerceTo(boolean, true);
 // true
 
 coerceTo(boolean, 'hello');
-// InvalidCoercion { expected: 'boolean', got: 'hello' }
+// InvalidType { expected: 'boolean', got: 'hello' }
 ```
 
 ## Literal types
@@ -132,7 +132,7 @@ coerceTo(literal('hello'), 'hello');
 // 'hello'
 
 coerceTo(literal('hello'), 'foo');
-// InvalidCoercion { expected: 'hello', got: 'foo' }
+// InvalidType { expected: 'hello', got: 'foo' }
 ```
 
 ### Compound types
@@ -180,10 +180,10 @@ coerceTo(arrayOf(number), [3, 4, 5]);
 // [ 3, 4, 5 ]
 
 coerceTo(arrayOf(number), 'hello');
-// InvalidCoercion { expected: 'array', got: 'hello' }
+// InvalidType { expected: 'array', got: 'hello' }
 
 coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+// AtKey { atKey: [ 1 ], error: InvalidType { expected: 'number', got: 'a' } }
 ```
 
 #### `oneOf(T1, T2, ...Ts)`
@@ -202,9 +202,9 @@ coerceTo(abc, 'a');
 coerceTo(abc, 'd');
 /* Joint {
     errors: [
-      InvalidCoercion { expected: 'a', got: 'd' },
-      InvalidCoercion { expected: 'b', got: 'd' },
-      InvalidCoercion { expected: 'c', got: 'd' }
+      InvalidType { expected: 'a', got: 'd' },
+      InvalidType { expected: 'b', got: 'd' },
+      InvalidType { expected: 'c', got: 'd' }
     ]
    }
 */
@@ -232,27 +232,27 @@ function fn(user: Infer<typeof User>) {
 
 ### Errors
 
-#### `InvalidCoercion`
-When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidCoercion`, which contains both the expectation and the actual value.
+#### `InvalidType`
+When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidType`, which contains both the expectation and the actual value.
 
 ```typescript
 import { string, coerceTo } from '@gucciogucci/contented';
 
 coerceTo(string, 42);
-// InvalidCoercion { expected: 'string', got: 42 }
+// InvalidType { expected: 'string', got: 42 }
 ```
-#### `AtKey<InvalidCoercion>`
+#### `AtKey<InvalidType>`
 
-An `InvalidCoercion` error, together with the path at which to find the non-conforming data.
+An `InvalidType` error, together with the path at which to find the non-conforming data.
 
 ```typescript
 import { number, arrayOf, object, coerceTo } from '@gucciogucci/contented';
 
 coerceTo(object({ 'x': number }), { x: 'hello' });
-// AtKey { atKey: [ 'x' ], error: InvalidCoercion { expected: 'number', got: 'hello' } }
+// AtKey { atKey: [ 'x' ], error: InvalidType { expected: 'number', got: 'hello' } }
 
 coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { atKey: [ 1 ], error: InvalidCoercion { expected: 'number', got: 'a' } }
+// AtKey { atKey: [ 1 ], error: InvalidType { expected: 'number', got: 'a' } }
 ```
 
 #### `MissingKey`
@@ -276,8 +276,8 @@ import { string, number, oneOf, coerceTo } from '@gucciogucci/contented';
 coerceTo(oneOf(string, number), true);
 /* Joint {
     errors: [
-      InvalidCoercion { expected: 'string', got: true },
-      InvalidCoercion { expected: 'number', got: true }
+      InvalidType { expected: 'string', got: true },
+      InvalidType { expected: 'number', got: true }
     ]
    }
 */

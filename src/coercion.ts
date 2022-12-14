@@ -38,16 +38,16 @@ function coerce(schema: Schema, value: any): any {
 }
 
 function coercePrimitive(schema: PrimitiveSchema, value: any): any {
-  return typeof value === schema ? value : new InvalidCoercion(schema, value)
+  return typeof value === schema ? value : new InvalidType(schema, value)
 }
 
 function coerceLiteral(schema: LiteralSchema, value: any): any {
-  return schema.literal === value ? value : new InvalidCoercion(`${schema.literal}`, value)
+  return schema.literal === value ? value : new InvalidType(`${schema.literal}`, value)
 }
 
 function coerceObject(schema: ObjectSchema, value: any): any {
   if (typeof value !== 'object') {
-    return new InvalidCoercion('object', value)
+    return new InvalidType('object', value)
   }
 
   const objectSchema = schema.object
@@ -70,7 +70,7 @@ function coerceObject(schema: ObjectSchema, value: any): any {
 
 function coerceArrayOf(schema: ArrayOfSchema, value: any): any {
   if (!Array.isArray(value)) {
-    return new InvalidCoercion('array', value)
+    return new InvalidType('array', value)
   }
 
   let pos = 0
@@ -104,7 +104,7 @@ function scope(path: Path, error: ContentedError): ContentedError {
   if (error instanceof MissingKey) {
     return new MissingKey(path.concat(error.missingKey))
   }
-  if (error instanceof InvalidCoercion) {
+  if (error instanceof InvalidType) {
     return new AtKey(path, error)
   }
   if (error instanceof Joint) {
@@ -125,13 +125,13 @@ export abstract class ContentedError {
 }
 
 // ----------------------------------------------------------------------
-// InvalidCoercion
+// InvalidType
 // ----------------------------------------------------------------------
-const INVALID_COERCION = Symbol()
+const INVALID_TYPE = Symbol()
 
-export class InvalidCoercion extends ContentedError {
+export class InvalidType extends ContentedError {
   // @ts-ignore
-  private readonly [INVALID_COERCION]: true
+  private readonly [INVALID_TYPE]: true
 
   constructor(public readonly expected: string, public readonly got: any) {
     super()
@@ -191,9 +191,9 @@ type Key = string | symbol | number
 // Why value is not...
 // ======================================================================
 type WhyValueIsNot<R, Cont = DoneCont> = IsPrimitive<R> extends true
-  ? Resume<Cont, InvalidCoercion>
+  ? Resume<Cont, InvalidType>
   : IsMatch<R> extends true
-  ? Resume<Cont, InvalidCoercion>
+  ? Resume<Cont, InvalidType>
   : IsOneOf<R> extends true
   ? WhyValueIsNotOneOf<R, Cont>
   : IsArray<R> extends true
@@ -217,7 +217,7 @@ type Map_WhyWalueIsNotOneOf<Rs, Cont> = Rs extends [infer Head, ...infer Tail]
 // ...an array
 // ----------------------------------------------------------------------
 type WhyValueIsNotArray<R, Cont> = R extends (infer E)[]
-  ? WhyValueIsNot<E, ScopeCont<InvalidCoercionCont<Cont>>>
+  ? WhyValueIsNot<E, ScopeCont<InvalidTypeCont<Cont>>>
   : Resume<Cont, 'EXPECTED AN ARRAY'>
 
 // ----------------------------------------------------------------------
@@ -227,7 +227,7 @@ type WhyValueIsNotObject<R, Cont> = Map_WhyValueIsNotObject<ToObjectValues<Requi
 
 type Map_WhyValueIsNotObject<Entries, Cont> = Entries extends [[infer Head], ...infer Tail]
   ? WhyValueIsNot<Head, ScopeCont<ObjectTailCont<Tail, Cont>>>
-  : Resume<Cont, InvalidCoercion> // the base error case of object is that the input is not an object
+  : Resume<Cont, InvalidType> // the base error case of object is that the input is not an object
 
 type ToObjectValues<O> = UnionToTuple<{ [K in keyof O]: [O[K]] }[keyof O]> // We wrap it in a tuple so that we preserve union types
 
@@ -238,7 +238,7 @@ type ToObjectValues<O> = UnionToTuple<{ [K in keyof O]: [O[K]] }[keyof O]> // We
 // of a union type
 type Scope<Why, C> = [Why] extends [Joint<infer Ws>] ? Map_Scope<Ws, JointCont<C>> : Resume<C, ScopeOverUnion<Why>>
 
-type ScopeOverUnion<Why> = Why extends any ? (Why extends InvalidCoercion ? AtKey<InvalidCoercion> : Why) : never
+type ScopeOverUnion<Why> = Why extends any ? (Why extends InvalidType ? AtKey<InvalidType> : Why) : never
 
 type Map_Scope<Ws, Cont> = Ws extends [infer Head, ...infer Tail]
   ? Scope<Head, ScopeTailCont<Tail, Cont>>
@@ -253,7 +253,7 @@ type Resume<C, Arg> =
   | (Is_OneOfTailCont<C> extends true ? Resume_OneOfTailCont<C, Arg> : never)
   | (Is_AppendWhyCont<C> extends true ? Resume_AppendWhyCont<C, Arg> : never)
   | (Is_MissingKeyCont<C> extends true ? Resume_MissingKeyCont<C, Arg> : never)
-  | (Is_InvalidCoercionCont<C> extends true ? Resume_InvalidCoercionCont<C, Arg> : never)
+  | (Is_InvalidTypeCont<C> extends true ? Resume_InvalidTypeCont<C, Arg> : never)
   | (Is_ScopeCont<C> extends true ? Resume_ScopeCont<C, Arg> : never)
   | (Is_ScopeTailCont<C> extends true ? Resume_ScopeTailCont<C, Arg> : never)
   | (Is_ObjectTailCont<C> extends true ? Resume_ObjectTailCont<C, Arg> : never)
@@ -277,7 +277,7 @@ type Resume_MissingKeyCont<C, Arg> = HasRequiredKeys<MissingKeyCont_Obj<C>> exte
   ? Resume<MissingKeyCont_Cont<C>, MissingKey | Arg>
   : Resume<MissingKeyCont_Cont<C>, Arg>
 
-type Resume_InvalidCoercionCont<C, Arg> = Resume<InvalidCoercionCont_Cont<C>, Arg | InvalidCoercion>
+type Resume_InvalidTypeCont<C, Arg> = Resume<InvalidTypeCont_Cont<C>, Arg | InvalidType>
 
 type Resume_ScopeCont<C, Arg> = Scope<Arg, ScopeCont_Cont<C>>
 
@@ -340,13 +340,13 @@ type MissingKeyCont_Cont<C> = C extends ['missing-key-cont', any, infer NextCont
 type MissingKeyCont_Obj<C> = C extends ['missing-key-cont', infer O, any] ? O : never
 
 // ----------------------------------------------------------------------
-// InvalidCoercionCont
+// InvalidTypeCont
 // ----------------------------------------------------------------------
-type InvalidCoercionCont<Cont> = ['invalid-coercion-cont', Cont]
+type InvalidTypeCont<Cont> = ['invalid-coercion-cont', Cont]
 
-type Is_InvalidCoercionCont<C> = C extends ['invalid-coercion-cont', any] ? true : false
+type Is_InvalidTypeCont<C> = C extends ['invalid-coercion-cont', any] ? true : false
 
-type InvalidCoercionCont_Cont<C> = C extends ['invalid-coercion-cont', infer NextCont] ? NextCont : never
+type InvalidTypeCont_Cont<C> = C extends ['invalid-coercion-cont', infer NextCont] ? NextCont : never
 
 // ----------------------------------------------------------------------
 // ScopeCont
