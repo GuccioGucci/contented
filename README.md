@@ -32,13 +32,13 @@
     - [`arrayOf(T)`](#arrayoft)
     - [`oneOf(T1, T2, ...Ts)`](#oneoft1-t2-ts)
   - [Utility types](#utility-types)
-    - [`Infer<typeof T>`](#infertypeof-t)
+    - [`Infer`](#infer)
   - [Errors](#errors)
     - [`CoercionError`](#coercionerror)
     - [`InvalidType`](#invalidtype)
     - [`AtKey<InvalidType>`](#atkeyinvalidcoercion)
     - [`MissingKey`](#missingkey)
-    - [`Joint<[...Errs]>`](#jointerrs)
+    - [`Joint`](#joint)
 - [License](#license)
 
 ## Introduction
@@ -213,7 +213,7 @@ coerceTo(abc, 'd');
 
 ### Utility types
 
-#### `Infer<typeof T>`
+#### `Infer`
 
 `Infer` comes in handy every time it is necessary to infer the compile-time type corresponding to some run-time representation `T`.
 
@@ -279,7 +279,7 @@ coerceTo(object({ 'x': number }), { y: 12 });
 // MissingKey { missingKey: [ 'x' ] }
 ```
 
-#### `Joint<[...Errs]>`
+#### `Joint`
 
 When multiple alternatives are provided but none of them is applicable to the input data, `coerceTo` returns a `Joint` error, reporting the errors resulting from the different failed attempts.
 
