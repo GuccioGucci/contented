@@ -246,7 +246,7 @@ if (res instanceof Coercionerror) {
 
 #### `InvalidType`
 
-When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidType`, which contains both the expectation and the actual value.
+When the input data does not conform to the expected type, `coerceTo` returns a `InvalidType`, which contains both the expectation and the actual value.
 
 ```typescript
 import { string, coerceTo } from '@gucciogucci/contented';
