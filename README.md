@@ -34,6 +34,7 @@
   - [Utility types](#utility-types)
     - [`Infer<typeof T>`](#infertypeof-t)
   - [Errors](#errors)
+    - [`CoercionError`](#coercionerror)
     - [`InvalidType`](#invalidtype)
     - [`AtKey<InvalidType>`](#atkeyinvalidcoercion)
     - [`MissingKey`](#missingkey)
@@ -232,7 +233,19 @@ function fn(user: Infer<typeof User>) {
 
 ### Errors
 
+### `CoercionError`
+
+Unsuccesful attempts to coerce to the desired run-time type are signaled by returning a `CoercionError`. Every error in the following sections specializes `CoercionError`.
+
+```typescript
+const res = coerceTo(Image, data);
+if (res instanceof Coercionerror) {
+  // error-handling logic
+}
+```
+
 #### `InvalidType`
+
 When the input data does not conform to the expected primitive type, `coerceTo` returns a `InvalidType`, which contains both the expectation and the actual value.
 
 ```typescript

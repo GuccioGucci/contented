@@ -60,7 +60,7 @@ function coerceObject(schema: ObjectSchema, value: any): any {
     if (!optional && value[key] === undefined) return new MissingKey([key])
 
     const res = coerce(schemaAtKey, value[key])
-    if (res instanceof ContentedError) {
+    if (res instanceof CoercionError) {
       return scope([key], res)
     }
   }
@@ -76,7 +76,7 @@ function coerceArrayOf(schema: ArrayOfSchema, value: any): any {
   let pos = 0
   for (const el of value) {
     const res = coerce(schema.arrayOf, el)
-    if (res instanceof ContentedError) {
+    if (res instanceof CoercionError) {
       return scope([pos], res)
     }
     pos += 1
@@ -89,7 +89,7 @@ function coerceOneOf(schema: OneOfSchema, value: any): any {
   const errors: any[] = []
   for (let schema of schemas) {
     const res = coerce(schema, value)
-    if (!(res instanceof ContentedError)) {
+    if (!(res instanceof CoercionError)) {
       return res
     }
     errors.push(res)
@@ -97,7 +97,7 @@ function coerceOneOf(schema: OneOfSchema, value: any): any {
   return new Joint(errors)
 }
 
-function scope(path: Path, error: ContentedError): ContentedError {
+function scope(path: Path, error: CoercionError): CoercionError {
   if (error instanceof AtKey) {
     return new AtKey(path.concat(error.atKey), error.error)
   }
@@ -108,20 +108,20 @@ function scope(path: Path, error: ContentedError): ContentedError {
     return new AtKey(path, error)
   }
   if (error instanceof Joint) {
-    return new Joint(error.errors.map((inner: ContentedError) => scope(path, inner)))
+    return new Joint(error.errors.map((inner: CoercionError) => scope(path, inner)))
   }
   /* c8 ignore next */
   throw new Error(`Unknown error type: ${error}`)
 }
 
 // ======================================================================
-// Contented Errors
+// Coercion Error
 // ======================================================================
-const CONTENTED_ERROR = Symbol()
+const COERCION_ERROR = Symbol()
 
-export abstract class ContentedError {
+export abstract class CoercionError {
   //@ts-ignore
-  private readonly [CONTENTED_ERROR]: true
+  private readonly [COERCION_ERROR]: true
 }
 
 // ----------------------------------------------------------------------
@@ -129,7 +129,7 @@ export abstract class ContentedError {
 // ----------------------------------------------------------------------
 const INVALID_TYPE = Symbol()
 
-export class InvalidType extends ContentedError {
+export class InvalidType extends CoercionError {
   // @ts-ignore
   private readonly [INVALID_TYPE]: true
 
@@ -143,7 +143,7 @@ export class InvalidType extends ContentedError {
 // ----------------------------------------------------------------------
 const AT_KEY = Symbol()
 
-export class AtKey<E> extends ContentedError {
+export class AtKey<E> extends CoercionError {
   // @ts-ignore
   private readonly [AT_KEY]: true
 
@@ -157,7 +157,7 @@ export class AtKey<E> extends ContentedError {
 // ----------------------------------------------------------------------
 const MISSING_KEY = Symbol()
 
-export class MissingKey extends ContentedError {
+export class MissingKey extends CoercionError {
   // @ts-ignore
   private readonly [MISSING_KEY]: true
 
@@ -171,7 +171,7 @@ export class MissingKey extends ContentedError {
 // ----------------------------------------------------------------------
 const JOINT = Symbol()
 
-export class Joint<E extends unknown[]> extends ContentedError {
+export class Joint<E extends unknown[]> extends CoercionError {
   // @ts-ignore
   private readonly [JOINT]: true
 
