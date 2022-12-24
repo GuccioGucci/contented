@@ -1,5 +1,6 @@
 export { arrayOf } from './arrayOf'
 export { boolean } from './boolean'
+export { explain } from './explain'
 export { literal } from './literal'
 export { number } from './number'
 export { object } from './object'

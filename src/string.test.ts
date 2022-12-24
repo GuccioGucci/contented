@@ -4,6 +4,7 @@ import fc, { assert, property } from 'fast-check'
 import { expectType } from 'ts-expect'
 import { InvalidType, coerceTo } from './coercion'
 import { string } from './string'
+import { explain } from './explain'
 
 test(`string accepts string values`, function () {
   assert(
@@ -23,6 +24,28 @@ test(`string rejects all but string values`, function () {
 
       expectType<string | InvalidType>(res)
       equal(res, new InvalidType('string', value))
+    })
+  )
+})
+
+test(`there is an explanation why a value is not a string`, function () {
+  assert(
+    property(notAString, (value) => {
+      const why = explain(string, value)
+      equal(why, {
+        value,
+        not: 'string',
+        cause: [new InvalidType('string', value)],
+      })
+    })
+  )
+})
+
+test(`there is no need for an explanation if the value is indeed a string`, function () {
+  assert(
+    property(fc.string(), (value) => {
+      const why = explain(string, value)
+      is(why, undefined)
     })
   )
 })
