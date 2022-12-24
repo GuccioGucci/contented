@@ -4,6 +4,7 @@ import fc, { assert, property } from 'fast-check'
 import { expectType } from 'ts-expect'
 import { coerceTo, InvalidType } from './coercion'
 import { boolean } from './boolean'
+import { explain } from './explain'
 
 test(`boolean accepts boolean values`, function () {
   assert(
@@ -23,6 +24,28 @@ test(`boolean rejects all but boolean values`, function () {
 
       expectType<boolean | InvalidType>(res)
       equal(res, new InvalidType('boolean', value))
+    })
+  )
+})
+
+test(`there is an explanation why a value is not a boolean`, function () {
+  assert(
+    property(notABoolean, (value) => {
+      const why = explain(boolean, value)
+      equal(why, {
+        value,
+        not: 'boolean',
+        cause: [new InvalidType('boolean', value)],
+      })
+    })
+  )
+})
+
+test(`there is no need for an explanation if the value is indeed a boolean`, function () {
+  assert(
+    property(fc.boolean(), (value) => {
+      const why = explain(boolean, value)
+      is(why, undefined)
     })
   )
 })
