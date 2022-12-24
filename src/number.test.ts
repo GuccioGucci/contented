@@ -4,6 +4,7 @@ import fc, { assert, property } from 'fast-check'
 import { expectType } from 'ts-expect'
 import { number } from './number'
 import { coerceTo, InvalidType } from './coercion'
+import { explain } from './explain'
 
 test(`number accepts number values`, function () {
   assert(
@@ -23,6 +24,28 @@ test('number rejects all but number values', function () {
 
       expectType<number | InvalidType>(res)
       equal(res, new InvalidType('number', value))
+    })
+  )
+})
+
+test(`there is an explanation why a value is not a number`, function () {
+  assert(
+    property(notANumber, (value) => {
+      const why = explain(number, value)
+      equal(why, {
+        value,
+        not: 'number',
+        cause: [new InvalidType('number', value)],
+      })
+    })
+  )
+})
+
+test(`there is no need for an explanation if the value is indeed a number`, function () {
+  assert(
+    property(fcNumber, (value) => {
+      const why = explain(number, value)
+      is(why, undefined)
     })
   )
 })
