@@ -97,7 +97,7 @@ function coerceOneOf(schema: OneOfSchema, value: any): any {
   return new Joint(errors)
 }
 
-function scope(path: Path, error: CoercionError): CoercionError {
+export function scope(path: Path, error: CoercionError): CoercionError {
   if (error instanceof AtKey) {
     return new AtKey(path.concat(error.atKey), error.error)
   }
