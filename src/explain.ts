@@ -1,5 +1,7 @@
 import { CoercionError, InvalidType, MissingKey, scope } from './coercion'
 import {
+  ArrayOfSchema,
+  isArrayOfSchema,
   isLiteralSchema,
   isObjectSchema,
   isOneOfSchema,
@@ -29,6 +31,9 @@ function explainSchema(schema: Schema, value: any): any {
   }
   if (isOneOfSchema(schema)) {
     return explainOneOf(schema, value)
+  }
+  if (isArrayOfSchema(schema)) {
+    return explainArrayOf(schema, value)
   }
   throw new Error(`Not yet implemented: ${schema} against ${value}`)
 }
@@ -100,6 +105,27 @@ function explainOneOf(schema: OneOfSchema, value: any): any {
     not: schema,
     cause,
   }
+}
+
+function explainArrayOf(schema: ArrayOfSchema, value: any): any {
+  if (!Array.isArray(value)) {
+    return {
+      value,
+      not: schema,
+      cause: [new InvalidType('array', value)],
+    }
+  }
+  let pos = 0
+  let cause: CoercionError[] = []
+  for (const el of value) {
+    const why = explainSchema(schema.arrayOf, el)
+    if (!why) continue
+
+    cause.push(...why.cause.map((c: CoercionError) => scope([pos], c)))
+    pos += 1
+  }
+
+  return cause.length === 0 ? undefined : { value, not: schema, cause }
 }
 
 interface WhyValueIsNot<_R> {
