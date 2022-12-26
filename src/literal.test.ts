@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { InvalidType, coerceTo } from './coercion'
-import { explain } from './explain'
+import { coerceTo } from './coercion'
+import { InvalidType, explain } from './explain'
 import { literal } from './literal'
 
 test(`literal succeds only if the input and expected values are the same`, function () {

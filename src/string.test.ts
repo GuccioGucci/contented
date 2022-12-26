@@ -1,9 +1,9 @@
 import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { InvalidType, coerceTo } from './coercion'
 import { string } from './string'
-import { explain } from './explain'
+import { coerceTo } from './coercion'
+import { InvalidType, explain } from './explain'
 
 test(`string accepts string values`, function () {
   assert(

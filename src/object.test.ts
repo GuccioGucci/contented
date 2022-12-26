@@ -1,10 +1,10 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { AtKey, InvalidType, MissingKey, coerceTo } from './coercion'
 import { number } from './number'
 import { object } from './object'
 import { string } from './string'
-import { explain } from './explain'
+import { coerceTo } from './coercion'
+import { AtKey, InvalidType, MissingKey, explain } from './explain'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
   const Point = object({ x: string, y: number })

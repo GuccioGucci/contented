@@ -1,4 +1,3 @@
-import { CoercionError, InvalidType, MissingKey, scope } from './coercion'
 import {
   ArrayOfSchema,
   isArrayOfSchema,
@@ -86,7 +85,7 @@ function explainObject(schema: ObjectSchema, value: any): any {
 
     cause.push(...why.cause.map((c: CoercionError) => scope([key], c)))
   }
-  return (cause.length === 0) ? undefined : { value, not: schema, cause }
+  return cause.length === 0 ? undefined : { value, not: schema, cause }
 }
 
 function explainOneOf(schema: OneOfSchema, value: any): any {
@@ -135,3 +134,93 @@ interface WhyValueIsNot<_R> {
 }
 
 type Not = Schema
+
+function scope(path: Path, error: CoercionError): CoercionError {
+  if (error instanceof AtKey) {
+    return new AtKey(path.concat(error.atKey), error.error)
+  }
+  if (error instanceof MissingKey) {
+    return new MissingKey(path.concat(error.missingKey))
+  }
+  if (error instanceof InvalidType) {
+    return new AtKey(path, error)
+  }
+  if (error instanceof Joint) {
+    return new Joint(error.errors.map((inner: CoercionError) => scope(path, inner)))
+  }
+  /* c8 ignore next */
+  throw new Error(`Unknown error type: ${error}`)
+}
+
+// ======================================================================
+// Coercion Error
+// ======================================================================
+const COERCION_ERROR = Symbol()
+
+export abstract class CoercionError {
+  //@ts-ignore
+  private readonly [COERCION_ERROR]: true
+}
+
+// ----------------------------------------------------------------------
+// InvalidType
+// ----------------------------------------------------------------------
+const INVALID_TYPE = Symbol()
+
+export class InvalidType extends CoercionError {
+  // @ts-ignore
+  private readonly [INVALID_TYPE]: true
+
+  constructor(public readonly expected: string, public readonly got: any) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// AtKey
+// ----------------------------------------------------------------------
+const AT_KEY = Symbol()
+
+export class AtKey<E> extends CoercionError {
+  // @ts-ignore
+  private readonly [AT_KEY]: true
+
+  constructor(public readonly atKey: Path, public readonly error: E) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// MissingKey
+// ----------------------------------------------------------------------
+const MISSING_KEY = Symbol()
+
+export class MissingKey extends CoercionError {
+  // @ts-ignore
+  private readonly [MISSING_KEY]: true
+
+  constructor(public readonly missingKey: Path) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// Joint
+// ----------------------------------------------------------------------
+const JOINT = Symbol()
+
+export class Joint<E extends unknown[]> extends CoercionError {
+  // @ts-ignore
+  private readonly [JOINT]: true
+
+  constructor(public readonly errors: E) {
+    super()
+  }
+}
+
+// ----------------------------------------------------------------------
+// Path
+// ----------------------------------------------------------------------
+type Path = Key[]
+
+type Key = string | symbol | number

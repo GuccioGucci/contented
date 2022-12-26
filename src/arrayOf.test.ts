@@ -1,12 +1,12 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { AtKey, InvalidType, MissingKey, coerceTo } from './coercion'
+import { coerceTo } from './coercion'
+import { AtKey, InvalidType, MissingKey, explain } from './explain'
 import { number } from './number'
 import { string } from './string'
 import { arrayOf } from './arrayOf'
 import { object } from './object'
 import { oneOf } from './oneOf'
-import { explain } from './explain'
 
 test(`array accepts array of the indicated element type`, function () {
   const arrayOfStrings = arrayOf(string)

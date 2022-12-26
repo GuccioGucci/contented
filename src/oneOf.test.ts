@@ -2,12 +2,12 @@ import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { number } from './number'
 import { string } from './string'
-import { AtKey, InvalidType, MissingKey, coerceTo } from './coercion'
 import { oneOf } from './oneOf'
 import { boolean } from './boolean'
 import { literal } from './literal'
 import { object } from './object'
-import { explain } from './explain'
+import { coerceTo } from './coercion'
+import { AtKey, InvalidType, MissingKey, explain } from './explain'
 
 test(`oneOf allows specifying alternatives`, function () {
   const T = oneOf(string, object({ b: number }), boolean)
