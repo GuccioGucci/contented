@@ -2,7 +2,7 @@ import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { number } from './number'
 import { string } from './string'
-import { AtKey, InvalidType, MissingKey, Joint, coerceTo } from './coercion'
+import { AtKey, InvalidType, MissingKey, coerceTo } from './coercion'
 import { oneOf } from './oneOf'
 import { boolean } from './boolean'
 import { literal } from './literal'
@@ -27,11 +27,8 @@ test(`oneOf rejects input values that are not coercible to any given alternative
   const res1 = coerceTo(T, true)
   const res2 = coerceTo(T, { a: 2 })
 
-  assert.equal(res1, new Joint([new InvalidType('a', true), new InvalidType('b', true), new InvalidType('c', true)]))
-  assert.equal(
-    res2,
-    new Joint([new InvalidType('a', { a: 2 }), new InvalidType('b', { a: 2 }), new InvalidType('c', { a: 2 })])
-  )
+  assert.is(res1, undefined)
+  assert.is(res2, undefined)
 })
 
 test(`there is an explanation if the input value is not coercibile to any given alternative`, function () {
@@ -58,11 +55,8 @@ test(`oneOf reports the path at which the error happened`, function () {
   const res1 = coerceTo(stringOrNumberAtA, { b: 12 })
   const res2 = coerceTo(stringOrNumberAtA, { a: 'hello' })
 
-  assert.equal(res1, new Joint([new InvalidType('string', { b: 12 }), new MissingKey(['a'])]))
-  assert.equal(
-    res2,
-    new Joint([new InvalidType('string', { a: 'hello' }), new AtKey(['a'], new InvalidType('number', 'hello'))])
-  )
+  assert.is(res1, undefined)
+  assert.is(res2, undefined)
 })
 
 test(`the explanation mentions the path at which the error happened`, function () {
@@ -73,19 +67,13 @@ test(`the explanation mentions the path at which the error happened`, function (
 
   assert.equal(why1, {
     value: { b: 12 },
-    not: { oneOf: ['string', { object: {a: 'number'} }]},
-    cause: [
-      new InvalidType('string', { b: 12 }),
-      new MissingKey(['a'])
-    ]
+    not: { oneOf: ['string', { object: { a: 'number' } }] },
+    cause: [new InvalidType('string', { b: 12 }), new MissingKey(['a'])],
   })
   assert.equal(why2, {
     value: { a: 'hello' },
-    not: { oneOf: ['string', { object: {a: 'number'} }]},
-    cause: [
-      new InvalidType('string', { a: 'hello' }),
-      new AtKey(['a'], new InvalidType('number', 'hello'))
-    ]
+    not: { oneOf: ['string', { object: { a: 'number' } }] },
+    cause: [new InvalidType('string', { a: 'hello' }), new AtKey(['a'], new InvalidType('number', 'hello'))],
   })
 })
 
@@ -95,8 +83,8 @@ test(`oneOf reports multi-level missing keys`, function () {
   const res1 = coerceTo(T, { b: 12 })
   const res2 = coerceTo(T, { a: { c: 12 } })
 
-  assert.equal(res1, new MissingKey(['a']))
-  assert.equal(res2, new Joint([new AtKey(['a'], new InvalidType('string', { c: 12 })), new MissingKey(['a', 'b'])]))
+  assert.is(res1, undefined)
+  assert.is(res2, undefined)
 })
 
 test(`there is an explanation in case of multi-level missing keys`, function () {

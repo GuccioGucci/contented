@@ -18,7 +18,7 @@ test('number rejects all but number values', function () {
   assert(
     property(notANumber, (value) => {
       const res = coerceTo(number, value)
-      equal(res, new InvalidType('number', value))
+      is(res, undefined)
     })
   )
 })

@@ -18,7 +18,7 @@ test(`boolean rejects all but boolean values`, function () {
   assert(
     property(notABoolean, (value) => {
       const res = coerceTo(boolean, value)
-      equal(res, new InvalidType('boolean', value))
+      is(res, undefined)
     })
   )
 })

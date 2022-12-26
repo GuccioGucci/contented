@@ -18,7 +18,7 @@ test(`string rejects all but string values`, function () {
   assert(
     property(notAString, (value) => {
       const res = coerceTo(string, value)
-      equal(res, new InvalidType('string', value))
+      is(res, undefined)
     })
   )
 })

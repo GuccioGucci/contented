@@ -12,8 +12,8 @@ test(`literal succeds only if the input and expected values are the same`, funct
   const res3 = coerceTo(ten, { a: 1, b: 2 })
 
   assert.is(res1, 10)
-  assert.equal(res2, new InvalidType('10', 'hello'))
-  assert.equal(res3, new InvalidType('10', { a: 1, b: 2 }))
+  assert.is(res2, undefined)
+  assert.is(res3, undefined)
 })
 
 test(`there is an explanation why a value is not of the expected literal type`, function () {

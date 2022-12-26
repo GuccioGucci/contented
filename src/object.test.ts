@@ -19,7 +19,7 @@ test(`object fails if the input data is not an object`, function () {
 
   const res = coerceTo(Point, 'hello')
 
-  assert.equal(res, new InvalidType('object', 'hello'))
+  assert.is(res, undefined)
 })
 
 test(`there is an explanation if the input data is not an object`, function () {
@@ -39,7 +39,7 @@ test(`object rejects the input data upon the first missing element`, function ()
 
   const res = coerceTo(Point, { x: 'hello' })
 
-  assert.equal(res, new MissingKey(['y']))
+  assert.is(res, undefined)
 })
 
 test(`there is an explanation if the input data is missing one or more keys`, function () {
@@ -66,7 +66,7 @@ test(`object rejects the input data upon the first mismatching element`, functio
 
   const res = coerceTo(Point, { x: 'hello', y: false })
 
-  assert.equal(res, new AtKey(['y'], new InvalidType('number', false)))
+  assert.is(res, undefined)
 })
 
 test(`there is an explanation if the input data presents invalid properties`, function () {
