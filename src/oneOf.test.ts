@@ -2,7 +2,6 @@ import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { number } from './number'
 import { string } from './string'
-import { expectType } from 'ts-expect'
 import { AtKey, InvalidType, MissingKey, Joint, coerceTo } from './coercion'
 import { oneOf } from './oneOf'
 import { boolean } from './boolean'
@@ -20,15 +19,6 @@ test(`oneOf allows specifying alternatives`, function () {
   assert.is(res1, 'hello')
   assert.equal(res2, { b: 15 })
   assert.is(res3, true)
-
-  type R =
-    | string
-    | boolean
-    | { b: number }
-    | Joint<[InvalidType, InvalidType, InvalidType | AtKey<InvalidType> | MissingKey]>
-  expectType<R>(res1)
-  expectType<R>(res2)
-  expectType<R>(res3)
 })
 
 test(`oneOf rejects input values that are not coercible to any given alternative`, function () {
@@ -42,10 +32,6 @@ test(`oneOf rejects input values that are not coercible to any given alternative
     res2,
     new Joint([new InvalidType('a', { a: 2 }), new InvalidType('b', { a: 2 }), new InvalidType('c', { a: 2 })])
   )
-
-  type R = 'a' | 'b' | 'c' | Joint<[InvalidType, InvalidType, InvalidType]>
-  expectType<R>(res1)
-  expectType<R>(res2)
 })
 
 test(`there is an explanation if the input value is not coercibile to any given alternative`, function () {
@@ -77,10 +63,6 @@ test(`oneOf reports the path at which the error happened`, function () {
     res2,
     new Joint([new InvalidType('string', { a: 'hello' }), new AtKey(['a'], new InvalidType('number', 'hello'))])
   )
-
-  type R = string | { a: number } | Joint<[InvalidType, InvalidType | AtKey<InvalidType> | MissingKey]>
-  expectType<R>(res1)
-  expectType<R>(res2)
 })
 
 test(`the explanation mentions the path at which the error happened`, function () {
@@ -115,14 +97,6 @@ test(`oneOf reports multi-level missing keys`, function () {
 
   assert.equal(res1, new MissingKey(['a']))
   assert.equal(res2, new Joint([new AtKey(['a'], new InvalidType('string', { c: 12 })), new MissingKey(['a', 'b'])]))
-
-  type R =
-    | InvalidType
-    | MissingKey
-    | { a: string | { b: number } }
-    | Joint<[AtKey<InvalidType>, AtKey<InvalidType> | MissingKey]>
-  expectType<R>(res1)
-  expectType<R>(res2)
 })
 
 test(`there is an explanation in case of multi-level missing keys`, function () {

@@ -1,7 +1,6 @@
 import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { expectType } from 'ts-expect'
 import { number } from './number'
 import { coerceTo, InvalidType } from './coercion'
 import { explain } from './explain'
@@ -10,8 +9,6 @@ test(`number accepts number values`, function () {
   assert(
     property(fcNumber, (value) => {
       const res = coerceTo(number, value)
-
-      expectType<number | InvalidType>(res)
       is(res, value)
     })
   )
@@ -21,8 +18,6 @@ test('number rejects all but number values', function () {
   assert(
     property(notANumber, (value) => {
       const res = coerceTo(number, value)
-
-      expectType<number | InvalidType>(res)
       equal(res, new InvalidType('number', value))
     })
   )

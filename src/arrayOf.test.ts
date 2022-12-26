@@ -1,6 +1,5 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { expectType } from 'ts-expect'
 import { AtKey, InvalidType, MissingKey, Joint, coerceTo } from './coercion'
 import { number } from './number'
 import { string } from './string'
@@ -15,9 +14,6 @@ test(`array accepts array of the indicated element type`, function () {
   const res = coerceTo(arrayOfStrings, ['a', 'b', 'c'])
 
   assert.equal(res, ['a', 'b', 'c'])
-
-  type R = string[] | InvalidType | AtKey<InvalidType>
-  expectType<R>(res)
 })
 
 test(`array rejects values that are not arrays`, function () {
@@ -26,9 +22,6 @@ test(`array rejects values that are not arrays`, function () {
   const res = coerceTo(arrayOfStrings, 5)
 
   assert.equal(res, new InvalidType('array', 5))
-
-  type R = string[] | InvalidType | AtKey<InvalidType>
-  expectType<R>(res)
 })
 
 test(`there is an explanation if the value is not an array`, function () {
@@ -48,9 +41,6 @@ test(`array rejects arrays of the wrong element type`, function () {
   const res = coerceTo(arrayOfStrings, [1, 2, 3])
 
   assert.equal(res, new AtKey([0], new InvalidType('string', 1)))
-
-  type R = string[] | InvalidType | AtKey<InvalidType>
-  expectType<R>(res)
 })
 
 test(`there is an explanation if elements are of the wrong type`, function () {
@@ -74,9 +64,6 @@ test(`array reports nested errors`, function () {
   const res = coerceTo(arrayOfObjs, [{ a: 5 }])
 
   assert.equal(res, new AtKey([0, 'a'], new InvalidType('string', 5)))
-
-  type R = InvalidType | AtKey<InvalidType> | { a: string }[] | MissingKey
-  expectType<R>(res)
 })
 
 test(`there is an explanation for the presence of nested errors`, function () {
@@ -97,9 +84,6 @@ test(`array rejects a value upon the first missing element`, function () {
   const res = coerceTo(arrayOfObjs, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
   assert.equal(res, new MissingKey([0, 'a']))
-
-  type R = InvalidType | AtKey<InvalidType> | { a: string }[] | MissingKey
-  expectType<R>(res)
 })
 
 test(`there is an explanation when there are missing elements`, function () {
@@ -132,11 +116,6 @@ test(`array accepts alternatives`, function () {
       new AtKey([2, 'a'], new InvalidType('number', 'hello')),
     ])
   )
-
-  type R = InvalidType | (string | { a: number })[] | Joint<[AtKey<InvalidType>, AtKey<InvalidType> | MissingKey]>
-  expectType<R>(res1)
-  expectType<R>(res2)
-  expectType<R>(res3)
 })
 
 test.run()

@@ -1,7 +1,6 @@
 import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { expectType } from 'ts-expect'
 import { coerceTo, InvalidType } from './coercion'
 import { boolean } from './boolean'
 import { explain } from './explain'
@@ -10,8 +9,6 @@ test(`boolean accepts boolean values`, function () {
   assert(
     property(fc.boolean(), (value) => {
       const res = coerceTo(boolean, value)
-
-      expectType<boolean | InvalidType>(res)
       is(res, value)
     })
   )
@@ -21,8 +18,6 @@ test(`boolean rejects all but boolean values`, function () {
   assert(
     property(notABoolean, (value) => {
       const res = coerceTo(boolean, value)
-
-      expectType<boolean | InvalidType>(res)
       equal(res, new InvalidType('boolean', value))
     })
   )
