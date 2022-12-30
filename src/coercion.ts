@@ -14,39 +14,44 @@ import {
 } from './Type'
 
 export function coerceTo<R>(type: Type<R>, value: any): R | undefined {
-  const { schema } = type
-  return coerce(schema, value)
+  return isValid(type, value) ? value : undefined
 }
 
-function coerce(schema: Schema, value: any): any {
+export function isValid<R>(type: Type<R>, value: any): value is R {
+  const { schema } = type
+  return isValidSchema(schema, value)
+}
+
+function isValidSchema(schema: Schema, value: any): boolean {
   if (isPrimitiveSchema(schema)) {
-    return coercePrimitive(schema, value)
+    return isValidPrimitive(schema, value)
   }
   if (isLiteralSchema(schema)) {
-    return coerceLiteral(schema, value)
+    return isValidLiteral(schema, value)
   }
   if (isObjectSchema(schema)) {
-    return coerceObject(schema, value)
+    return isValidObject(schema, value)
   }
   if (isOneOfSchema(schema)) {
-    return coerceOneOf(schema, value)
+    return isValidOneOf(schema, value)
   }
   if (isArrayOfSchema(schema)) {
-    return coerceArrayOf(schema, value)
+    return isValidArrayOf(schema, value)
   }
+  throw new Error(`Unknown schema: ${schema}`)
 }
 
-function coercePrimitive(schema: PrimitiveSchema, value: any): any {
-  return typeof value === schema ? value : undefined
+function isValidPrimitive(schema: PrimitiveSchema, value: any): boolean {
+  return typeof value === schema
 }
 
-function coerceLiteral(schema: LiteralSchema, value: any): any {
-  return schema.literal === value ? value : undefined
+function isValidLiteral(schema: LiteralSchema, value: any): boolean {
+  return schema.literal === value
 }
 
-function coerceObject(schema: ObjectSchema, value: any): any {
+function isValidObject(schema: ObjectSchema, value: any): boolean {
   if (typeof value !== 'object') {
-    return undefined
+    return false
   }
 
   const objectSchema = schema.object
@@ -56,38 +61,38 @@ function coerceObject(schema: ObjectSchema, value: any): any {
 
     if (optional && !value.hasOwnProperty(key)) continue
     if (optional && value[key] === undefined) continue
-    if (!optional && value[key] === undefined) return undefined
+    if (!optional && value[key] === undefined) return false
 
-    const res = coerce(schemaAtKey, value[key])
-    if (!res) {
-      return undefined
+    const valid = isValidSchema(schemaAtKey, value[key])
+    if (!valid) {
+      return false
     }
   }
 
-  return value
+  return true
 }
 
-function coerceArrayOf(schema: ArrayOfSchema, value: any): any {
+function isValidArrayOf(schema: ArrayOfSchema, value: any): boolean {
   if (!Array.isArray(value)) {
-    return undefined
+    return false
   }
 
   for (const el of value) {
-    const res = coerce(schema.arrayOf, el)
-    if (!res) {
-      return undefined
+    const valid = isValidSchema(schema.arrayOf, el)
+    if (!valid) {
+      return false
     }
   }
-  return value
+  return true
 }
 
-function coerceOneOf(schema: OneOfSchema, value: any): any {
+function isValidOneOf(schema: OneOfSchema, value: any): boolean {
   const schemas = schema.oneOf
-  for (let schema of schemas) {
-    const res = coerce(schema, value)
-    if (res !== undefined) {
-      return res
+  for (const altSchema of schemas) {
+    const valid = isValidSchema(altSchema, value)
+    if (valid) {
+      return true
     }
   }
-  return undefined
+  return false
 }
