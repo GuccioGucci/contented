@@ -145,9 +145,6 @@ function scope(path: Path, error: CoercionError): CoercionError {
   if (error instanceof InvalidType) {
     return new AtKey(path, error)
   }
-  if (error instanceof Joint) {
-    return new Joint(error.errors.map((inner: CoercionError) => scope(path, inner)))
-  }
   /* c8 ignore next */
   throw new Error(`Unknown error type: ${error}`)
 }
@@ -200,20 +197,6 @@ export class MissingKey extends CoercionError {
   private readonly [MISSING_KEY]: true
 
   constructor(public readonly missingKey: Path) {
-    super()
-  }
-}
-
-// ----------------------------------------------------------------------
-// Joint
-// ----------------------------------------------------------------------
-const JOINT = Symbol()
-
-export class Joint<E extends unknown[]> extends CoercionError {
-  // @ts-ignore
-  private readonly [JOINT]: true
-
-  constructor(public readonly errors: E) {
     super()
   }
 }
