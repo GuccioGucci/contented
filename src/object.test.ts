@@ -4,7 +4,7 @@ import { number } from './number'
 import { object } from './object'
 import { string } from './string'
 import { coerceTo } from './coercion'
-import { AtKey, InvalidType, MissingKey, explain } from './explain'
+import { AtKey, MissingKey, explain } from './explain'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
   const Point = object({ x: string, y: number })
@@ -30,7 +30,12 @@ test(`there is an explanation if the input data is not an object`, function () {
   assert.equal(why, {
     value: 'hello',
     not: { object: { x: 'string', y: 'number' } },
-    cause: [new InvalidType('object', 'hello')],
+    cause: [
+      {
+        value: 'hello',
+        not: { object: { x: 'string', y: 'number' } },
+      },
+    ],
   })
 })
 

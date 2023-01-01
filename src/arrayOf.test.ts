@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { coerceTo } from './coercion'
-import { AtKey, InvalidType, MissingKey, explain } from './explain'
+import { AtKey, MissingKey, explain } from './explain'
 import { number } from './number'
 import { string } from './string'
 import { arrayOf } from './arrayOf'
@@ -31,7 +31,12 @@ test(`there is an explanation if the value is not an array`, function () {
   assert.equal(why, {
     value: 5,
     not: { arrayOf: 'string' },
-    cause: [new InvalidType('array', 5)],
+    cause: [
+      {
+        value: 5,
+        not: { arrayOf: 'string' },
+      },
+    ],
   })
 })
 

@@ -64,7 +64,7 @@ function explainObject(schema: ObjectSchema, value: any): any {
     return {
       value,
       not: schema,
-      cause: [new InvalidType('object', value)],
+      cause: [{ value, not: schema }],
     }
   }
   const objectSchema = schema.object
@@ -111,7 +111,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): any {
     return {
       value,
       not: schema,
-      cause: [new InvalidType('array', value)],
+      cause: [{ value, not: schema }],
     }
   }
   let pos = 0
