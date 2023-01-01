@@ -68,12 +68,12 @@ test(`the explanation mentions the path at which the error happened`, function (
   assert.equal(why1, {
     value: { b: 12 },
     not: { oneOf: ['string', { object: { a: 'number' } }] },
-    cause: [new InvalidType('string', { b: 12 }), new MissingKey(['a'])],
+    cause: [{ value: { b: 12 }, not: 'string' }, new MissingKey(['a'])],
   })
   assert.equal(why2, {
     value: { a: 'hello' },
     not: { oneOf: ['string', { object: { a: 'number' } }] },
-    cause: [new InvalidType('string', { a: 'hello' }), new AtKey(['a'], new InvalidType('number', 'hello'))],
+    cause: [{ value: { a: 'hello' }, not: 'string' }, new AtKey(['a'], { value: 'hello', not: 'number' })],
   })
 })
 
@@ -101,7 +101,7 @@ test(`there is an explanation in case of multi-level missing keys`, function () 
   assert.equal(why2, {
     value: { a: { c: 12 } },
     not: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
-    cause: [new AtKey(['a'], new InvalidType('string', { c: 12 })), new MissingKey(['a', 'b'])],
+    cause: [new AtKey(['a'], { value: { c: 12 }, not: 'string' }), new MissingKey(['a', 'b'])],
   })
 })
 

@@ -76,7 +76,7 @@ test(`there is an explanation if the input data presents invalid properties`, fu
   assert.equal(why, {
     value: { x: true, y: false },
     not: { object: { x: 'string', y: 'number' } },
-    cause: [new AtKey(['x'], new InvalidType('string', true)), new AtKey(['y'], new InvalidType('number', false))],
+    cause: [new AtKey(['x'], { value: true, not: 'string' }), new AtKey(['y'], { value: false, not: 'number' })],
   })
 })
 

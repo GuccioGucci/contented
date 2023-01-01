@@ -3,7 +3,7 @@ import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { string } from './string'
 import { coerceTo } from './coercion'
-import { InvalidType, explain } from './explain'
+import { explain } from './explain'
 
 test(`string accepts string values`, function () {
   assert(
@@ -30,7 +30,7 @@ test(`there is an explanation why a value is not a string`, function () {
       equal(why, {
         value,
         not: 'string',
-        cause: [new InvalidType('string', value)],
+        cause: [{ value, not: 'string' }],
       })
     })
   )

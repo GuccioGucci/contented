@@ -2,7 +2,7 @@ import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { coerceTo } from './coercion'
-import { InvalidType, explain } from './explain'
+import { explain } from './explain'
 import { boolean } from './boolean'
 
 test(`boolean accepts boolean values`, function () {
@@ -30,7 +30,7 @@ test(`there is an explanation why a value is not a boolean`, function () {
       equal(why, {
         value,
         not: 'boolean',
-        cause: [new InvalidType('boolean', value)],
+        cause: [{ value, not: 'boolean' }],
       })
     })
   )

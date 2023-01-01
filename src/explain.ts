@@ -44,7 +44,7 @@ function explainPrimitive(schema: PrimitiveSchema, value: any): any {
   return {
     value,
     not: schema,
-    cause: [new InvalidType(schema, value)],
+    cause: [{ value, not: schema }],
   }
 }
 
@@ -130,23 +130,24 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): any {
 interface WhyValueIsNot<_R> {
   value: any
   not: Not
-  cause: CoercionError[]
+  cause: (CoercionError | Cause)[]
 }
 
 type Not = Schema
 
-function scope(path: Path, error: CoercionError): CoercionError {
+type Cause = { value: any; not: Not }
+
+function scope(path: Path, error: CoercionError | Cause): CoercionError {
   if (error instanceof AtKey) {
     return new AtKey(path.concat(error.atKey), error.error)
   }
   if (error instanceof MissingKey) {
     return new MissingKey(path.concat(error.missingKey))
   }
-  if (error instanceof InvalidType) {
-    return new AtKey(path, error)
-  }
+
+  return new AtKey(path, error)
   /* c8 ignore next */
-  throw new Error(`Unknown error type: ${error}`)
+  // throw new Error(`Unknown error type: ${error}`)
 }
 
 // ======================================================================

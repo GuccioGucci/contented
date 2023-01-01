@@ -51,9 +51,9 @@ test(`there is an explanation if elements are of the wrong type`, function () {
     value: [1, 2, 3],
     not: { arrayOf: 'string' },
     cause: [
-      new AtKey([0], new InvalidType('string', 1)),
-      new AtKey([1], new InvalidType('string', 2)),
-      new AtKey([2], new InvalidType('string', 3)),
+      new AtKey([0], { value: 1, not: 'string' }),
+      new AtKey([1], { value: 2, not: 'string' }),
+      new AtKey([2], { value: 3, not: 'string' }),
     ],
   })
 })
@@ -74,7 +74,7 @@ test(`there is an explanation for the presence of nested errors`, function () {
   assert.equal(why, {
     value: [{ a: 5 }],
     not: { arrayOf: { object: { a: 'string' } } },
-    cause: [new AtKey([0, 'a'], new InvalidType('string', 5))],
+    cause: [new AtKey([0, 'a'], { value: 5, not: 'string' })],
   })
 })
 
