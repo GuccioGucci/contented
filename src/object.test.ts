@@ -4,7 +4,7 @@ import { number } from './number'
 import { object } from './object'
 import { string } from './string'
 import { coerceTo } from './coercion'
-import { AtKey, explain } from './explain'
+import { explain } from './explain'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
   const Point = object({ x: string, y: number })
@@ -81,7 +81,10 @@ test(`there is an explanation if the input data presents invalid properties`, fu
   assert.equal(why, {
     value: { x: true, y: false },
     not: { object: { x: 'string', y: 'number' } },
-    cause: [new AtKey(['x'], { value: true, not: 'string' }), new AtKey(['y'], { value: false, not: 'number' })],
+    cause: [
+      { atKey: ['x'], value: true, not: 'string' },
+      { atKey: ['y'], value: false, not: 'number' },
+    ],
   })
 })
 

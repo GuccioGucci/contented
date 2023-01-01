@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { coerceTo } from './coercion'
-import { AtKey, explain } from './explain'
+import { explain } from './explain'
 import { number } from './number'
 import { string } from './string'
 import { arrayOf } from './arrayOf'
@@ -56,9 +56,9 @@ test(`there is an explanation if elements are of the wrong type`, function () {
     value: [1, 2, 3],
     not: { arrayOf: 'string' },
     cause: [
-      new AtKey([0], { value: 1, not: 'string' }),
-      new AtKey([1], { value: 2, not: 'string' }),
-      new AtKey([2], { value: 3, not: 'string' }),
+      { atKey: [0], value: 1, not: 'string' },
+      { atKey: [1], value: 2, not: 'string' },
+      { atKey: [2], value: 3, not: 'string' },
     ],
   })
 })
@@ -79,7 +79,7 @@ test(`there is an explanation for the presence of nested errors`, function () {
   assert.equal(why, {
     value: [{ a: 5 }],
     not: { arrayOf: { object: { a: 'string' } } },
-    cause: [new AtKey([0, 'a'], { value: 5, not: 'string' })],
+    cause: [{ atKey: [0, 'a'], value: 5, not: 'string' }],
   })
 })
 
