@@ -55,7 +55,7 @@ function explainLiteral(schema: LiteralSchema, value: any): any {
   return {
     value,
     not: schema,
-    cause: [new InvalidType(`${schema.literal}`, value)],
+    cause: [{ value, not: schema }],
   }
 }
 

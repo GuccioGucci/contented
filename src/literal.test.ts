@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { coerceTo } from './coercion'
-import { InvalidType, explain } from './explain'
+import { explain } from './explain'
 import { literal } from './literal'
 
 test(`literal succeds only if the input and expected values are the same`, function () {
@@ -25,12 +25,12 @@ test(`there is an explanation why a value is not of the expected literal type`, 
   assert.equal(why1, {
     value: 'hello',
     not: { literal: 10 },
-    cause: [new InvalidType('10', 'hello')],
+    cause: [{ value: 'hello', not: { literal: 10 } }],
   })
   assert.equal(why2, {
     value: { a: 1, b: 2 },
     not: { literal: 10 },
-    cause: [new InvalidType('10', { a: 1, b: 2 })],
+    cause: [{ value: { a: 1, b: 2 }, not: { literal: 10 } }],
   })
 })
 

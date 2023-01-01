@@ -7,7 +7,7 @@ import { boolean } from './boolean'
 import { literal } from './literal'
 import { object } from './object'
 import { coerceTo } from './coercion'
-import { AtKey, InvalidType, MissingKey, explain } from './explain'
+import { AtKey, MissingKey, explain } from './explain'
 
 test(`oneOf allows specifying alternatives`, function () {
   const T = oneOf(string, object({ b: number }), boolean)
@@ -40,12 +40,20 @@ test(`there is an explanation if the input value is not coercibile to any given 
   assert.equal(why1, {
     value: true,
     not: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
-    cause: [new InvalidType('a', true), new InvalidType('b', true), new InvalidType('c', true)],
+    cause: [
+      { value: true, not: { literal: 'a' } },
+      { value: true, not: { literal: 'b' } },
+      { value: true, not: { literal: 'c' } },
+    ],
   })
   assert.equal(why2, {
     value: { a: 2 },
     not: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
-    cause: [new InvalidType('a', { a: 2 }), new InvalidType('b', { a: 2 }), new InvalidType('c', { a: 2 })],
+    cause: [
+      { value: { a: 2 }, not: { literal: 'a' } },
+      { value: { a: 2 }, not: { literal: 'b' } },
+      { value: { a: 2 }, not: { literal: 'c' } },
+    ],
   })
 })
 
