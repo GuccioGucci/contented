@@ -161,20 +161,6 @@ export abstract class CoercionError {
 }
 
 // ----------------------------------------------------------------------
-// InvalidType
-// ----------------------------------------------------------------------
-const INVALID_TYPE = Symbol()
-
-export class InvalidType extends CoercionError {
-  // @ts-ignore
-  private readonly [INVALID_TYPE]: true
-
-  constructor(public readonly expected: string, public readonly got: any) {
-    super()
-  }
-}
-
-// ----------------------------------------------------------------------
 // AtKey
 // ----------------------------------------------------------------------
 const AT_KEY = Symbol()
