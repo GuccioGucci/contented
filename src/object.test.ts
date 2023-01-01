@@ -4,7 +4,7 @@ import { number } from './number'
 import { object } from './object'
 import { string } from './string'
 import { coerceTo } from './coercion'
-import { AtKey, MissingKey, explain } from './explain'
+import { AtKey, explain } from './explain'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
   const Point = object({ x: string, y: number })
@@ -56,13 +56,13 @@ test(`there is an explanation if the input data is missing one or more keys`, fu
   assert.equal(why1, {
     value: {},
     not: { object: { x: 'string', y: 'number' } },
-    cause: [new MissingKey(['x']), new MissingKey(['y'])],
+    cause: [{ missingKey: ['x'] }, { missingKey: ['y'] }],
   })
 
   assert.equal(why2, {
     value: { x: 'hello' },
     not: { object: { x: 'string', y: 'number' } },
-    cause: [new MissingKey(['y'])],
+    cause: [{ missingKey: ['y'] }],
   })
 })
 

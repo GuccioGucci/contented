@@ -68,7 +68,7 @@ function explainObject(schema: ObjectSchema, value: any): any {
     }
   }
   const objectSchema = schema.object
-  const cause: CoercionError[] = []
+  const cause: (CoercionError | Cause)[] = []
   for (let [key, schemaAtKey] of Object.entries(objectSchema)) {
     const optional = key.endsWith('?')
     key = optional ? key.slice(0, -1) : key
@@ -76,7 +76,7 @@ function explainObject(schema: ObjectSchema, value: any): any {
     if (optional && !value.hasOwnProperty(key)) continue
     if (optional && value[key] === undefined) continue
     if (!optional && value[key] === undefined) {
-      cause.push(new MissingKey([key]))
+      cause.push({ missingKey: [key] })
       continue
     }
 
@@ -135,19 +135,22 @@ interface WhyValueIsNot<_R> {
 
 type Not = Schema
 
-type Cause = { value: any; not: Not }
+type Cause = { value: any; not: Not } | { missingKey: Path }
 
-function scope(path: Path, error: CoercionError | Cause): CoercionError {
-  if (error instanceof AtKey) {
-    return new AtKey(path.concat(error.atKey), error.error)
-  }
-  if (error instanceof MissingKey) {
-    return new MissingKey(path.concat(error.missingKey))
+function scope(path: Path, error: CoercionError | Cause): CoercionError | Cause {
+  if (error instanceof CoercionError) {
+    if (error instanceof AtKey) {
+      return new AtKey(path.concat(error.atKey), error.error)
+    }
+    /* c8 ignore next */
+    throw new Error(`Unknown error type: ${error}`)
   }
 
+  // Cause
+  if ('missingKey' in error) {
+    return { missingKey: path.concat(error.missingKey) }
+  }
   return new AtKey(path, error)
-  /* c8 ignore next */
-  // throw new Error(`Unknown error type: ${error}`)
 }
 
 // ======================================================================
@@ -170,20 +173,6 @@ export class AtKey<E> extends CoercionError {
   private readonly [AT_KEY]: true
 
   constructor(public readonly atKey: Path, public readonly error: E) {
-    super()
-  }
-}
-
-// ----------------------------------------------------------------------
-// MissingKey
-// ----------------------------------------------------------------------
-const MISSING_KEY = Symbol()
-
-export class MissingKey extends CoercionError {
-  // @ts-ignore
-  private readonly [MISSING_KEY]: true
-
-  constructor(public readonly missingKey: Path) {
     super()
   }
 }

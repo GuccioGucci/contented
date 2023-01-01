@@ -7,7 +7,7 @@ import { boolean } from './boolean'
 import { literal } from './literal'
 import { object } from './object'
 import { coerceTo } from './coercion'
-import { AtKey, MissingKey, explain } from './explain'
+import { AtKey, explain } from './explain'
 
 test(`oneOf allows specifying alternatives`, function () {
   const T = oneOf(string, object({ b: number }), boolean)
@@ -76,7 +76,7 @@ test(`the explanation mentions the path at which the error happened`, function (
   assert.equal(why1, {
     value: { b: 12 },
     not: { oneOf: ['string', { object: { a: 'number' } }] },
-    cause: [{ value: { b: 12 }, not: 'string' }, new MissingKey(['a'])],
+    cause: [{ value: { b: 12 }, not: 'string' }, { missingKey: ['a'] }],
   })
   assert.equal(why2, {
     value: { a: 'hello' },
@@ -104,12 +104,12 @@ test(`there is an explanation in case of multi-level missing keys`, function () 
   assert.equal(why1, {
     value: { b: 12 },
     not: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
-    cause: [new MissingKey(['a'])],
+    cause: [{ missingKey: ['a'] }],
   })
   assert.equal(why2, {
     value: { a: { c: 12 } },
     not: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
-    cause: [new AtKey(['a'], { value: { c: 12 }, not: 'string' }), new MissingKey(['a', 'b'])],
+    cause: [new AtKey(['a'], { value: { c: 12 }, not: 'string' }), { missingKey: ['a', 'b'] }],
   })
 })
 

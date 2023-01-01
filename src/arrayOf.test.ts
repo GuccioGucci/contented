@@ -1,7 +1,7 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
 import { coerceTo } from './coercion'
-import { AtKey, MissingKey, explain } from './explain'
+import { AtKey, explain } from './explain'
 import { number } from './number'
 import { string } from './string'
 import { arrayOf } from './arrayOf'
@@ -98,7 +98,7 @@ test(`there is an explanation when there are missing elements`, function () {
   assert.equal(why, {
     value: [{ b: 0 }, { b: 1 }, { b: 2 }],
     not: { arrayOf: { object: { a: 'string' } } },
-    cause: [new MissingKey([0, 'a']), new MissingKey([1, 'a']), new MissingKey([2, 'a'])],
+    cause: [{ missingKey: [0, 'a'] }, { missingKey: [1, 'a'] }, { missingKey: [2, 'a'] }],
   })
 })
 
