@@ -49,7 +49,7 @@ test(`there is an explanation if elements are of the wrong type`, function () {
   assert.equal(why, {
     value: [1, 2, 3],
     isNot: { arrayOf: 'string' },
-    cause: [
+    since: [
       { atKey: 0, value: 1, isNot: 'string' },
       { atKey: 1, value: 2, isNot: 'string' },
       { atKey: 2, value: 3, isNot: 'string' },
@@ -73,12 +73,12 @@ test(`there is an explanation for the presence of nested errors`, function () {
   assert.equal(why, {
     value: [{ a: 5 }],
     isNot: { arrayOf: { object: { a: 'string' } } },
-    cause: [
+    since: [
       {
         atKey: 0,
         value: { a: 5 },
         isNot: { object: { a: 'string' } },
-        cause: [
+        since: [
           {
             atKey: 'a',
             value: 5,
@@ -105,24 +105,24 @@ test(`there is an explanation when there are missing elements`, function () {
   assert.equal(why, {
     value: [{ b: 0 }, { b: 1 }, { b: 2 }],
     isNot: { arrayOf: { object: { a: 'string' } } },
-    cause: [
+    since: [
       {
         atKey: 0,
         value: { b: 0 },
         isNot: { object: { a: 'string' } },
-        cause: [{ missingKey: 'a' }],
+        since: [{ missingKey: 'a' }],
       },
       {
         atKey: 1,
         value: { b: 1 },
         isNot: { object: { a: 'string' } },
-        cause: [{ missingKey: 'a' }],
+        since: [{ missingKey: 'a' }],
       },
       {
         atKey: 2,
         value: { b: 2 },
         isNot: { object: { a: 'string' } },
-        cause: [{ missingKey: 'a' }],
+        since: [{ missingKey: 'a' }],
       },
     ],
   })

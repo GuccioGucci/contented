@@ -50,13 +50,13 @@ test(`there is an explanation if the input data is missing one or more keys`, fu
   assert.equal(why1, {
     value: {},
     isNot: { object: { x: 'string', y: 'number' } },
-    cause: [{ missingKey: 'x' }, { missingKey: 'y' }],
+    since: [{ missingKey: 'x' }, { missingKey: 'y' }],
   })
 
   assert.equal(why2, {
     value: { x: 'hello' },
     isNot: { object: { x: 'string', y: 'number' } },
-    cause: [{ missingKey: 'y' }],
+    since: [{ missingKey: 'y' }],
   })
 })
 
@@ -75,7 +75,7 @@ test(`there is an explanation if the input data presents invalid properties`, fu
   assert.equal(why, {
     value: { x: true, y: false },
     isNot: { object: { x: 'string', y: 'number' } },
-    cause: [
+    since: [
       { atKey: 'x', value: true, isNot: 'string' },
       { atKey: 'y', value: false, isNot: 'number' },
     ],

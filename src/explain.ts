@@ -59,7 +59,7 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
     }
   }
   const objectSchema = schema.object
-  const cause: Cause[] = []
+  const since: NestedExplanation[] = []
   for (let [key, schemaAtKey] of Object.entries(objectSchema)) {
     const optional = key.endsWith('?')
     key = optional ? key.slice(0, -1) : key
@@ -67,32 +67,32 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
     if (optional && !value.hasOwnProperty(key)) continue
     if (optional && value[key] === undefined) continue
     if (!optional && value[key] === undefined) {
-      cause.push({ missingKey: key })
+      since.push({ missingKey: key })
       continue
     }
 
     const why = explainSchema(schemaAtKey, value[key])
     if (!why) continue
 
-    cause.push({ atKey: key, ...why })
+    since.push({ atKey: key, ...why })
   }
-  return cause.length === 0 ? undefined : { value, isNot: schema, cause }
+  return since.length === 0 ? undefined : { value, isNot: schema, since: since }
 }
 
 function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined {
   const schemas = schema.oneOf
-  const cause: Cause[] = []
+  const since: NestedExplanation[] = []
   for (const altSchema of schemas) {
     const why = explainSchema(altSchema, value)
     if (!why) {
       return undefined
     }
-    cause.push(why)
+    since.push(why)
   }
   return {
     value,
     isNot: schema,
-    cause,
+    since: since,
   }
 }
 
@@ -104,16 +104,16 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
     }
   }
   let pos = 0
-  let cause: Cause[] = []
+  let since: NestedExplanation[] = []
   for (const el of value) {
     const why = explainSchema(schema.arrayOf, el)
     if (!why) continue
 
-    cause.push({ atKey: pos, ...why })
+    since.push({ atKey: pos, ...why })
     pos += 1
   }
 
-  return cause.length === 0 ? undefined : { value, isNot: schema, cause }
+  return since.length === 0 ? undefined : { value, isNot: schema, since: since }
 }
 
 // ======================================================================
@@ -122,12 +122,12 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
 interface Explanation {
   value: any
   isNot: Not
-  cause?: Cause[]
+  since?: NestedExplanation[]
 }
 
 type Not = Schema
 
-type Cause = ({ atKey: Key } & Explanation) | { missingKey: Key } | Explanation
+type NestedExplanation = ({ atKey: Key } & Explanation) | { missingKey: Key } | Explanation
 
 // ----------------------------------------------------------------------
 // Key
