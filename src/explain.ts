@@ -13,12 +13,12 @@ import {
   Type,
 } from './Type'
 
-export function explain<R>(type: Type<R>, value: any): WhyValueIsNot<R> | undefined {
+export function explain<R>(type: Type<R>, value: any): Explanation | undefined {
   const { schema } = type
   return explainSchema(schema, value)
 }
 
-function explainSchema(schema: Schema, value: any): any {
+function explainSchema(schema: Schema, value: any): Explanation | undefined {
   if (isPrimitiveSchema(schema)) {
     return explainPrimitive(schema, value)
   }
@@ -37,7 +37,7 @@ function explainSchema(schema: Schema, value: any): any {
   throw new Error(`Not yet implemented: ${schema} against ${value}`)
 }
 
-function explainPrimitive(schema: PrimitiveSchema, value: any): any {
+function explainPrimitive(schema: PrimitiveSchema, value: any): Explanation | undefined {
   if (typeof value === schema) {
     return undefined
   }
@@ -48,7 +48,7 @@ function explainPrimitive(schema: PrimitiveSchema, value: any): any {
   }
 }
 
-function explainLiteral(schema: LiteralSchema, value: any): any {
+function explainLiteral(schema: LiteralSchema, value: any): Explanation | undefined {
   if (schema.literal === value) {
     return undefined
   }
@@ -59,7 +59,7 @@ function explainLiteral(schema: LiteralSchema, value: any): any {
   }
 }
 
-function explainObject(schema: ObjectSchema, value: any): any {
+function explainObject(schema: ObjectSchema, value: any): Explanation | undefined {
   if (typeof value !== 'object') {
     return {
       value,
@@ -88,7 +88,7 @@ function explainObject(schema: ObjectSchema, value: any): any {
   return cause.length === 0 ? undefined : { value, not: schema, cause }
 }
 
-function explainOneOf(schema: OneOfSchema, value: any): any {
+function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined {
   const schemas = schema.oneOf
   const cause: Cause[] = []
   for (const altSchema of schemas) {
@@ -106,7 +106,7 @@ function explainOneOf(schema: OneOfSchema, value: any): any {
   }
 }
 
-function explainArrayOf(schema: ArrayOfSchema, value: any): any {
+function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefined {
   if (!Array.isArray(value)) {
     return {
       value,
@@ -128,9 +128,9 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): any {
 }
 
 // ======================================================================
-// Why value is not...
+// Explanation
 // ======================================================================
-interface WhyValueIsNot<_R> {
+interface Explanation {
   value: any
   not: Not
   cause: Cause[]
