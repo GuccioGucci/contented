@@ -31,12 +31,6 @@ test(`there is an explanation if the value is not an array`, function () {
   assert.equal(why, {
     value: 5,
     not: { arrayOf: 'string' },
-    cause: [
-      {
-        value: 5,
-        not: { arrayOf: 'string' },
-      },
-    ],
   })
 })
 
@@ -56,9 +50,9 @@ test(`there is an explanation if elements are of the wrong type`, function () {
     value: [1, 2, 3],
     not: { arrayOf: 'string' },
     cause: [
-      { atKey: 0, value: 1, not: 'string', cause: [{ value: 1, not: 'string' }] }, // FIXME: remove extra cause
-      { atKey: 1, value: 2, not: 'string', cause: [{ value: 2, not: 'string' }] },
-      { atKey: 2, value: 3, not: 'string', cause: [{ value: 3, not: 'string' }] },
+      { atKey: 0, value: 1, not: 'string' },
+      { atKey: 1, value: 2, not: 'string' },
+      { atKey: 2, value: 3, not: 'string' },
     ],
   })
 })
@@ -89,7 +83,6 @@ test(`there is an explanation for the presence of nested errors`, function () {
             atKey: 'a',
             value: 5,
             not: 'string',
-            cause: [{ value: 5, not: 'string' }], // FIXME: remove extra cause
           },
         ],
       },

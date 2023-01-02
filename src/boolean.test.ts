@@ -30,7 +30,6 @@ test(`there is an explanation why a value is not a boolean`, function () {
       equal(why, {
         value,
         not: 'boolean',
-        cause: [{ value, not: 'boolean' }],
       })
     })
   )

@@ -30,7 +30,6 @@ test(`there is an explanation why a value is not a number`, function () {
       equal(why, {
         value,
         not: 'number',
-        cause: [{ value, not: 'number' }],
       })
     })
   )

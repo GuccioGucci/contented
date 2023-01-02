@@ -41,22 +41,14 @@ function explainPrimitive(schema: PrimitiveSchema, value: any): Explanation | un
   if (typeof value === schema) {
     return undefined
   }
-  return {
-    value,
-    not: schema,
-    cause: [{ value, not: schema }],
-  }
+  return { value, not: schema }
 }
 
 function explainLiteral(schema: LiteralSchema, value: any): Explanation | undefined {
   if (schema.literal === value) {
     return undefined
   }
-  return {
-    value,
-    not: schema,
-    cause: [{ value, not: schema }],
-  }
+  return { value, not: schema }
 }
 
 function explainObject(schema: ObjectSchema, value: any): Explanation | undefined {
@@ -64,7 +56,6 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
     return {
       value,
       not: schema,
-      cause: [{ value, not: schema }],
     }
   }
   const objectSchema = schema.object
@@ -96,8 +87,7 @@ function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined 
     if (!why) {
       return undefined
     }
-
-    cause.push(...why.cause)
+    cause.push(why)
   }
   return {
     value,
@@ -111,7 +101,6 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
     return {
       value,
       not: schema,
-      cause: [{ value, not: schema }],
     }
   }
   let pos = 0
@@ -133,12 +122,12 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
 interface Explanation {
   value: any
   not: Not
-  cause: Cause[]
+  cause?: Cause[]
 }
 
 type Not = Schema
 
-type Cause = { atKey?: Key; value: any; not: Not; cause?: Cause[] } | { missingKey: Key }
+type Cause = ({ atKey: Key } & Explanation) | { missingKey: Key } | Explanation
 
 // ----------------------------------------------------------------------
 // Key

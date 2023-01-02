@@ -30,12 +30,6 @@ test(`there is an explanation if the input data is not an object`, function () {
   assert.equal(why, {
     value: 'hello',
     not: { object: { x: 'string', y: 'number' } },
-    cause: [
-      {
-        value: 'hello',
-        not: { object: { x: 'string', y: 'number' } },
-      },
-    ],
   })
 })
 
@@ -82,8 +76,8 @@ test(`there is an explanation if the input data presents invalid properties`, fu
     value: { x: true, y: false },
     not: { object: { x: 'string', y: 'number' } },
     cause: [
-      { atKey: 'x', value: true, not: 'string', cause: [{ value: true, not: 'string' }] }, // FIXME: remove extra cause
-      { atKey: 'y', value: false, not: 'number', cause: [{ value: false, not: 'number' }] },
+      { atKey: 'x', value: true, not: 'string' },
+      { atKey: 'y', value: false, not: 'number' },
     ],
   })
 })

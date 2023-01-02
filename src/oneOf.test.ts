@@ -76,14 +76,31 @@ test(`the explanation mentions the path at which the error happened`, function (
   assert.equal(why1, {
     value: { b: 12 },
     not: { oneOf: ['string', { object: { a: 'number' } }] },
-    cause: [{ value: { b: 12 }, not: 'string' }, { missingKey: 'a' }],
+    cause: [
+      {
+        value: { b: 12 },
+        not: 'string',
+      },
+      {
+        value: { b: 12 },
+        not: { object: { a: 'number' } },
+        cause: [{ missingKey: 'a' }],
+      },
+    ],
   })
   assert.equal(why2, {
     value: { a: 'hello' },
     not: { oneOf: ['string', { object: { a: 'number' } }] },
     cause: [
-      { value: { a: 'hello' }, not: 'string' },
-      { atKey: 'a', value: 'hello', not: 'number', cause: [{ value: 'hello', not: 'number' }] }, // FIXME: remove extra cause
+      {
+        value: { a: 'hello' },
+        not: 'string',
+      },
+      {
+        value: { a: 'hello' },
+        not: { object: { a: 'number' } },
+        cause: [{ atKey: 'a', value: 'hello', not: 'number' }],
+      },
     ],
   })
 })
@@ -117,14 +134,15 @@ test(`there is an explanation in case of multi-level missing keys`, function () 
         atKey: 'a',
         value: { c: 12 },
         not: { oneOf: ['string', { object: { b: 'number' } }] },
-        // FIXME: divide the two types of oneOf
         cause: [
           {
             value: { c: 12 },
             not: 'string',
           },
           {
-            missingKey: 'b',
+            value: { c: 12 },
+            not: { object: { b: 'number' } },
+            cause: [{ missingKey: 'b' }],
           },
         ],
       },
