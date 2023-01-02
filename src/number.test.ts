@@ -29,7 +29,7 @@ test(`there is an explanation why a value is not a number`, function () {
       const why = explain(number, value)
       equal(why, {
         value,
-        not: 'number',
+        isNot: 'number',
       })
     })
   )

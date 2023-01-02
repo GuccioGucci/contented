@@ -24,11 +24,11 @@ test(`there is an explanation why a value is not of the expected literal type`, 
 
   assert.equal(why1, {
     value: 'hello',
-    not: { literal: 10 },
+    isNot: { literal: 10 },
   })
   assert.equal(why2, {
     value: { a: 1, b: 2 },
-    not: { literal: 10 },
+    isNot: { literal: 10 },
   })
 })
 

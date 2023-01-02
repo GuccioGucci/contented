@@ -30,7 +30,7 @@ test(`there is an explanation if the value is not an array`, function () {
   const why = explain(arrayOfStrings, 5)
   assert.equal(why, {
     value: 5,
-    not: { arrayOf: 'string' },
+    isNot: { arrayOf: 'string' },
   })
 })
 
@@ -48,11 +48,11 @@ test(`there is an explanation if elements are of the wrong type`, function () {
   const why = explain(arrayOfStrings, [1, 2, 3])
   assert.equal(why, {
     value: [1, 2, 3],
-    not: { arrayOf: 'string' },
+    isNot: { arrayOf: 'string' },
     cause: [
-      { atKey: 0, value: 1, not: 'string' },
-      { atKey: 1, value: 2, not: 'string' },
-      { atKey: 2, value: 3, not: 'string' },
+      { atKey: 0, value: 1, isNot: 'string' },
+      { atKey: 1, value: 2, isNot: 'string' },
+      { atKey: 2, value: 3, isNot: 'string' },
     ],
   })
 })
@@ -72,17 +72,17 @@ test(`there is an explanation for the presence of nested errors`, function () {
 
   assert.equal(why, {
     value: [{ a: 5 }],
-    not: { arrayOf: { object: { a: 'string' } } },
+    isNot: { arrayOf: { object: { a: 'string' } } },
     cause: [
       {
         atKey: 0,
         value: { a: 5 },
-        not: { object: { a: 'string' } },
+        isNot: { object: { a: 'string' } },
         cause: [
           {
             atKey: 'a',
             value: 5,
-            not: 'string',
+            isNot: 'string',
           },
         ],
       },
@@ -104,24 +104,24 @@ test(`there is an explanation when there are missing elements`, function () {
   const why = explain(arrayOfObjs, [{ b: 0 }, { b: 1 }, { b: 2 }])
   assert.equal(why, {
     value: [{ b: 0 }, { b: 1 }, { b: 2 }],
-    not: { arrayOf: { object: { a: 'string' } } },
+    isNot: { arrayOf: { object: { a: 'string' } } },
     cause: [
       {
         atKey: 0,
         value: { b: 0 },
-        not: { object: { a: 'string' } },
+        isNot: { object: { a: 'string' } },
         cause: [{ missingKey: 'a' }],
       },
       {
         atKey: 1,
         value: { b: 1 },
-        not: { object: { a: 'string' } },
+        isNot: { object: { a: 'string' } },
         cause: [{ missingKey: 'a' }],
       },
       {
         atKey: 2,
         value: { b: 2 },
-        not: { object: { a: 'string' } },
+        isNot: { object: { a: 'string' } },
         cause: [{ missingKey: 'a' }],
       },
     ],

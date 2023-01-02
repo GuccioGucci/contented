@@ -29,7 +29,7 @@ test(`there is an explanation why a value is not a string`, function () {
       const why = explain(string, value)
       equal(why, {
         value,
-        not: 'string',
+        isNot: 'string',
       })
     })
   )

@@ -41,21 +41,21 @@ function explainPrimitive(schema: PrimitiveSchema, value: any): Explanation | un
   if (typeof value === schema) {
     return undefined
   }
-  return { value, not: schema }
+  return { value, isNot: schema }
 }
 
 function explainLiteral(schema: LiteralSchema, value: any): Explanation | undefined {
   if (schema.literal === value) {
     return undefined
   }
-  return { value, not: schema }
+  return { value, isNot: schema }
 }
 
 function explainObject(schema: ObjectSchema, value: any): Explanation | undefined {
   if (typeof value !== 'object') {
     return {
       value,
-      not: schema,
+      isNot: schema,
     }
   }
   const objectSchema = schema.object
@@ -76,7 +76,7 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
 
     cause.push({ atKey: key, ...why })
   }
-  return cause.length === 0 ? undefined : { value, not: schema, cause }
+  return cause.length === 0 ? undefined : { value, isNot: schema, cause }
 }
 
 function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined {
@@ -91,7 +91,7 @@ function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined 
   }
   return {
     value,
-    not: schema,
+    isNot: schema,
     cause,
   }
 }
@@ -100,7 +100,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
   if (!Array.isArray(value)) {
     return {
       value,
-      not: schema,
+      isNot: schema,
     }
   }
   let pos = 0
@@ -113,7 +113,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
     pos += 1
   }
 
-  return cause.length === 0 ? undefined : { value, not: schema, cause }
+  return cause.length === 0 ? undefined : { value, isNot: schema, cause }
 }
 
 // ======================================================================
@@ -121,7 +121,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
 // ======================================================================
 interface Explanation {
   value: any
-  not: Not
+  isNot: Not
   cause?: Cause[]
 }
 

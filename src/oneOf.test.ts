@@ -39,20 +39,20 @@ test(`there is an explanation if the input value is not coercibile to any given 
 
   assert.equal(why1, {
     value: true,
-    not: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
+    isNot: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
     cause: [
-      { value: true, not: { literal: 'a' } },
-      { value: true, not: { literal: 'b' } },
-      { value: true, not: { literal: 'c' } },
+      { value: true, isNot: { literal: 'a' } },
+      { value: true, isNot: { literal: 'b' } },
+      { value: true, isNot: { literal: 'c' } },
     ],
   })
   assert.equal(why2, {
     value: { a: 2 },
-    not: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
+    isNot: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
     cause: [
-      { value: { a: 2 }, not: { literal: 'a' } },
-      { value: { a: 2 }, not: { literal: 'b' } },
-      { value: { a: 2 }, not: { literal: 'c' } },
+      { value: { a: 2 }, isNot: { literal: 'a' } },
+      { value: { a: 2 }, isNot: { literal: 'b' } },
+      { value: { a: 2 }, isNot: { literal: 'c' } },
     ],
   })
 })
@@ -75,31 +75,31 @@ test(`the explanation mentions the path at which the error happened`, function (
 
   assert.equal(why1, {
     value: { b: 12 },
-    not: { oneOf: ['string', { object: { a: 'number' } }] },
+    isNot: { oneOf: ['string', { object: { a: 'number' } }] },
     cause: [
       {
         value: { b: 12 },
-        not: 'string',
+        isNot: 'string',
       },
       {
         value: { b: 12 },
-        not: { object: { a: 'number' } },
+        isNot: { object: { a: 'number' } },
         cause: [{ missingKey: 'a' }],
       },
     ],
   })
   assert.equal(why2, {
     value: { a: 'hello' },
-    not: { oneOf: ['string', { object: { a: 'number' } }] },
+    isNot: { oneOf: ['string', { object: { a: 'number' } }] },
     cause: [
       {
         value: { a: 'hello' },
-        not: 'string',
+        isNot: 'string',
       },
       {
         value: { a: 'hello' },
-        not: { object: { a: 'number' } },
-        cause: [{ atKey: 'a', value: 'hello', not: 'number' }],
+        isNot: { object: { a: 'number' } },
+        cause: [{ atKey: 'a', value: 'hello', isNot: 'number' }],
       },
     ],
   })
@@ -123,25 +123,25 @@ test(`there is an explanation in case of multi-level missing keys`, function () 
 
   assert.equal(why1, {
     value: { b: 12 },
-    not: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
+    isNot: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
     cause: [{ missingKey: 'a' }],
   })
   assert.equal(why2, {
     value: { a: { c: 12 } },
-    not: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
+    isNot: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
     cause: [
       {
         atKey: 'a',
         value: { c: 12 },
-        not: { oneOf: ['string', { object: { b: 'number' } }] },
+        isNot: { oneOf: ['string', { object: { b: 'number' } }] },
         cause: [
           {
             value: { c: 12 },
-            not: 'string',
+            isNot: 'string',
           },
           {
             value: { c: 12 },
-            not: { object: { b: 'number' } },
+            isNot: { object: { b: 'number' } },
             cause: [{ missingKey: 'b' }],
           },
         ],

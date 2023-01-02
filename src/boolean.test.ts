@@ -29,7 +29,7 @@ test(`there is an explanation why a value is not a boolean`, function () {
       const why = explain(boolean, value)
       equal(why, {
         value,
-        not: 'boolean',
+        isNot: 'boolean',
       })
     })
   )

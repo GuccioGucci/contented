@@ -29,7 +29,7 @@ test(`there is an explanation if the input data is not an object`, function () {
 
   assert.equal(why, {
     value: 'hello',
-    not: { object: { x: 'string', y: 'number' } },
+    isNot: { object: { x: 'string', y: 'number' } },
   })
 })
 
@@ -49,13 +49,13 @@ test(`there is an explanation if the input data is missing one or more keys`, fu
 
   assert.equal(why1, {
     value: {},
-    not: { object: { x: 'string', y: 'number' } },
+    isNot: { object: { x: 'string', y: 'number' } },
     cause: [{ missingKey: 'x' }, { missingKey: 'y' }],
   })
 
   assert.equal(why2, {
     value: { x: 'hello' },
-    not: { object: { x: 'string', y: 'number' } },
+    isNot: { object: { x: 'string', y: 'number' } },
     cause: [{ missingKey: 'y' }],
   })
 })
@@ -74,10 +74,10 @@ test(`there is an explanation if the input data presents invalid properties`, fu
   const why = explain(Point, { x: true, y: false })
   assert.equal(why, {
     value: { x: true, y: false },
-    not: { object: { x: 'string', y: 'number' } },
+    isNot: { object: { x: 'string', y: 'number' } },
     cause: [
-      { atKey: 'x', value: true, not: 'string' },
-      { atKey: 'y', value: false, not: 'number' },
+      { atKey: 'x', value: true, isNot: 'string' },
+      { atKey: 'y', value: false, isNot: 'number' },
     ],
   })
 })
