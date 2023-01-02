@@ -76,14 +76,14 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
     if (optional && !value.hasOwnProperty(key)) continue
     if (optional && value[key] === undefined) continue
     if (!optional && value[key] === undefined) {
-      cause.push({ missingKey: [key] })
+      cause.push({ missingKey: key })
       continue
     }
 
     const why = explainSchema(schemaAtKey, value[key])
     if (!why) continue
 
-    cause.push(...why.cause.map((c: Cause) => scope([key], c)))
+    cause.push({ atKey: key, ...why })
   }
   return cause.length === 0 ? undefined : { value, not: schema, cause }
 }
@@ -120,7 +120,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
     const why = explainSchema(schema.arrayOf, el)
     if (!why) continue
 
-    cause.push(...why.cause.map((c: Cause) => scope([pos], c)))
+    cause.push({ atKey: pos, ...why })
     pos += 1
   }
 
@@ -138,21 +138,9 @@ interface Explanation {
 
 type Not = Schema
 
-type Cause = { atKey?: Path; value: any; not: Not } | { missingKey: Path }
-
-function scope(path: Path, error: Cause): Cause {
-  if ('missingKey' in error) {
-    return { missingKey: path.concat(error.missingKey) }
-  }
-  if (error.atKey) {
-    return { atKey: path.concat(error.atKey), value: error.value, not: error.not }
-  }
-  return { atKey: path, ...error }
-}
+type Cause = { atKey?: Key; value: any; not: Not; cause?: Cause[] } | { missingKey: Key }
 
 // ----------------------------------------------------------------------
-// Path
+// Key
 // ----------------------------------------------------------------------
-type Path = Key[]
-
 type Key = string | symbol | number

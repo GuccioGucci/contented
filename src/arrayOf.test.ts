@@ -56,9 +56,9 @@ test(`there is an explanation if elements are of the wrong type`, function () {
     value: [1, 2, 3],
     not: { arrayOf: 'string' },
     cause: [
-      { atKey: [0], value: 1, not: 'string' },
-      { atKey: [1], value: 2, not: 'string' },
-      { atKey: [2], value: 3, not: 'string' },
+      { atKey: 0, value: 1, not: 'string', cause: [{ value: 1, not: 'string' }] }, // FIXME: remove extra cause
+      { atKey: 1, value: 2, not: 'string', cause: [{ value: 2, not: 'string' }] },
+      { atKey: 2, value: 3, not: 'string', cause: [{ value: 3, not: 'string' }] },
     ],
   })
 })
@@ -79,7 +79,21 @@ test(`there is an explanation for the presence of nested errors`, function () {
   assert.equal(why, {
     value: [{ a: 5 }],
     not: { arrayOf: { object: { a: 'string' } } },
-    cause: [{ atKey: [0, 'a'], value: 5, not: 'string' }],
+    cause: [
+      {
+        atKey: 0,
+        value: { a: 5 },
+        not: { object: { a: 'string' } },
+        cause: [
+          {
+            atKey: 'a',
+            value: 5,
+            not: 'string',
+            cause: [{ value: 5, not: 'string' }], // FIXME: remove extra cause
+          },
+        ],
+      },
+    ],
   })
 })
 
@@ -98,7 +112,26 @@ test(`there is an explanation when there are missing elements`, function () {
   assert.equal(why, {
     value: [{ b: 0 }, { b: 1 }, { b: 2 }],
     not: { arrayOf: { object: { a: 'string' } } },
-    cause: [{ missingKey: [0, 'a'] }, { missingKey: [1, 'a'] }, { missingKey: [2, 'a'] }],
+    cause: [
+      {
+        atKey: 0,
+        value: { b: 0 },
+        not: { object: { a: 'string' } },
+        cause: [{ missingKey: 'a' }],
+      },
+      {
+        atKey: 1,
+        value: { b: 1 },
+        not: { object: { a: 'string' } },
+        cause: [{ missingKey: 'a' }],
+      },
+      {
+        atKey: 2,
+        value: { b: 2 },
+        not: { object: { a: 'string' } },
+        cause: [{ missingKey: 'a' }],
+      },
+    ],
   })
 })
 

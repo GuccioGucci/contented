@@ -56,13 +56,13 @@ test(`there is an explanation if the input data is missing one or more keys`, fu
   assert.equal(why1, {
     value: {},
     not: { object: { x: 'string', y: 'number' } },
-    cause: [{ missingKey: ['x'] }, { missingKey: ['y'] }],
+    cause: [{ missingKey: 'x' }, { missingKey: 'y' }],
   })
 
   assert.equal(why2, {
     value: { x: 'hello' },
     not: { object: { x: 'string', y: 'number' } },
-    cause: [{ missingKey: ['y'] }],
+    cause: [{ missingKey: 'y' }],
   })
 })
 
@@ -82,8 +82,8 @@ test(`there is an explanation if the input data presents invalid properties`, fu
     value: { x: true, y: false },
     not: { object: { x: 'string', y: 'number' } },
     cause: [
-      { atKey: ['x'], value: true, not: 'string' },
-      { atKey: ['y'], value: false, not: 'number' },
+      { atKey: 'x', value: true, not: 'string', cause: [{ value: true, not: 'string' }] }, // FIXME: remove extra cause
+      { atKey: 'y', value: false, not: 'number', cause: [{ value: false, not: 'number' }] },
     ],
   })
 })
