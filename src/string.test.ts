@@ -26,8 +26,8 @@ test(`string rejects all but string values`, function () {
 test(`there is an explanation why a value is not a string`, function () {
   assert(
     property(notAString, (value) => {
-      const why = explain(string, value)
-      equal(why, {
+      const exp = explain(string, value)
+      equal(exp, {
         value,
         isNot: 'string',
       })
@@ -38,8 +38,8 @@ test(`there is an explanation why a value is not a string`, function () {
 test(`there is no need for an explanation if the value is indeed a string`, function () {
   assert(
     property(fc.string(), (value) => {
-      const why = explain(string, value)
-      is(why, undefined)
+      const exp = explain(string, value)
+      is(exp, undefined)
     })
   )
 })

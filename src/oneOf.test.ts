@@ -34,10 +34,10 @@ test(`oneOf rejects input values that are not coercible to any given alternative
 test(`there is an explanation if the input value is not coercibile to any given alternative`, function () {
   const T = oneOf(literal('a'), literal('b'), literal('c'))
 
-  const why1 = explain(T, true)
-  const why2 = explain(T, { a: 2 })
+  const exp1 = explain(T, true)
+  const exp2 = explain(T, { a: 2 })
 
-  assert.equal(why1, {
+  assert.equal(exp1, {
     value: true,
     isNot: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
     since: [
@@ -46,7 +46,7 @@ test(`there is an explanation if the input value is not coercibile to any given 
       { value: true, isNot: { literal: 'c' } },
     ],
   })
-  assert.equal(why2, {
+  assert.equal(exp2, {
     value: { a: 2 },
     isNot: { oneOf: [{ literal: 'a' }, { literal: 'b' }, { literal: 'c' }] },
     since: [
@@ -70,10 +70,10 @@ test(`oneOf reports the path at which the error happened`, function () {
 test(`the explanation mentions the path at which the error happened`, function () {
   const stringOrNumberAtA = oneOf(string, object({ a: number }))
 
-  const why1 = explain(stringOrNumberAtA, { b: 12 })
-  const why2 = explain(stringOrNumberAtA, { a: 'hello' })
+  const exp1 = explain(stringOrNumberAtA, { b: 12 })
+  const exp2 = explain(stringOrNumberAtA, { a: 'hello' })
 
-  assert.equal(why1, {
+  assert.equal(exp1, {
     value: { b: 12 },
     isNot: { oneOf: ['string', { object: { a: 'number' } }] },
     since: [
@@ -88,7 +88,7 @@ test(`the explanation mentions the path at which the error happened`, function (
       },
     ],
   })
-  assert.equal(why2, {
+  assert.equal(exp2, {
     value: { a: 'hello' },
     isNot: { oneOf: ['string', { object: { a: 'number' } }] },
     since: [
@@ -118,15 +118,15 @@ test(`oneOf reports multi-level missing keys`, function () {
 test(`there is an explanation in case of multi-level missing keys`, function () {
   const T = object({ a: oneOf(string, object({ b: number })) })
 
-  const why1 = explain(T, { b: 12 })
-  const why2 = explain(T, { a: { c: 12 } })
+  const exp1 = explain(T, { b: 12 })
+  const exp2 = explain(T, { a: { c: 12 } })
 
-  assert.equal(why1, {
+  assert.equal(exp1, {
     value: { b: 12 },
     isNot: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
     since: [{ missingKey: 'a' }],
   })
-  assert.equal(why2, {
+  assert.equal(exp2, {
     value: { a: { c: 12 } },
     isNot: { object: { a: { oneOf: ['string', { object: { b: 'number' } }] } } },
     since: [

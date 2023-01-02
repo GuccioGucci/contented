@@ -19,14 +19,14 @@ test(`literal succeds only if the input and expected values are the same`, funct
 test(`there is an explanation why a value is not of the expected literal type`, function () {
   const ten = literal(10)
 
-  const why1 = explain(ten, 'hello')
-  const why2 = explain(ten, { a: 1, b: 2 })
+  const exp1 = explain(ten, 'hello')
+  const exp2 = explain(ten, { a: 1, b: 2 })
 
-  assert.equal(why1, {
+  assert.equal(exp1, {
     value: 'hello',
     isNot: { literal: 10 },
   })
-  assert.equal(why2, {
+  assert.equal(exp2, {
     value: { a: 1, b: 2 },
     isNot: { literal: 10 },
   })

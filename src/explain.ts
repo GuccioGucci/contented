@@ -71,10 +71,10 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
       continue
     }
 
-    const why = explainSchema(schemaAtKey, value[key])
-    if (!why) continue
+    const exp = explainSchema(schemaAtKey, value[key])
+    if (!exp) continue
 
-    since.push({ atKey: key, ...why })
+    since.push({ atKey: key, ...exp })
   }
   return since.length === 0 ? undefined : { value, isNot: schema, since: since }
 }
@@ -83,11 +83,11 @@ function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined 
   const schemas = schema.oneOf
   const since: NestedExplanation[] = []
   for (const altSchema of schemas) {
-    const why = explainSchema(altSchema, value)
-    if (!why) {
+    const exp = explainSchema(altSchema, value)
+    if (!exp) {
       return undefined
     }
-    since.push(why)
+    since.push(exp)
   }
   return {
     value,
@@ -106,10 +106,10 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
   let pos = 0
   let since: NestedExplanation[] = []
   for (const el of value) {
-    const why = explainSchema(schema.arrayOf, el)
-    if (!why) continue
+    const exp = explainSchema(schema.arrayOf, el)
+    if (!exp) continue
 
-    since.push({ atKey: pos, ...why })
+    since.push({ atKey: pos, ...exp })
     pos += 1
   }
 

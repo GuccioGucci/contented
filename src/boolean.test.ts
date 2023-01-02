@@ -26,8 +26,8 @@ test(`boolean rejects all but boolean values`, function () {
 test(`there is an explanation why a value is not a boolean`, function () {
   assert(
     property(notABoolean, (value) => {
-      const why = explain(boolean, value)
-      equal(why, {
+      const exp = explain(boolean, value)
+      equal(exp, {
         value,
         isNot: 'boolean',
       })
@@ -38,8 +38,8 @@ test(`there is an explanation why a value is not a boolean`, function () {
 test(`there is no need for an explanation if the value is indeed a boolean`, function () {
   assert(
     property(fc.boolean(), (value) => {
-      const why = explain(boolean, value)
-      is(why, undefined)
+      const exp = explain(boolean, value)
+      is(exp, undefined)
     })
   )
 })

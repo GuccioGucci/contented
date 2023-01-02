@@ -26,8 +26,8 @@ test('number rejects all but number values', function () {
 test(`there is an explanation why a value is not a number`, function () {
   assert(
     property(notANumber, (value) => {
-      const why = explain(number, value)
-      equal(why, {
+      const exp = explain(number, value)
+      equal(exp, {
         value,
         isNot: 'number',
       })
@@ -38,8 +38,8 @@ test(`there is an explanation why a value is not a number`, function () {
 test(`there is no need for an explanation if the value is indeed a number`, function () {
   assert(
     property(fcNumber, (value) => {
-      const why = explain(number, value)
-      is(why, undefined)
+      const exp = explain(number, value)
+      is(exp, undefined)
     })
   )
 })

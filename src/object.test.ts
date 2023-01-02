@@ -25,9 +25,9 @@ test(`object fails if the input data is not an object`, function () {
 test(`there is an explanation if the input data is not an object`, function () {
   const Point = object({ x: string, y: number })
 
-  const why = explain(Point, 'hello')
+  const exp = explain(Point, 'hello')
 
-  assert.equal(why, {
+  assert.equal(exp, {
     value: 'hello',
     isNot: { object: { x: 'string', y: 'number' } },
   })
@@ -44,16 +44,16 @@ test(`object rejects the input data upon the first missing element`, function ()
 test(`there is an explanation if the input data is missing one or more keys`, function () {
   const Point = object({ x: string, y: number })
 
-  const why1 = explain(Point, {})
-  const why2 = explain(Point, { x: 'hello' })
+  const exp1 = explain(Point, {})
+  const exp2 = explain(Point, { x: 'hello' })
 
-  assert.equal(why1, {
+  assert.equal(exp1, {
     value: {},
     isNot: { object: { x: 'string', y: 'number' } },
     since: [{ missingKey: 'x' }, { missingKey: 'y' }],
   })
 
-  assert.equal(why2, {
+  assert.equal(exp2, {
     value: { x: 'hello' },
     isNot: { object: { x: 'string', y: 'number' } },
     since: [{ missingKey: 'y' }],
@@ -71,8 +71,8 @@ test(`object rejects the input data upon the first mismatching element`, functio
 test(`there is an explanation if the input data presents invalid properties`, function () {
   const Point = object({ x: string, y: number })
 
-  const why = explain(Point, { x: true, y: false })
-  assert.equal(why, {
+  const exp = explain(Point, { x: true, y: false })
+  assert.equal(exp, {
     value: { x: true, y: false },
     isNot: { object: { x: 'string', y: 'number' } },
     since: [
