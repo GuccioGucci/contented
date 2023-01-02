@@ -103,7 +103,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
       isNot: schema,
     }
   }
-  let since: NestedExplanation[] = []
+  const since: NestedExplanation[] = []
   for (const [idx, el] of indexed(value)) {
     const exp = explainSchema(schema.arrayOf, el)
     if (!exp) continue
