@@ -1,6 +1,6 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './coercion'
+import { coerceTo } from './coerceTo'
 import { explain } from './explain'
 import { number } from './number'
 import { string } from './string'

@@ -6,7 +6,7 @@ import { oneOf } from './oneOf'
 import { boolean } from './boolean'
 import { literal } from './literal'
 import { object } from './object'
-import { coerceTo } from './coercion'
+import { coerceTo } from './coerceTo'
 import { explain } from './explain'
 
 test(`oneOf allows specifying alternatives`, function () {

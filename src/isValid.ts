@@ -13,10 +13,6 @@ import {
   ArrayOfSchema,
 } from './Type'
 
-export function coerceTo<R>(type: Type<R>, value: any): R | undefined {
-  return isValid(type, value) ? value : undefined
-}
-
 export function isValid<R>(type: Type<R>, value: any): value is R {
   const { schema } = type
   return isValidSchema(schema, value)

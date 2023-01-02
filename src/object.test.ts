@@ -3,7 +3,7 @@ import assert from 'uvu/assert'
 import { number } from './number'
 import { object } from './object'
 import { string } from './string'
-import { coerceTo } from './coercion'
+import { coerceTo } from './coerceTo'
 import { explain } from './explain'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
