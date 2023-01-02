@@ -103,14 +103,12 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
       isNot: schema,
     }
   }
-  let pos = 0
   let since: NestedExplanation[] = []
-  for (const el of value) {
+  for (const [idx, el] of indexed(value)) {
     const exp = explainSchema(schema.arrayOf, el)
     if (!exp) continue
 
-    since.push({ atKey: pos, ...exp })
-    pos += 1
+    since.push({ atKey: idx, ...exp })
   }
 
   return since.length === 0 ? undefined : { value, isNot: schema, since: since }
@@ -133,3 +131,14 @@ type NestedExplanation = ({ atKey: Key } & Explanation) | { missingKey: Key } | 
 // Key
 // ----------------------------------------------------------------------
 type Key = string | symbol | number
+
+// ======================================================================
+// Helpers
+// ======================================================================
+function* indexed<A>(it: Iterable<A>) {
+  let pos = 0
+  for (const x of it) {
+    yield [pos, x]
+    pos += 1
+  }
+}
