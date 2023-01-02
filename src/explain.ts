@@ -121,11 +121,11 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
 // ======================================================================
 interface Explanation {
   value: any
-  isNot: Not
+  isNot: IsNot
   since?: NestedExplanation[]
 }
 
-type Not = Schema
+type IsNot = Schema
 
 type NestedExplanation = ({ atKey: Key } & Explanation) | { missingKey: Key } | Explanation
 
