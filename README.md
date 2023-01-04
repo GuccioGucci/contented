@@ -21,6 +21,8 @@
 - [Reference](#reference)
   - [Coercing](#coercing)
     - [`coerceTo(T, input)`](#coercetot-input)
+    - [`isValid(T, input)`](#isvalidt-input)
+    - [`explain(T, input)`](#explaint-input)
   - [Primitive types](#primitive-types)
     - [`string`](#string)
     - [`number`](#number)
@@ -33,12 +35,6 @@
     - [`oneOf(T1, T2, ...Ts)`](#oneoft1-t2-ts)
   - [Utility types](#utility-types)
     - [`Infer`](#infer)
-  - [Errors](#errors)
-    - [`CoercionError`](#coercionerror)
-    - [`InvalidType`](#invalidtype)
-    - [`AtKey<InvalidType>`](#atkeyinvalidcoercion)
-    - [`MissingKey`](#missingkey)
-    - [`Joint`](#joint)
 - [License](#license)
 
 ## Introduction
@@ -64,60 +60,117 @@ Contented may be useful every time there are expectations — but no real guaran
 
 #### `coerceTo(T, input)`
 
-Attempts to coerce the `input` data to the type represented by `T`. Note that the specific return value, whether successful or not, depends on the particular `T`.
+Attempts to coerce the `input` data to the type represented by `T`. It returns `input` as a `T`, or `undefined` if the data cannot be coerced.
 
 ```typescript
-import { string, coerceTo } from '@gucciogucci/contented';
+import { number, object, coerceTo } from '@gucciogucci/contented';
 
-coerceTo(string, 'hello');
-// 'hello'
+const Point = object({
+  x: number,
+  y: number
+});
 
-coerceTo(string, 42);
-// InvalidType { expected: 'string', got: 42 }
+const point = coerceTo(Point, { x: 10, y : 20 });
+// point: { x: number, y : number }
+
+const notAPoint = coerceTo(Point, 'hello');
+// notAPoint: undefined
+```
+
+#### `isValid(T, input)`
+
+A type-guard that returns `true` if `input` is evaluated to be a `T`, and `false` otherwise.
+
+```typescript
+import { number, object, isValid } from '@gucciogucci/contented';
+
+const Point = object({
+  x: number,
+  y: number
+});
+
+if (isValid(Point, input)) {
+  // here input: { x: number, y: number }
+}
+```
+
+#### `explain(T, input)`
+
+Explains why `input` cannot be coerced to `T`. It returns `undefined` if no explanation is needed, that is, if `input` is in fact a `T`.
+
+```typescript
+import { number, object, explain } from '@gucciogucci/contented';
+
+const Point = object({
+  x: number,
+  y: number
+});
+
+explain(Point, { x: 10 });
+/* {
+     value: { x: 10 },
+     isNot: { object: { x: 'number', y: 'number' } },
+     since: [ { missingKey: 'y' } ]
+   }
+*/
+
+explain(Point, { x: 'hello', y: 'there' })
+/* {
+     value: { x: 'hello', y: 'there' },
+     isNot: { object: { x: 'number', y: 'number' } },
+     since: [
+       { atKey: 'x', value: 'hello', isNot: 'number' },
+       { atKey: 'y', value: 'there', isNot: 'number' }
+     ]
+   }
+*/
+
+explain(Point, { x: 10, y : 20 });
+// undefined
 ```
 
 ### Primitive types
 
 #### `string`
 
-A run-time representation of the `string` type. An attempt to coerce to `string` may result in either the string itself (if the input data is indeed a string) or an `InvalidType` error.
+A run-time representation of the `string` type.
 
 ```typescript
-import { string, coerceTo } from '@gucciogucci/contented';
+import { string, coerceTo, explain } from '@gucciogucci/contented';
 
 coerceTo(string, 'hello');
 // 'hello'
 
-coerceTo(string, 42);
-// InvalidType { expected: 'string', got: 42 }
+explain(string, 42);
+// { value: 42, isNot: 'string' }
 ```
 
 #### `number`
 
-A run-time representation of the `number` type. An attempt to coerce to `number` may result in either the number itself (if the input data is indeed a number) or an `InvalidType` error.
+A run-time representation of the `number` type.
 
 ```typescript
-import { number, coerceTo } from '@gucciogucci/contented';
+import { number, coerceTo, explain } from '@gucciogucci/contented';
 
 coerceTo(number, 42);
 // 42
 
-coerceTo(number, 'hello');
-// InvalidType { expected: 'number', got: 'hello' }
+explain(number, 'hello');
+// { value: 'hello', isNot: 'number' }
 ```
 
 #### `boolean`
 
-A run-time representation of the `boolean` type. An attempt to coerce to `boolean` may result in either the boolean itself (if the input data is indeed a boolean) or an `InvalidType` error.
+A run-time representation of the `boolean` type.
 
 ```typescript
-import { boolean, coerceTo } from '@gucciogucci/contented';
+import { boolean, coerceTo, explain } from '@gucciogucci/contented';
 
 coerceTo(boolean, true);
 // true
 
-coerceTo(boolean, 'hello');
-// InvalidType { expected: 'boolean', got: 'hello' }
+explain(boolean, 'hello');
+// { value: 'hello', isNot: 'boolean' }
 ```
 
 ## Literal types
@@ -127,13 +180,13 @@ coerceTo(boolean, 'hello');
 A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `literal(value)` succeed only when `value` is provided as an input.
 
 ```typescript
-import { literal, coerceTo } from '@gucciogucci/contented';
+import { literal, coerceTo, explain } from '@gucciogucci/contented';
 
 coerceTo(literal('hello'), 'hello');
 // 'hello'
 
-coerceTo(literal('hello'), 'foo');
-// InvalidType { expected: 'hello', got: 'foo' }
+explain(literal('hello'), 'foo');
+// { value: 'foo', isNot: { literal: 'hello' }  }
 ```
 
 ### Compound types
@@ -143,12 +196,20 @@ coerceTo(literal('hello'), 'foo');
 A run-time representation of an object.
 
 ```typescript
-import { number, object, coerceTo } from '@gucciogucci/contented';
+import { number, object, coerceTo, explain } from '@gucciogucci/contented';
 
 const Point = object({ x: number, y: number });
 
 coerceTo(Point, { x: 10, y : 20 });
 // { x: 10, y: 20 }
+
+explain(Point, { x: 10 });
+/* {
+     value: { x: 10 },
+     isNot: { object: { x: 'number', y: 'number' } },
+     since: [ { missingKey: 'y' } ]
+   }
+*/
 ```
 
 As with compile-time types, optional properties are marked by adding a `?` at the end of their names:
@@ -158,7 +219,7 @@ import { number, object, coerceTo } from '@gucciogucci/contented';
 
 const Point = object({ x: number, y: number, 'z?': number })
 
-coerceTo(Point, {x: 10, y: 20 });
+coerceTo(Point, { x: 10, y: 20 });
 // { x: 10, y: 20 }
 
 coerceTo(Point, { x: 10, y: 20, z: 30 });
@@ -175,38 +236,44 @@ coerceTo(Point, { x: 10, y: 20, z: undefined });
 A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
 
 ```typescript
-import { number, arrayOf, coerceTo } from '@gucciogucci/contented';
+import { number, arrayOf, coerceTo, explain } from '@gucciogucci/contented';
 
-coerceTo(arrayOf(number), [3, 4, 5]);
+coerceTo(arrayOf(number), [ 3, 4, 5 ]);
 // [ 3, 4, 5 ]
 
-coerceTo(arrayOf(number), 'hello');
-// InvalidType { expected: 'array', got: 'hello' }
+explain(arrayOf(number), 'hello');
+// { value: 'hello', isNot: { arrayOf: 'number' } }
 
-coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { atKey: [ 1 ], error: InvalidType { expected: 'number', got: 'a' } }
+explain(arrayOf(number), [ 3, 'a', 5 ]);
+/* {
+     value: [ 3, 'a', 5 ],
+     isNot: { arrayOf: 'number' },
+     since: [ { atKey: 1, value: 'a', isNot: 'number' } ]
+   }
+*/
 ```
 
 #### `oneOf(T1, T2, ...Ts)`
 
-A run-time representation of the union type `T1 | T2 | ...Ts`. In case of a failed coercion, the result encloses the errors coming from both `T1`, `T2`, and all subsequent alternatives.
-
+A run-time representation of the union type `T1 | T2 | ...Ts`.
 
 ```typescript
-import { oneOf, match, coerceTo } from '@gucciogucci/contented';
+import { oneOf, match, coerceTo, explain } from '@gucciogucci/contented';
 
-const abc = oneOf(match('a'), match('b'), match('c'));
+const abc = oneOf(literal('a'), literal('b'), literal('c'));
 
 coerceTo(abc, 'a');
 // 'a'
 
-coerceTo(abc, 'd');
-/* Joint {
-    errors: [
-      InvalidType { expected: 'a', got: 'd' },
-      InvalidType { expected: 'b', got: 'd' },
-      InvalidType { expected: 'c', got: 'd' }
-    ]
+explain(abc, 'd');
+/* {
+     value: 'd',
+     isNot: { oneOf: [ { literal: 'a' }, { literal: 'b' }, { literal: 'c' } ] },
+     since: [
+       { value: 'd', isNot: { literal: 'a' } },
+       { value: 'd', isNot: { literal: 'b' } },
+       { value: 'd', isNot: { literal: 'c' } }
+     ]
    }
 */
 ```
@@ -218,7 +285,7 @@ coerceTo(abc, 'd');
 `Infer` comes in handy every time it is necessary to infer the compile-time type corresponding to some run-time representation `T`.
 
 ```typescript
-import { Infer, string, object, coerceTo } from '@gucciogucci/contented';
+import { Infer, string, object } from '@gucciogucci/contented';
 
 const User = object({
   name: string,
@@ -227,77 +294,12 @@ const User = object({
 });
 
 function fn(user: Infer<typeof User>) {
-  // here, user : { name: string; surname: string; contacts: { phone: string } }
+  // here, user: { name: string; surname: string; contacts: { phone: string } }
 }
-```
-
-### Errors
-
-### `CoercionError`
-
-Unsuccesful attempts to coerce to the desired run-time type are signaled by returning a `CoercionError`. Every error in the following sections specializes `CoercionError`.
-
-```typescript
-const res = coerceTo(Image, data);
-if (res instanceof Coercionerror) {
-  // error-handling logic
-}
-```
-
-#### `InvalidType`
-
-When the input data does not conform to the expected type, `coerceTo` returns a `InvalidType`, which contains both the expectation and the actual value.
-
-```typescript
-import { string, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(string, 42);
-// InvalidType { expected: 'string', got: 42 }
-```
-#### `AtKey<InvalidType>`
-
-An `InvalidType` error, together with the path at which to find the non-conforming data.
-
-```typescript
-import { number, arrayOf, object, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(object({ 'x': number }), { x: 'hello' });
-// AtKey { atKey: [ 'x' ], error: InvalidType { expected: 'number', got: 'hello' } }
-
-coerceTo(arrayOf(number), [3, 'a', 5]);
-// AtKey { atKey: [ 1 ], error: InvalidType { expected: 'number', got: 'a' } }
-```
-
-#### `MissingKey`
-
-The path at which a non-existing key in the input data was instead expected.
-
-```typescript
-import { number, at, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(object({ 'x': number }), { y: 12 });
-// MissingKey { missingKey: [ 'x' ] }
-```
-
-#### `Joint`
-
-When multiple alternatives are provided but none of them is applicable to the input data, `coerceTo` returns a `Joint` error, reporting the errors resulting from the different failed attempts.
-
-```typescript
-import { string, number, oneOf, coerceTo } from '@gucciogucci/contented';
-
-coerceTo(oneOf(string, number), true);
-/* Joint {
-    errors: [
-      InvalidType { expected: 'string', got: true },
-      InvalidType { expected: 'number', got: true }
-    ]
-   }
-*/
 ```
 
 ## License
 
-Copyright 2022 Gucci.
+Copyright 2023 Gucci.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
