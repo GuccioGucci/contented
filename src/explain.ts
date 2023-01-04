@@ -34,7 +34,7 @@ function explainSchema(schema: Schema, value: any): Explanation | undefined {
   if (isArrayOfSchema(schema)) {
     return explainArrayOf(schema, value)
   }
-  throw new Error(`Not yet implemented: ${schema} against ${value}`)
+  throw new Error(`Unknown schema ${schema} against ${value}`)
 }
 
 function explainPrimitive(schema: PrimitiveSchema, value: any): Explanation | undefined {
