@@ -34,6 +34,7 @@ function isValidSchema(schema: Schema, value: any): boolean {
   if (isArrayOfSchema(schema)) {
     return isValidArrayOf(schema, value)
   }
+  /* c8 ignore next */
   throw new Error(`Unknown schema: ${schema}`)
 }
 

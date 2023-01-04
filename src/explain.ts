@@ -34,6 +34,7 @@ function explainSchema(schema: Schema, value: any): Explanation | undefined {
   if (isArrayOfSchema(schema)) {
     return explainArrayOf(schema, value)
   }
+  /* c8 ignore next */
   throw new Error(`Unknown schema ${schema} against ${value}`)
 }
 
