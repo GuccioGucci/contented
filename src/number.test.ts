@@ -47,5 +47,5 @@ test(`there is no need for an explanation if the value is indeed a number`, func
 test.run()
 
 const fcSymbol = fc.string().map((str) => Symbol(str))
-const fcNumber = fc.oneof(fc.integer(), fc.float(), fc.double())
+const fcNumber = fc.oneof(fc.integer(), fc.float(), fc.double()).filter((x) => !Number.isNaN(x))
 const notANumber = fc.oneof(fc.string(), fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)
