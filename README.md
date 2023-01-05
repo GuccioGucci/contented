@@ -173,7 +173,7 @@ explain(boolean, 'hello');
 // { value: 'hello', isNot: 'boolean' }
 ```
 
-## Literal types
+### Literal types
 
 #### `literal`
 
