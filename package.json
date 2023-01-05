@@ -15,7 +15,7 @@
     "build": "tsc --build tsconfig.build.json",
     "ts:check": "tsc --noEmit",
     "prepare": "husky install",
-    "dep:upgrade:major": "npx npm-check-updates -u",
+    "dep:upgrade:major": "npx npm-check-updates@12.5.12 -u",
     "dep:upgrade:minor": "npm run dep:upgrade:major -- --target minor"
   },
   "repository": {
