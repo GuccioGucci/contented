@@ -77,7 +77,7 @@ function explainObject(schema: ObjectSchema, value: any): Explanation | undefine
 
     since.push({ atKey: key, ...exp })
   }
-  return since.length === 0 ? undefined : { value, isNot: schema, since: since }
+  return since.length === 0 ? undefined : { value, isNot: schema, since }
 }
 
 function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined {
@@ -93,7 +93,7 @@ function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined 
   return {
     value,
     isNot: schema,
-    since: since,
+    since,
   }
 }
 
@@ -112,7 +112,7 @@ function explainArrayOf(schema: ArrayOfSchema, value: any): Explanation | undefi
     since.push({ atKey: idx, ...exp })
   }
 
-  return since.length === 0 ? undefined : { value, isNot: schema, since: since }
+  return since.length === 0 ? undefined : { value, isNot: schema, since }
 }
 
 // ======================================================================
