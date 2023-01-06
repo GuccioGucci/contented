@@ -1,5 +1,5 @@
 import { test } from 'uvu'
-import assert from 'uvu/assert'
+import { is, equal } from 'uvu/assert'
 import { coerceTo } from './coerceTo'
 import { explain } from './explain'
 import { number } from './number'
@@ -13,7 +13,7 @@ test(`array accepts array of the indicated element type`, function () {
 
   const res = coerceTo(arrayOfStrings, ['a', 'b', 'c'])
 
-  assert.equal(res, ['a', 'b', 'c'])
+  equal(res, ['a', 'b', 'c'])
 })
 
 test(`array rejects values that are not arrays`, function () {
@@ -21,14 +21,14 @@ test(`array rejects values that are not arrays`, function () {
 
   const res = coerceTo(arrayOfStrings, 5)
 
-  assert.is(res, undefined)
+  is(res, undefined)
 })
 
 test(`there is an explanation if the value is not an array`, function () {
   const arrayOfStrings = arrayOf(string)
 
   const exp = explain(arrayOfStrings, 5)
-  assert.equal(exp, {
+  equal(exp, {
     value: 5,
     isNot: { arrayOf: 'string' },
   })
@@ -39,14 +39,14 @@ test(`array rejects arrays of the wrong element type`, function () {
 
   const res = coerceTo(arrayOfStrings, [1, 2, 3])
 
-  assert.is(res, undefined)
+  is(res, undefined)
 })
 
 test(`there is an explanation if elements are of the wrong type`, function () {
   const arrayOfStrings = arrayOf(string)
 
   const exp = explain(arrayOfStrings, [1, 2, 3])
-  assert.equal(exp, {
+  equal(exp, {
     value: [1, 2, 3],
     isNot: { arrayOf: 'string' },
     since: [
@@ -62,7 +62,7 @@ test(`array reports nested errors`, function () {
 
   const res = coerceTo(arrayOfObjs, [{ a: 5 }])
 
-  assert.is(res, undefined)
+  is(res, undefined)
 })
 
 test(`there is an explanation for the presence of nested errors`, function () {
@@ -70,7 +70,7 @@ test(`there is an explanation for the presence of nested errors`, function () {
 
   const exp = explain(arrayOfObjs, [{ a: 5 }])
 
-  assert.equal(exp, {
+  equal(exp, {
     value: [{ a: 5 }],
     isNot: { arrayOf: { object: { a: 'string' } } },
     since: [
@@ -95,14 +95,14 @@ test(`array rejects a value upon the first missing element`, function () {
 
   const res = coerceTo(arrayOfObjs, [{ b: 0 }, { b: 1 }, { b: 2 }])
 
-  assert.is(res, undefined)
+  is(res, undefined)
 })
 
 test(`there is an explanation when there are missing elements`, function () {
   const arrayOfObjs = arrayOf(object({ a: string }))
 
   const exp = explain(arrayOfObjs, [{ b: 0 }, { b: 1 }, { b: 2 }])
-  assert.equal(exp, {
+  equal(exp, {
     value: [{ b: 0 }, { b: 1 }, { b: 2 }],
     isNot: { arrayOf: { object: { a: 'string' } } },
     since: [
@@ -135,9 +135,9 @@ test(`array accepts alternatives`, function () {
   const res2 = coerceTo(arrayOfAlternatives, ['x', 'y', false])
   const res3 = coerceTo(arrayOfAlternatives, ['x', 'y', { a: 'hello' }])
 
-  assert.equal(res1, ['x', 'y', { a: 12 }])
-  assert.is(res2, undefined)
-  assert.is(res3, undefined)
+  equal(res1, ['x', 'y', { a: 12 }])
+  is(res2, undefined)
+  is(res3, undefined)
 })
 
 test.run()

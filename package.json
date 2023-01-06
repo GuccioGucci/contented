@@ -39,6 +39,7 @@
   "devDependencies": {
     "@types/node": "^18.11.18",
     "c8": "^7.12.0",
+    "denoify": "^1.4.5",
     "fast-check": "^3.5.0",
     "husky": "^8.0.3",
     "lint-staged": "^12.5.0",
