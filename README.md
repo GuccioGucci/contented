@@ -258,7 +258,7 @@ explain(arrayOf(number), [ 3, 'a', 5 ]);
 A run-time representation of the union type `T1 | T2 | ...Ts`.
 
 ```typescript
-import { oneOf, match, coerceTo, explain } from '@gucciogucci/contented';
+import { oneOf, literal, coerceTo, explain } from '@gucciogucci/contented';
 
 const abc = oneOf(literal('a'), literal('b'), literal('c'));
 
