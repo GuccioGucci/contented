@@ -229,8 +229,6 @@ coerceTo(Point, { x: 10, y: 20, z: undefined });
 // { x: 10, y: 20, z: undefined }
 ```
 
-### Array types
-
 #### `arrayOf(T)`
 
 A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
