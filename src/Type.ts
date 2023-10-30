@@ -51,7 +51,7 @@ export function isOneOfSchema(schema: Schema): schema is OneOfSchema {
 }
 
 // ----------------------------------------------------------------------
-// Object
+// Array
 // ----------------------------------------------------------------------
 export type ArrayOfSchema = { arrayOf: Schema }
 
