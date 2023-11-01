@@ -1,3 +1,4 @@
+import { typeOf } from './typeOf'
 import {
   Type,
   PrimitiveSchema,
@@ -39,7 +40,7 @@ function isValidSchema(schema: Schema, value: any): boolean {
 }
 
 function isValidPrimitive(schema: PrimitiveSchema, value: any): boolean {
-  return typeof value === schema
+  return typeOf(value) === schema
 }
 
 function isValidLiteral(schema: LiteralSchema, value: any): boolean {

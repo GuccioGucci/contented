@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@gucciogucci/contented">
-    <img alt="NPM" src="https://badgen.net/npm/v/@gucciogucci/contented"/>
+    <img alt="NPM" src="https://badge.fury.io/js/@gucciogucci%2Fcontented.svg"/>
   </a>
   <img alt="Node.js" src="https://img.shields.io/node/v/@gucciogucci/contented.svg">
   <a href="https://github.com/GuccioGucci/contented/actions/workflows/test.yml"><img alt="Test" src="https://github.com/GuccioGucci/contented/actions/workflows/test.yml/badge.svg"></a>
@@ -27,6 +27,7 @@
     - [`string`](#string)
     - [`number`](#number)
     - [`boolean`](#boolean)
+    - [`null_`](#null\_)
   - [Literal types](#literal-types)
     - [`literal`](#literal)
   - [Compound types](#compound-types)
@@ -171,6 +172,20 @@ coerceTo(boolean, true);
 
 explain(boolean, 'hello');
 // { value: 'hello', isNot: 'boolean' }
+```
+
+#### `null_`
+
+A run-time representation of the `null` type. The trailing underscore is to avoid shadowing the built-in `null` value.
+
+```typescript
+import { null_, coerceTo, explain } from '@gucciogucci/contented';
+
+coerceTo(null_, null);
+// null
+
+explain(null_, 'hello');
+// { value: 'hello', isNot: 'null' }
 ```
 
 ### Literal types

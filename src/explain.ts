@@ -1,3 +1,4 @@
+import { typeOf } from './typeOf'
 import {
   ArrayOfSchema,
   isArrayOfSchema,
@@ -39,7 +40,7 @@ function explainSchema(schema: Schema, value: any): Explanation | undefined {
 }
 
 function explainPrimitive(schema: PrimitiveSchema, value: any): Explanation | undefined {
-  if (typeof value === schema) {
+  if (typeOf(value) === schema) {
     return undefined
   }
   return { value, isNot: schema }
