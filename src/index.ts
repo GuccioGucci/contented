@@ -1,6 +1,5 @@
 export { arrayOf } from './arrayOf'
 export { boolean } from './boolean'
-export { coerceTo } from './coerceTo'
 export { explain } from './explain'
 export { Infer } from './Type'
 export { isValid } from './isValid'

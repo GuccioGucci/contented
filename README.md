@@ -20,7 +20,6 @@
 - [Introduction](#introduction)
 - [Reference](#reference)
   - [Coercing](#coercing)
-    - [`coerceTo(T, input)`](#coercetot-input)
     - [`isValid(T, input)`](#isvalidt-input)
     - [`explain(T, input)`](#explaint-input)
   - [Primitive types](#primitive-types)
@@ -43,14 +42,12 @@
 Contented is a TypeScript library for performing type coercion at run-time. To this end, Contented introduces run-time representations of primitive types, such as `string`, which can be then mixed and matched to describe compound types.
 
 ```typescript
-import { string, number, object, coerceTo } from '@gucciogucci/contented';
+import { string, number, object } from '@gucciogucci/contented';
 
 const Image = object({
   url: string,
   size: number
 });
-
-const image = coerceTo(Image, data /* arbitrary data */);
 ```
 
 Contented may be useful every time there are expectations — but no real guarantees, on the shape of data acquired at run-time. Common use cases include processing data coming over the wire, from files, or any other external source.
@@ -58,25 +55,6 @@ Contented may be useful every time there are expectations — but no real guaran
 ## Reference
 
 ### Coercing
-
-#### `coerceTo(T, input)`
-
-Attempts to coerce the `input` data to the type represented by `T`. It returns `input` as a `T`, or `undefined` if the data cannot be coerced.
-
-```typescript
-import { number, object, coerceTo } from '@gucciogucci/contented';
-
-const Point = object({
-  x: number,
-  y: number
-});
-
-const point = coerceTo(Point, { x: 10, y : 20 });
-// point: { x: number, y : number }
-
-const notAPoint = coerceTo(Point, 'hello');
-// notAPoint: undefined
-```
 
 #### `isValid(T, input)`
 
@@ -137,10 +115,10 @@ explain(Point, { x: 10, y : 20 });
 A run-time representation of the `string` type.
 
 ```typescript
-import { string, coerceTo, explain } from '@gucciogucci/contented';
+import { string, isValid, explain } from '@gucciogucci/contented';
 
-coerceTo(string, 'hello');
-// 'hello'
+isValid(string, 'hello');
+// true
 
 explain(string, 42);
 // { value: 42, isNot: 'string' }
@@ -151,10 +129,10 @@ explain(string, 42);
 A run-time representation of the `number` type.
 
 ```typescript
-import { number, coerceTo, explain } from '@gucciogucci/contented';
+import { number, isValid, explain } from '@gucciogucci/contented';
 
-coerceTo(number, 42);
-// 42
+isValid(number, 42);
+// true
 
 explain(number, 'hello');
 // { value: 'hello', isNot: 'number' }
@@ -165,9 +143,9 @@ explain(number, 'hello');
 A run-time representation of the `boolean` type.
 
 ```typescript
-import { boolean, coerceTo, explain } from '@gucciogucci/contented';
+import { boolean, isValid, explain } from '@gucciogucci/contented';
 
-coerceTo(boolean, true);
+isValid(boolean, false);
 // true
 
 explain(boolean, 'hello');
@@ -179,10 +157,10 @@ explain(boolean, 'hello');
 A run-time representation of the `null` type. The trailing underscore is to avoid shadowing the built-in `null` value.
 
 ```typescript
-import { null_, coerceTo, explain } from '@gucciogucci/contented';
+import { null_, isValid, explain } from '@gucciogucci/contented';
 
-coerceTo(null_, null);
-// null
+isValid(null_, null);
+// true
 
 explain(null_, 'hello');
 // { value: 'hello', isNot: 'null' }
@@ -195,10 +173,10 @@ explain(null_, 'hello');
 A run-time representation of the narrowest type that can be constructed from `value`. Hence, coercions to `literal(value)` succeed only when `value` is provided as an input.
 
 ```typescript
-import { literal, coerceTo, explain } from '@gucciogucci/contented';
+import { literal, isValid, explain } from '@gucciogucci/contented';
 
-coerceTo(literal('hello'), 'hello');
-// 'hello'
+isValid(literal('hello'), 'hello');
+// true
 
 explain(literal('hello'), 'foo');
 // { value: 'foo', isNot: { literal: 'hello' }  }
@@ -211,12 +189,12 @@ explain(literal('hello'), 'foo');
 A run-time representation of an object.
 
 ```typescript
-import { number, object, coerceTo, explain } from '@gucciogucci/contented';
+import { number, object, isValid, explain } from '@gucciogucci/contented';
 
 const Point = object({ x: number, y: number });
 
-coerceTo(Point, { x: 10, y : 20 });
-// { x: 10, y: 20 }
+isValid(Point, { x: 10, y : 20 });
+// true
 
 explain(Point, { x: 10 });
 /* {
@@ -230,18 +208,18 @@ explain(Point, { x: 10 });
 As with compile-time types, optional properties are marked by adding a `?` at the end of their names:
 
 ```typescript
-import { number, object, coerceTo } from '@gucciogucci/contented';
+import { number, object, isValid } from '@gucciogucci/contented';
 
 const Point = object({ x: number, y: number, 'z?': number })
 
-coerceTo(Point, { x: 10, y: 20 });
-// { x: 10, y: 20 }
+isValid(Point, { x: 10, y: 20 });
+// true
 
-coerceTo(Point, { x: 10, y: 20, z: 30 });
-// { x: 10, y: 20, z: 30 }
+isValid(Point, { x: 10, y: 20, z: 30 });
+// true
 
-coerceTo(Point, { x: 10, y: 20, z: undefined });
-// { x: 10, y: 20, z: undefined }
+isValid(Point, { x: 10, y: 20, z: undefined });
+// true
 ```
 
 #### `arrayOf(T)`
@@ -249,10 +227,10 @@ coerceTo(Point, { x: 10, y: 20, z: undefined });
 A run-time representation of an array of `T`s, where `T` denotes the run-time representation of its element type.
 
 ```typescript
-import { number, arrayOf, coerceTo, explain } from '@gucciogucci/contented';
+import { number, arrayOf, isValid, explain } from '@gucciogucci/contented';
 
-coerceTo(arrayOf(number), [ 3, 4, 5 ]);
-// [ 3, 4, 5 ]
+isValid(arrayOf(number), [ 3, 4, 5 ]);
+// true
 
 explain(arrayOf(number), 'hello');
 // { value: 'hello', isNot: { arrayOf: 'number' } }
@@ -271,12 +249,12 @@ explain(arrayOf(number), [ 3, 'a', 5 ]);
 A run-time representation of the union type `T1 | T2 | ...Ts`.
 
 ```typescript
-import { oneOf, literal, coerceTo, explain } from '@gucciogucci/contented';
+import { oneOf, literal, isValid, explain } from '@gucciogucci/contented';
 
 const abc = oneOf(literal('a'), literal('b'), literal('c'));
 
-coerceTo(abc, 'a');
-// 'a'
+isValid(abc, 'a');
+// true
 
 explain(abc, 'd');
 /* {
