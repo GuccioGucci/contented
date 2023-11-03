@@ -2,19 +2,19 @@ import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { null_ } from './null'
-import { coerceTo } from './coerceTo'
+import { isValid } from './isValid'
 import { explain } from './explain'
 
 test(`null_ accepts null values`, function () {
-  const res = coerceTo(null_, null)
-  is(res, null)
+  const res = isValid(null_, null)
+  is(res, true)
 })
 
 test(`null_ rejects all but null values`, function () {
   assert(
     property(notNull, (value) => {
-      const res = coerceTo(null_, value)
-      is(res, undefined)
+      const res = isValid(null_, value)
+      is(res, false)
     })
   )
 })

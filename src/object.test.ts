@@ -3,23 +3,23 @@ import assert from 'uvu/assert'
 import { number } from './number'
 import { object } from './object'
 import { string } from './string'
-import { coerceTo } from './coerceTo'
+import { isValid } from './isValid'
 import { explain } from './explain'
 
 test(`object succeeds if the input data is an object adhering to the expectations`, function () {
   const Point = object({ x: string, y: number })
 
-  const res = coerceTo(Point, { x: 'hello', y: 12 })
+  const res = isValid(Point, { x: 'hello', y: 12 })
 
-  assert.equal(res, { x: 'hello', y: 12 })
+  assert.is(res, true)
 })
 
 test(`object fails if the input data is not an object`, function () {
   const Point = object({ x: string, y: number })
 
-  const res = coerceTo(Point, 'hello')
+  const res = isValid(Point, 'hello')
 
-  assert.is(res, undefined)
+  assert.is(res, false)
 })
 
 test(`there is an explanation if the input data is not an object`, function () {
@@ -36,9 +36,9 @@ test(`there is an explanation if the input data is not an object`, function () {
 test(`object rejects the input data upon the first missing element`, function () {
   const Point = object({ x: string, y: number })
 
-  const res = coerceTo(Point, { x: 'hello' })
+  const res = isValid(Point, { x: 'hello' })
 
-  assert.is(res, undefined)
+  assert.is(res, false)
 })
 
 test(`there is an explanation if the input data is missing one or more keys`, function () {
@@ -63,9 +63,9 @@ test(`there is an explanation if the input data is missing one or more keys`, fu
 test(`object rejects the input data upon the first mismatching element`, function () {
   const Point = object({ x: string, y: number })
 
-  const res = coerceTo(Point, { x: 'hello', y: false })
+  const res = isValid(Point, { x: 'hello', y: false })
 
-  assert.is(res, undefined)
+  assert.is(res, false)
 })
 
 test(`there is an explanation if the input data presents invalid properties`, function () {
@@ -85,13 +85,13 @@ test(`there is an explanation if the input data presents invalid properties`, fu
 test(`object marks optional fields by ending keys with ?`, function () {
   const obj = object({ 'x?': string, y: number })
 
-  const res1 = coerceTo(obj, { x: 'hello', y: 20 })
-  const res2 = coerceTo(obj, { x: undefined, y: 20 })
-  const res3 = coerceTo(obj, { y: 20 })
+  const res1 = isValid(obj, { x: 'hello', y: 20 })
+  const res2 = isValid(obj, { x: undefined, y: 20 })
+  const res3 = isValid(obj, { y: 20 })
 
-  assert.equal(res1, { x: 'hello', y: 20 })
-  assert.equal(res2, { x: undefined, y: 20 })
-  assert.equal(res3, { y: 20 })
+  assert.is(res1, true)
+  assert.is(res2, true)
+  assert.is(res3, true)
 })
 
 test.run()

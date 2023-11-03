@@ -2,14 +2,14 @@ import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { number } from './number'
-import { coerceTo } from './coerceTo'
+import { isValid } from './isValid'
 import { explain } from './explain'
 
 test(`number accepts number values`, function () {
   assert(
     property(fcNumber, (value) => {
-      const res = coerceTo(number, value)
-      is(res, value)
+      const res = isValid(number, value)
+      is(res, true)
     })
   )
 })
@@ -17,8 +17,8 @@ test(`number accepts number values`, function () {
 test('number rejects all but number values', function () {
   assert(
     property(notANumber, (value) => {
-      const res = coerceTo(number, value)
-      is(res, undefined)
+      const res = isValid(number, value)
+      is(res, false)
     })
   )
 })

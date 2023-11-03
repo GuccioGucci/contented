@@ -1,19 +1,19 @@
 import { test } from 'uvu'
 import assert from 'uvu/assert'
-import { coerceTo } from './coerceTo'
+import { isValid } from './isValid'
 import { explain } from './explain'
 import { literal } from './literal'
 
 test(`literal succeds only if the input and expected values are the same`, function () {
   const ten = literal(10)
 
-  const res1 = coerceTo(ten, 10)
-  const res2 = coerceTo(ten, 'hello')
-  const res3 = coerceTo(ten, { a: 1, b: 2 })
+  const res1 = isValid(ten, 10)
+  const res2 = isValid(ten, 'hello')
+  const res3 = isValid(ten, { a: 1, b: 2 })
 
-  assert.is(res1, 10)
-  assert.is(res2, undefined)
-  assert.is(res3, undefined)
+  assert.is(res1, true)
+  assert.is(res2, false)
+  assert.is(res3, false)
 })
 
 test(`there is an explanation why a value is not of the expected literal type`, function () {

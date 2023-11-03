@@ -1,15 +1,15 @@
 import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
-import { coerceTo } from './coerceTo'
+import { isValid } from './isValid'
 import { explain } from './explain'
 import { boolean } from './boolean'
 
 test(`boolean accepts boolean values`, function () {
   assert(
     property(fc.boolean(), (value) => {
-      const res = coerceTo(boolean, value)
-      is(res, value)
+      const res = isValid(boolean, value)
+      is(res, true)
     })
   )
 })
@@ -17,8 +17,8 @@ test(`boolean accepts boolean values`, function () {
 test(`boolean rejects all but boolean values`, function () {
   assert(
     property(notABoolean, (value) => {
-      const res = coerceTo(boolean, value)
-      is(res, undefined)
+      const res = isValid(boolean, value)
+      is(res, false)
     })
   )
 })

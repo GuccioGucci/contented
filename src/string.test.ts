@@ -2,14 +2,14 @@ import { test } from 'uvu'
 import { is, equal } from 'uvu/assert'
 import fc, { assert, property } from 'fast-check'
 import { string } from './string'
-import { coerceTo } from './coerceTo'
+import { isValid } from './isValid'
 import { explain } from './explain'
 
 test(`string accepts string values`, function () {
   assert(
     property(fc.string(), (value) => {
-      const res = coerceTo(string, value)
-      is(res, value)
+      const res = isValid(string, value)
+      is(res, true)
     })
   )
 })
@@ -17,8 +17,8 @@ test(`string accepts string values`, function () {
 test(`string rejects all but string values`, function () {
   assert(
     property(notAString, (value) => {
-      const res = coerceTo(string, value)
-      is(res, undefined)
+      const res = isValid(string, value)
+      is(res, false)
     })
   )
 })
