@@ -291,6 +291,6 @@ function fn(user: Infer<typeof User>) {
 
 ## License
 
-Copyright 2023 Gucci.
+Copyright 2024 Gucci.
 
 Licensed under the [GNU Lesser General Public License, Version 3.0](http://www.gnu.org/licenses/lgpl.txt)
