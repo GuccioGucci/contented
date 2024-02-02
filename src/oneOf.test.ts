@@ -57,16 +57,6 @@ test(`there is an explanation if the input value is not coercible to any given a
   })
 })
 
-test(`oneOf reports the path at which the error happened`, function () {
-  const stringOrNumberAtA = oneOf(string, object({ a: number }))
-
-  const res1 = isValid(stringOrNumberAtA, { b: 12 })
-  const res2 = isValid(stringOrNumberAtA, { a: 'hello' })
-
-  assert.is(res1, false)
-  assert.is(res2, false)
-})
-
 test(`the explanation mentions the path at which the error happened`, function () {
   const stringOrNumberAtA = oneOf(string, object({ a: number }))
 
