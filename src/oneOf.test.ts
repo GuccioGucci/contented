@@ -31,7 +31,7 @@ test(`oneOf rejects input values that are not coercible to any given alternative
   assert.is(res2, false)
 })
 
-test(`there is an explanation if the input value is not coercibile to any given alternative`, function () {
+test(`there is an explanation if the input value is not coercible to any given alternative`, function () {
   const T = oneOf(literal('a'), literal('b'), literal('c'))
 
   const exp1 = explain(T, true)
