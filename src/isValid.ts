@@ -12,6 +12,8 @@ import {
   OneOfSchema,
   isArrayOfSchema,
   ArrayOfSchema,
+  isAllOfSchema,
+  AllOfSchema,
 } from './Type'
 
 export function isValid<R>(type: Type<R>, value: any): value is R {
@@ -31,6 +33,9 @@ function isValidSchema(schema: Schema, value: any): boolean {
   }
   if (isOneOfSchema(schema)) {
     return isValidOneOf(schema, value)
+  }
+  if (isAllOfSchema(schema)) {
+    return isValidAllOf(schema, value)
   }
   if (isArrayOfSchema(schema)) {
     return isValidArrayOf(schema, value)
@@ -93,4 +98,15 @@ function isValidOneOf(schema: OneOfSchema, value: any): boolean {
     }
   }
   return false
+}
+
+function isValidAllOf(schema: AllOfSchema, value: any): boolean {
+  const schemas = schema.allOf
+  for (const interSchema of schemas) {
+    const valid = isValidSchema(interSchema, value)
+    if (!valid) {
+      return false
+    }
+  }
+  return true
 }

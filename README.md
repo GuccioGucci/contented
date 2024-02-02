@@ -32,6 +32,7 @@
     - [`object`](#object)
     - [`arrayOf(T)`](#arrayoft)
     - [`oneOf(T1, T2, ...Ts)`](#oneoft1-t2-ts)
+    - [`allOf(T1, T2, ...Ts)`](#alloft1-t2-ts)
   - [Utility types](#utility-types)
     - [`Infer`](#infer)
 - [License](#license)
@@ -264,6 +265,31 @@ explain(abc, 'd');
        { value: 'd', isNot: { literal: 'b' } },
        { value: 'd', isNot: { literal: 'c' } }
      ]
+   }
+*/
+```
+
+#### `allOf(T1, T2, ...Ts)`
+
+A run-time representation of the intersection type `T1 & T2 & ...Ts`.
+
+```typescript
+import { allOf, object, number, isValid, explain } from '@gucciogucci/contented';
+
+const abObject = allOf(object({ a: number }), object({ b: number }));
+
+isValid(abObject, { a: 10, b: 20 });
+// true
+
+explain(abObject, { a: 10 });
+/* {
+     value: { a: 10 },
+     isNot: { allOf: [ { object: { a: 'number' } }, { object: { b: 'number' } } ] },
+     since: [{
+       value: { a: 10 },
+       isNot: { object: { b: 'number' } },
+       since: [ { missingKey: 'b' } ]
+     }]
    }
 */
 ```

@@ -1,3 +1,4 @@
+export { allOf } from './allOf'
 export { arrayOf } from './arrayOf'
 export { boolean } from './boolean'
 export { explain } from './explain'

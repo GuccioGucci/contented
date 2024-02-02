@@ -1,6 +1,8 @@
 import { typeOf } from './typeOf'
 import {
+  AllOfSchema,
   ArrayOfSchema,
+  isAllOfSchema,
   isArrayOfSchema,
   isLiteralSchema,
   isObjectSchema,
@@ -31,6 +33,9 @@ function explainSchema(schema: Schema, value: any): Explanation | undefined {
   }
   if (isOneOfSchema(schema)) {
     return explainOneOf(schema, value)
+  }
+  if (isAllOfSchema(schema)) {
+    return explainAllOf(schema, value)
   }
   if (isArrayOfSchema(schema)) {
     return explainArrayOf(schema, value)
@@ -90,6 +95,22 @@ function explainOneOf(schema: OneOfSchema, value: any): Explanation | undefined 
       return undefined
     }
     since.push(exp)
+  }
+  return {
+    value,
+    isNot: schema,
+    since,
+  }
+}
+
+function explainAllOf(schema: AllOfSchema, value: any): Explanation | undefined {
+  const schemas = schema.allOf
+  const since: NestedExplanation[] = []
+  for (const instSchema of schemas) {
+    const exp = explainSchema(instSchema, value)
+    if (exp) {
+      since.push(exp)
+    }
   }
   return {
     value,

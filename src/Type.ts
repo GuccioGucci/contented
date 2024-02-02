@@ -12,7 +12,7 @@ export type Infer<T> = T extends Type<infer R> ? R : never
 // ======================================================================
 // Schema
 // ======================================================================
-export type Schema = PrimitiveSchema | LiteralSchema | ObjectSchema | OneOfSchema | ArrayOfSchema
+export type Schema = PrimitiveSchema | LiteralSchema | ObjectSchema | OneOfSchema | AllOfSchema | ArrayOfSchema
 
 // ----------------------------------------------------------------------
 // Primitive
@@ -48,6 +48,15 @@ export type OneOfSchema = { oneOf: Schema[] }
 
 export function isOneOfSchema(schema: Schema): schema is OneOfSchema {
   return typeof schema === 'object' && 'oneOf' in schema
+}
+
+// ----------------------------------------------------------------------
+// AllOf
+// ----------------------------------------------------------------------
+export type AllOfSchema = { allOf: Schema[] }
+
+export function isAllOfSchema(schema: Schema): schema is AllOfSchema {
+  return typeof schema === 'object' && 'allOf' in schema
 }
 
 // ----------------------------------------------------------------------
