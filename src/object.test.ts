@@ -94,4 +94,12 @@ test(`object marks optional fields by ending keys with ?`, function () {
   assert.is(res3, true)
 })
 
+test(`null is not an object`, function () {
+  const obj = object({})
+
+  const res = isValid(obj, null)
+
+  assert.is(res, false)
+})
+
 test.run()

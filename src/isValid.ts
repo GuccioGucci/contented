@@ -53,7 +53,7 @@ function isValidLiteral(schema: LiteralSchema, value: any): boolean {
 }
 
 function isValidObject(schema: ObjectSchema, value: any): boolean {
-  if (typeof value !== 'object') {
+  if (typeOf(value) !== 'object') {
     return false
   }
 
