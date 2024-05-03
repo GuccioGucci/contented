@@ -102,4 +102,15 @@ test(`null is not an object`, function () {
   assert.is(res, false)
 })
 
+test(`explain that null is not an object`, function () {
+  const obj = object({})
+
+  const exp = explain(obj, null)
+
+  assert.equal(exp, {
+    value: null,
+    isNot: { object: {} },
+  })
+})
+
 test.run()

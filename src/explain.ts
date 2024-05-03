@@ -59,7 +59,7 @@ function explainLiteral(schema: LiteralSchema, value: any): Explanation | undefi
 }
 
 function explainObject(schema: ObjectSchema, value: any): Explanation | undefined {
-  if (typeof value !== 'object') {
+  if (typeOf(value) !== 'object') {
     return {
       value,
       isNot: schema,
