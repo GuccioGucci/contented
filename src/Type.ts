@@ -17,10 +17,10 @@ export type Schema = PrimitiveSchema | LiteralSchema | ObjectSchema | OneOfSchem
 // ----------------------------------------------------------------------
 // Primitive
 // ----------------------------------------------------------------------
-export type PrimitiveSchema = 'string' | 'boolean' | 'number' | 'null'
+export type PrimitiveSchema = 'string' | 'boolean' | 'number' | 'null' | 'bigint'
 
 export function isPrimitiveSchema(schema: Schema): schema is PrimitiveSchema {
-  return schema === 'string' || schema === 'boolean' || schema === 'number' || schema === 'null'
+  return schema === 'string' || schema === 'boolean' || schema === 'number' || schema === 'null' || schema === 'bigint'
 }
 
 // ----------------------------------------------------------------------

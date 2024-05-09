@@ -32,4 +32,14 @@ test(`there is an explanation why a value is not of the expected literal type`, 
   })
 })
 
+test('bigint literals are recognized as literals', function () {
+  const ten = literal(10n)
+
+  const res1 = isValid(ten, 10n)
+  const res2 = isValid(ten, 10)
+
+  assert.is(res1, true)
+  assert.is(res2, false)
+})
+
 test.run()

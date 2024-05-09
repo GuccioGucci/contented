@@ -1,6 +1,6 @@
 import { Type } from './Type'
 
-export function literal<R extends string | number | boolean>(value: Narrow<R>): Type<Narrow<R>> {
+export function literal<R extends string | number | boolean | bigint>(value: Narrow<R>): Type<Narrow<R>> {
   return { schema: { literal: value } }
 }
 

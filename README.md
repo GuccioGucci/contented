@@ -7,9 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@gucciogucci/contented">
-    <img alt="NPM" src="https://badge.fury.io/js/@gucciogucci%2Fcontented.svg"/>
-  </a>
+  <a href="https://www.npmjs.com/package/@gucciogucci/contented"><img alt="NPM" src="https://badge.fury.io/js/@gucciogucci%2Fcontented.svg"/></a>
   <a href="https://github.com/GuccioGucci/contented/actions/workflows/test.yml"><img alt="Test" src="https://github.com/GuccioGucci/contented/actions/workflows/test.yml/badge.svg"></a>
   <a href="https://bundlephobia.com/package/@gucciogucci/contented"><img alt="Bundlephobia Minified" src="https://img.shields.io/bundlephobia/min/@gucciogucci/contented.svg"></a>
 </p>
@@ -24,6 +22,7 @@
   - [Primitive types](#primitive-types)
     - [`string`](#string)
     - [`number`](#number)
+    - [`bigint`](#bigint)
     - [`boolean`](#boolean)
     - [`null_`](#null\_)
   - [Literal types](#literal-types)
@@ -136,6 +135,20 @@ isValid(number, 42);
 
 explain(number, 'hello');
 // { value: 'hello', isNot: 'number' }
+```
+
+#### `bigint`
+
+A run-time representation of the `bigint` type.
+
+```typescript
+import { bigint, isValid, explain } from '@gucciogucci/contented';
+
+isValid(bigint, 1024n);
+// true
+
+explain(bigint, 'hello');
+// { value: 'hello', isNot: 'bigint' }
 ```
 
 #### `boolean`

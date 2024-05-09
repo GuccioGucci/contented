@@ -48,4 +48,4 @@ test.run()
 
 const fcSymbol = fc.string().map((str) => Symbol(str))
 const fcNumber = fc.oneof(fc.integer(), fc.float(), fc.double())
-const notABoolean = fc.oneof(fcNumber, fc.string(), fc.constant(null), fc.constant(undefined), fcSymbol)
+const notABoolean = fc.oneof(fcNumber, fc.bigInt(), fc.string(), fc.constant(null), fc.constant(undefined), fcSymbol)

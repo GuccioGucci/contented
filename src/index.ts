@@ -1,5 +1,6 @@
 export { allOf } from './allOf'
 export { arrayOf } from './arrayOf'
+export { bigint } from './bigint'
 export { boolean } from './boolean'
 export { explain } from './explain'
 export { Infer } from './Type'

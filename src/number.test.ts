@@ -48,4 +48,4 @@ test.run()
 
 const fcSymbol = fc.string().map((str) => Symbol(str))
 const fcNumber = fc.oneof(fc.integer(), fc.float(), fc.double()).filter((x) => !Number.isNaN(x))
-const notANumber = fc.oneof(fc.string(), fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)
+const notANumber = fc.oneof(fc.string(), fc.bigInt(), fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)

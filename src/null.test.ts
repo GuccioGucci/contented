@@ -40,4 +40,4 @@ test.run()
 
 const fcSymbol = fc.string().map((str) => Symbol(str))
 const fcNumber = fc.oneof(fc.integer(), fc.float(), fc.double())
-const notNull = fc.oneof(fcNumber, fc.boolean(), fc.string(), fc.constant(undefined), fcSymbol)
+const notNull = fc.oneof(fcNumber, fc.bigInt(), fc.boolean(), fc.string(), fc.constant(undefined), fcSymbol)
