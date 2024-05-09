@@ -48,4 +48,4 @@ test.run()
 
 const fcSymbol = fc.string().map((str) => Symbol(str))
 const fcNumber = fc.oneof(fc.integer(), fc.float(), fc.double())
-const notABigint = fc.oneof(fcNumber, fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)
+const notABigint = fc.oneof(fcNumber, fc.string(), fc.boolean(), fc.constant(null), fc.constant(undefined), fcSymbol)
